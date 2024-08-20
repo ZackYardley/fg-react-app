@@ -19,6 +19,8 @@ import {
 } from "@/components/carbon-calculator";
 import { useEmissions } from "@/contexts";
 import { saveEmissionsData } from "@/api/emissions";
+import analytics from '@react-native-firebase/analytics';
+
 
 export default function EnergyCalculator() {
   const {
@@ -440,12 +442,20 @@ export default function EnergyCalculator() {
         <NextButton
           isFormValid={isFormValid}
           onNext="breakdown"
-          saveData={() => {
+          saveData={async () => {
             saveEmissionsData({
               transportationData,
               dietData,
               energyData,
               totalData,
+            });
+
+            //Log an event to Firebase Analytics!
+            await analytics().logEvent('carbon_emission_calculated', {
+              transportation: transportationData,
+              diet: dietData,
+              energy: energyData,
+              total: totalData,
             });
           }}
         />
