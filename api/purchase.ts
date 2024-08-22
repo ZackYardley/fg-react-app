@@ -1,16 +1,8 @@
-import {
-  getFirestore,
-  doc,
-  runTransaction,
-  serverTimestamp,
-  collection,
-  getDoc,
-  addDoc,
-} from "firebase/firestore";
+import { getFirestore, doc, runTransaction, serverTimestamp, collection, getDoc, addDoc } from "firebase/firestore";
 import { CartItem, CarbonCredit } from "@/types";
 
 // Purchase carbon credits
-const purchaseCarbonCredits = async (userId: string, items: CartItem[]) => {
+const purchaseCarbonCredits = async (userId: string, items: CartItem[], paymentIntentId: string) => {
   const db = getFirestore();
   const userRef = doc(db, "users", userId);
 
@@ -37,14 +29,12 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[]) => {
       }
 
       // Create a new transaction document
-      const transactionRef = doc(
-        collection(db, "users", userId, "transactions")
-      );
+      const transactionRef = doc(collection(db, "users", userId, "transactions"));
       const transactionData = {
         credits: purchasedCredits,
         totalAmount,
         purchaseDate: serverTimestamp(),
-        // paymentIntentId: paymentIntent.id // Uncomment when using Stripe
+        paymentIntentId: paymentIntentId, // Add the paymentIntentId to the transaction data
       };
 
       transaction.set(transactionRef, transactionData);
@@ -52,9 +42,7 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[]) => {
       // Update user's carbon credits
       const existingCredits = userDoc.data().carbonCredits || [];
       const updatedCredits = purchasedCredits.map((item) => {
-        const existingCredit = existingCredits.find(
-          (credit: CartItem) => credit.id === item.id
-        );
+        const existingCredit = existingCredits.find((credit: CartItem) => credit.id === item.id);
         if (existingCredit) {
           // If the credit already exists, update the quantity
           return {
@@ -69,10 +57,7 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[]) => {
 
       // Merge the updated credits with the existing ones
       const finalCredits = existingCredits
-        .filter(
-          (credit: CartItem) =>
-            !updatedCredits.some((uc) => uc.id === credit.id)
-        )
+        .filter((credit: CartItem) => !updatedCredits.some((uc) => uc.id === credit.id))
         .concat(updatedCredits);
 
       transaction.update(userRef, {
@@ -90,8 +75,7 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[]) => {
     console.error("Error in purchaseCarbonCredits:", error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "An unknown error occurred",
+      error: error instanceof Error ? error.message : "An unknown error occurred",
     };
   }
 };
@@ -107,12 +91,7 @@ async function fetchPaymentSheetParams(
   const db = getFirestore();
 
   try {
-    const checkoutSessionRef = collection(
-      db,
-      "users",
-      uid,
-      "checkout_sessions"
-    );
+    const checkoutSessionRef = collection(db, "users", uid, "checkout_sessions");
     const newSessionDoc = await addDoc(checkoutSessionRef, {
       client: "mobile",
       mode: "payment",
@@ -133,11 +112,7 @@ async function fetchPaymentSheetParams(
       const updatedDoc = await getDoc(newSessionDoc);
       const data = updatedDoc.data();
 
-      if (
-        data?.paymentIntentClientSecret &&
-        data?.ephemeralKeySecret &&
-        data?.customer
-      ) {
+      if (data?.paymentIntentClientSecret && data?.ephemeralKeySecret && data?.customer) {
         // console.log("Additional fields added to the session:", data);
         return {
           paymentIntent: data.paymentIntentClientSecret,
@@ -147,9 +122,7 @@ async function fetchPaymentSheetParams(
       }
     }
 
-    throw new Error(
-      "Timeout: Additional fields were not added within the expected time."
-    );
+    throw new Error("Timeout: Additional fields were not added within the expected time.");
   } catch (error) {
     console.error("Error creating or retrieving checkout session:", error);
     throw error;
