@@ -10,6 +10,7 @@ type StripeProviderProps = {
   merchantIdentifier?: string;
   handleURLCallback?: (url: string) => boolean;
   resetPaymentSheetCustomer?: () => Promise<null>;
+  PaymentSheetError?: "Failed" | "Canceled" | "Timeout";
 };
 
 export const StripeProvider = ({
@@ -17,6 +18,7 @@ export const StripeProvider = ({
   merchantIdentifier,
   handleURLCallback,
   resetPaymentSheetCustomer,
+  PaymentSheetError,
   children,
 }: PropsWithChildren<StripeProviderProps>) => {
   return <>{children}</>;
@@ -27,6 +29,7 @@ type StripeHook = () => {
   presentPaymentSheet: () => Promise<{ error: any }>;
   handleURLCallback: (url: string) => Promise<boolean>;
   resetPaymentSheetCustomer: () => Promise<null>;
+  paymentSheetError: null;
 };
 
 export const useStripe: StripeHook = () => ({
@@ -34,4 +37,5 @@ export const useStripe: StripeHook = () => ({
   presentPaymentSheet: async () => ({ error: null }),
   handleURLCallback: (url: string) => Promise.resolve(false),
   resetPaymentSheetCustomer: () => Promise.resolve(null),
+  paymentSheetError: null,
 });

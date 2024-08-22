@@ -5,7 +5,10 @@ import {
   StripeProvider,
   useStripe,
   handleURLCallback,
-  resetPaymentSheetCustomer
+  resetPaymentSheetCustomer,
+  PaymentSheetError,
+  presentPaymentSheet,
+  initPaymentSheet,
 } from "@stripe/stripe-react-native";
 
-export { StripeProvider, useStripe, handleURLCallback, resetPaymentSheetCustomer };
+export { StripeProvider, useStripe, handleURLCallback, resetPaymentSheetCustomer, PaymentSheetError, presentPaymentSheet, initPaymentSheet };

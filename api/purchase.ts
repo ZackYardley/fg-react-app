@@ -80,14 +80,14 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[], paymentI
   }
 };
 
-async function fetchPaymentSheetParams(
+const fetchOneTimePaymentSheetParams = async (
   amount: number,
   uid: string
 ): Promise<{
   paymentIntent: string;
   ephemeralKey: string;
   customer: string;
-}> {
+}> => {
   const db = getFirestore();
 
   try {
@@ -127,6 +127,54 @@ async function fetchPaymentSheetParams(
     console.error("Error creating or retrieving checkout session:", error);
     throw error;
   }
-}
+};
 
-export { purchaseCarbonCredits, fetchPaymentSheetParams };
+const fetchSubscriptionPaymentSheetParams = async (
+  price: string,
+  uid: string
+): Promise<{
+  paymentIntent: string;
+  ephemeralKey: string;
+  customer: string;
+}> => {
+  const db = getFirestore();
+
+  try {
+    const checkoutSessionRef = collection(db, "users", uid, "checkout_sessions");
+    const newSessionDoc = await addDoc(checkoutSessionRef, {
+      client: "mobile",
+      mode: "subscription",
+      price: price,
+    });
+    console.log("New session doc:", newSessionDoc);
+
+    // Poll for the additional fields
+    const maxAttempts = 10;
+    const delayMs = 1000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      console.log("Polling for additional fields...");
+      console.log("Attempt:", attempt);
+
+      const updatedDoc = await getDoc(newSessionDoc);
+      const data = updatedDoc.data();
+
+      if (data?.paymentIntentClientSecret && data?.ephemeralKeySecret && data?.customer) {
+        console.log("Additional fields added to the session:", data);
+        return {
+          paymentIntent: data.paymentIntentClientSecret,
+          ephemeralKey: data.ephemeralKeySecret,
+          customer: data.customer,
+        };
+      }
+    }
+
+    throw new Error("Timeout: Additional fields were not added within the expected time.");
+  } catch (error) {
+    console.error("Error creating or retrieving checkout session:", error);
+    throw error;
+  }
+};
+
+export { purchaseCarbonCredits, fetchOneTimePaymentSheetParams, fetchSubscriptionPaymentSheetParams };

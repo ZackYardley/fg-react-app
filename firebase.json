@@ -41,7 +41,7 @@
     }
   },
   "extensions": {
-    "firestore-send-email-oah7": "firebase/firestore-send-email@0.1.34"
+    "firestore-send-email": "firebase/firestore-send-email@0.1.34"
   },
   "hosting": {
     "public": "dist",

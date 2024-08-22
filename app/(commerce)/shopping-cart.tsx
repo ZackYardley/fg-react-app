@@ -8,7 +8,7 @@ import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/
 import { CartItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
 import { PageHeader, BackButton, Loading } from "@/components/common";
-import { purchaseCarbonCredits, fetchPaymentSheetParams } from "@/api/purchase";
+import { purchaseCarbonCredits, fetchOneTimePaymentSheetParams } from "@/api/purchase";
 import { formatPrice } from "@/utils";
 import { fetchSpecificCredit } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
@@ -61,7 +61,7 @@ export default function ShoppingCartScreen() {
     // Fetch payment sheet parameters
     try {
       setIsProcessingPayment(true);
-      const { paymentIntent, ephemeralKey, customer } = await fetchPaymentSheetParams(
+      const { paymentIntent, ephemeralKey, customer } = await fetchOneTimePaymentSheetParams(
         getCartTotal(),
         auth.currentUser?.uid || ""
       );
