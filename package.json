@@ -9,7 +9,6 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "build": "node scripts/loadEnv.js",
     "predeploy": "npx expo export -p web",
     "deploy-hosting": "npm run predeploy && firebase deploy --only hosting"
   },
@@ -21,6 +20,7 @@
     "@expo/vector-icons": "^14.0.2",
     "@react-native-assets/slider": "^7.2.1",
     "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-firebase/analytics": "^20.4.0",
     "@react-native-firebase/app": "^20.4.0",
     "@react-native-firebase/messaging": "^20.4.0",
     "@react-native-google-signin/google-signin": "^12.2.1",

@@ -16,7 +16,7 @@ export default function Breakdown() {
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
   const [retryCount, setRetryCount] = useState(0);
-  const [showConfetti, setShowConfetti] = useState(true); // Control visibility of confetti
+  const [dataLoaded, setDataLoaded] = useState(false);
   const explosionRef = useRef<ConfettiCannon>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Breakdown() {
         setTransportationEmissions(totalData.transportationEmissions);
         setDietEmissions(totalData.dietEmissions);
         setEnergyEmissions(totalData.energyEmissions);
-        explosionRef.current?.start(); // Trigger confetti when data is loaded
+        setDataLoaded(true);
       } else if (retryCount < 3) {
         setTimeout(() => {
           setRetryCount((prevCount) => prevCount + 1);
@@ -38,6 +38,12 @@ export default function Breakdown() {
 
     loadData();
   }, [retryCount]);
+
+  useEffect(() => {
+    if (dataLoaded) {
+      explosionRef.current?.start();
+    }
+  }, [dataLoaded]);
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -50,22 +56,10 @@ export default function Breakdown() {
       }
     });
 
-    // Rest of your existing useEffect code...
-
     return () => unsubscribe();
   }, [retryCount]);
 
-  useEffect(() => {
-    if (showConfetti) {
-      const timeout = setTimeout(() => {
-        setShowConfetti(false); // Hide confetti after 3 seconds
-      }, 3000); // Match this duration with your confetti fallSpeed
-
-      return () => clearTimeout(timeout); // Cleanup timeout
-    }
-  }, [showConfetti]);
-
-  if (!emissionsPerYear) {
+  if (!dataLoaded) {
     return <CalculatingScreen />;
   }
 
@@ -206,19 +200,17 @@ export default function Breakdown() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      {showConfetti && (
-        <View style={styles.confettiContainer}>
-          <ConfettiCannon
-            count={200}
-            origin={{ x: screenWidth / 2, y: 0 }}
-            autoStart={false}
-            ref={explosionRef}
-            fadeOut
-            fallSpeed={2000}
-            explosionSpeed={1}
-          />
-        </View>
-      )}
+      <View style={styles.confettiContainer} pointerEvents="none">
+        <ConfettiCannon
+          count={200}
+          origin={{ x: screenWidth / 2, y: 0 }}
+          autoStart={false}
+          ref={explosionRef}
+          fadeOut
+          fallSpeed={3000}
+          explosionSpeed={1}
+        />
+      </View>
     </View>
   );
 }

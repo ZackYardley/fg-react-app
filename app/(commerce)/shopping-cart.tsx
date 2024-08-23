@@ -1,26 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth } from "firebase/auth";
-import {
-  incrementQuantity,
-  decrementQuantity,
-  getCart,
-  clearCart,
-} from "@/api/cart";
+import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
 import { CartItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
 import { PageHeader, BackButton, Loading } from "@/components/common";
-import { purchaseCarbonCredits, fetchPaymentSheetParams } from "@/api/purchase";
+import { purchaseCarbonCredits, fetchOneTimePaymentSheetParams } from "@/api/purchase";
 import { formatPrice } from "@/utils";
 import { fetchSpecificCredit } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
@@ -34,6 +22,7 @@ export default function ShoppingCartScreen() {
   const [loading, setLoading] = useState(true);
   const [isUpdatingQuantity, setIsUpdatingQuantity] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
 
   // Function to calculate cart total
   const getCartTotal = useCallback(() => {
@@ -72,11 +61,12 @@ export default function ShoppingCartScreen() {
     // Fetch payment sheet parameters
     try {
       setIsProcessingPayment(true);
-      const { paymentIntent, ephemeralKey, customer } =
-        await fetchPaymentSheetParams(
-          getCartTotal(),
-          auth.currentUser?.uid || ""
-        );
+      const { paymentIntent, ephemeralKey, customer } = await fetchOneTimePaymentSheetParams(
+        getCartTotal(),
+        auth.currentUser?.uid || ""
+      );
+
+      setPaymentIntentId(paymentIntent);
 
       // Stripe configuration to open the payment sheet
       const { error } = await initPaymentSheet({
@@ -98,7 +88,6 @@ export default function ShoppingCartScreen() {
           testEnv: true, // use test environment
         },
         returnURL: "com.fgdevteam.fgreactapp://stripe-redirect",
-
       });
 
       if (error) {
@@ -122,27 +111,21 @@ export default function ShoppingCartScreen() {
     if (error) {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
-      handleSuccessfulPurchase();
+      handleSuccessfulPurchase(paymentIntentId || "");
     }
   };
 
   // Successful purchase logic
-  const handleSuccessfulPurchase = async () => {
+  const handleSuccessfulPurchase = async (paymentIntentId: string) => {
     try {
       setIsProcessingPayment(true);
-      const result = await purchaseCarbonCredits(
-        auth.currentUser?.uid || "",
-        items
-      );
+      const result = await purchaseCarbonCredits(auth.currentUser?.uid || "", items, paymentIntentId);
 
       if (result.success) {
         await clearCart();
         setItems([]);
 
-        Alert.alert(
-          "Purchase Successful",
-          "Your carbon credits have been added to your account."
-        );
+        Alert.alert("Purchase Successful", "Your carbon credits have been added to your account.");
         router.push({
           pathname: "/purchase-complete",
           params: { transactionId: result.transactionId },
@@ -152,10 +135,7 @@ export default function ShoppingCartScreen() {
       }
     } catch (error) {
       console.error("Error during purchase:", error);
-      Alert.alert(
-        "Purchase Failed",
-        "There was an error processing your purchase. Please try again."
-      );
+      Alert.alert("Purchase Failed", "There was an error processing your purchase. Please try again.");
     } finally {
       setIsProcessingPayment(false);
     }
@@ -207,37 +187,24 @@ export default function ShoppingCartScreen() {
   const renderItem = ({ item }: { item: CartItemWithDetails }) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemInfo}>
-        <LinearGradient
-          colors={item.colors}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.gradient}
-        >
+        <LinearGradient colors={item.colors} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={styles.gradient}>
           <Image source={item.image} style={styles.itemImage} />
         </LinearGradient>
       </View>
       <View style={styles.itemActions}>
         <Text style={styles.itemName}>{item.name}</Text>
         <View style={styles.quantityControl}>
-          <TouchableOpacity
-            onPress={() => handleDecrementQuantity(item.id)}
-            style={styles.quantityButton}
-          >
+          <TouchableOpacity onPress={() => handleDecrementQuantity(item.id)} style={styles.quantityButton}>
             <Icon name="minus" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.quantityText}>{item.quantity}</Text>
-          <TouchableOpacity
-            onPress={() => handleIncrementQuantity(item.id)}
-            style={styles.quantityButton}
-          >
+          <TouchableOpacity onPress={() => handleIncrementQuantity(item.id)} style={styles.quantityButton}>
             <Icon name="plus" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.priceContainer}>
-        <Text style={styles.itemPrice}>
-          {formatPrice(item.price * item.quantity)}
-        </Text>
+        <Text style={styles.itemPrice}>{formatPrice(item.price * item.quantity)}</Text>
       </View>
     </View>
   );
@@ -248,10 +215,7 @@ export default function ShoppingCartScreen() {
 
   const ListHeaderComponent = () => (
     <>
-      <PageHeader
-        subtitle="Shopping Cart"
-        description="Make a Positive Impact on the Environment Today!"
-      />
+      <PageHeader subtitle="Shopping Cart" description="Make a Positive Impact on the Environment Today!" />
       <BackButton />
     </>
   );
@@ -272,22 +236,14 @@ export default function ShoppingCartScreen() {
       <TouchableOpacity
         style={[
           styles.purchaseButton,
-          (items.length === 0 || isUpdatingQuantity || isProcessingPayment) &&
-            styles.disabledButton,
+          (items.length === 0 || isUpdatingQuantity || isProcessingPayment) && styles.disabledButton,
         ]}
         onPress={openPaymentSheet}
-        disabled={
-          items.length === 0 || isUpdatingQuantity || isProcessingPayment
-        }
+        disabled={items.length === 0 || isUpdatingQuantity || isProcessingPayment}
       >
-        <Text style={styles.purchaseButtonText}>
-          {isProcessingPayment ? "Processing..." : "Buy Now"}
-        </Text>
+        <Text style={styles.purchaseButtonText}>{isProcessingPayment ? "Processing..." : "Buy Now"}</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.continueButton}
-        onPress={() => router.navigate("/carbon-credit")}
-      >
+      <TouchableOpacity style={styles.continueButton} onPress={() => router.navigate("/carbon-credit")}>
         <Text style={styles.continueButtonText}>Continue Shopping</Text>
       </TouchableOpacity>
     </View>

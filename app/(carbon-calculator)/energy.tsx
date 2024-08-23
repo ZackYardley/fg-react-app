@@ -7,6 +7,8 @@ import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } fro
 import { useEmissions } from "@/contexts";
 import { saveEmissionsData } from "@/api/emissions";
 import { stateData } from "@/types";
+import analytics from '@react-native-firebase/analytics';
+
 
 export default function EnergyCalculator() {
   const { transportationData, dietData, energyData, totalData, updateEnergyData, updateTotalData } = useEmissions();
@@ -355,12 +357,20 @@ export default function EnergyCalculator() {
         <NextButton
           isFormValid={isFormValid}
           onNext="breakdown"
-          saveData={() => {
+          saveData={async () => {
             saveEmissionsData({
               transportationData,
               dietData,
               energyData,
               totalData,
+            });
+
+            //Log an event to Firebase Analytics!
+            await analytics().logEvent('carbon_emission_calculated', {
+              transportation: transportationData,
+              diet: dietData,
+              energy: energyData,
+              total: totalData,
             });
           }}
         />
