@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BackButton, PageHeader } from "@/components/common";
@@ -10,7 +10,7 @@ import { router } from "expo-router";
 
 const ForevergreenSubscriptions = () => {
   const auth = getAuth();
-  const { initPaymentSheet, presentPaymentSheet, paymentSheetError } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
 
@@ -33,19 +33,6 @@ const ForevergreenSubscriptions = () => {
       </TouchableOpacity>
     </View>
   );
-
-  // useEffect(() => {
-  //   const intializePaymentSheet = async () => {
-  //     const { error } = await initPaymentSheet({
-  //       paymentIntentClientSecret: clientSecret,
-  //       returnURL: "forevergreen://stripe-redirect",
-  //       allowsDelayedPaymentMethods: true,
-  //     });
-  //     if (error) {
-  //       // Handle error
-  //     }
-  //   };
-  // }, [clientSecret, initPaymentSheet]);
 
   const initializePaymentSheet = useCallback(
     async (price: string) => {
