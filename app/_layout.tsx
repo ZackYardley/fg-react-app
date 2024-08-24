@@ -28,9 +28,9 @@ export default function RootLayout() {
 
     if (Platform.OS === "android" || Platform.OS === "ios") {
       Notifications.setupMessaging();
-      const unsubscribe = Notifications.initializeNotifications();
-      return unsubscribe;
+      Notifications.initializeNotifications();
     }
+    
   }, [loaded]);
 
   const { handleURLCallback } = useStripe();
