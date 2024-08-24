@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
+    "linebreak-style": 0,
     "quotes": ["error", "double", {"allowTemplateLiterals": true}],
   },
   overrides: [
