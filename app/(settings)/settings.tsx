@@ -207,22 +207,7 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <View style={styles.manageSubscriptions}>
-            <Text style={styles.manageSubscriptionsTitle}>Manage Subscriptions</Text>
-            <View style={styles.subscriptionButtons}>
-              <TouchableOpacity
-                onPress={() => router.push("/subscriptions-settings")}
-                style={styles.subscriptionButton}
-              >
-                <Text style={styles.subscriptionEmoji}>⚙️</Text>
-                <Text style={styles.subscriptionButtonText}>Settings</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push("/subscriptions")} style={styles.subscriptionButton}>
-                <Text style={styles.subscriptionEmoji}>🛒</Text>
-                <Text style={styles.subscriptionButtonText}>View Subscriptions</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutButtonText}>Logout</Text>
@@ -389,30 +374,6 @@ const styles = StyleSheet.create({
   offsetButtonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "600",
-  },
-  manageSubscriptions: {
-    backgroundColor: "#e5e7eb",
-    padding: 16,
-    borderRadius: 8,
-  },
-  manageSubscriptionsTitle: {
-    fontSize: 20,
-    textAlign: "center",
-    marginBottom: 12,
-    fontWeight: "700",
-  },
-  subscriptionButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  subscriptionButton: {
-    alignItems: "center",
-  },
-  subscriptionEmoji: {
-    fontSize: 24,
-  },
-  subscriptionButtonText: {
     fontWeight: "600",
   },
   logoutButton: {
