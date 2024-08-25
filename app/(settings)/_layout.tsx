@@ -8,7 +8,6 @@ export default function SettingsLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="settings" />
       <Stack.Screen name="profile-settings" />
       <Stack.Screen name="purchase-history" />
       <Stack.Screen name="notifications-settings" />

@@ -163,7 +163,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={{ flexGrow: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
-        <BackButton />
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
             <View style={styles.profileImageBG}>
@@ -193,6 +192,7 @@ export default function ProfileScreen() {
           <SettingsItem title="Payment Methods" screen="/payment-methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
           <SettingsItem title="Notifications" screen="/notifications-settings" />
+          <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <View style={styles.carbonFootprint}>
             <Text style={styles.carbonFootprintTitle}>Your carbon footprint...</Text>
@@ -206,8 +206,6 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
-          <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutButtonText}>Logout</Text>

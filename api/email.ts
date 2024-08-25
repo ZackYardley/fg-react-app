@@ -2,12 +2,7 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 // Function to send a generic email by adding a document to the 'mail' collection
 // Deeplinking to be added
-const sendEmail = async (
-  to: string[],
-  subject: string,
-  text: string,
-  html: string
-): Promise<void> => {
+const sendEmail = async (to: string[], subject: string, text: string, html: string): Promise<void> => {
   const db = getFirestore();
 
   try {
@@ -56,10 +51,7 @@ const sendWelcomeEmail = async (email: string, name: string): Promise<void> => {
 };
 
 // Function to send account deletion email
-const sendAccountDeletionEmail = async (
-  email: string,
-  name: string
-): Promise<void> => {
+const sendAccountDeletionEmail = async (email: string, name: string): Promise<void> => {
   const subject = "Account Deleted - We're Sorry to See You Go";
   const text = `Hello ${name},\n\nWe're sorry to see you go. Your account has been successfully deleted.\n\nIf you change your mind, you're always welcome back.\n\nBest regards,\nThe App Team`;
   const html = `
@@ -72,5 +64,10 @@ const sendAccountDeletionEmail = async (
 
   await sendEmail([email], subject, text, html);
 };
+
+// todo: add carbon credit purchase email
+// todo: add carbon credit subscription email
+// todo: add carbon credit subscription cancellation email
+// todo: add carbon credit subscription renewal email
 
 export { sendEmail, sendWelcomeEmail, sendAccountDeletionEmail };

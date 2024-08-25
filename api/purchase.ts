@@ -1,7 +1,6 @@
 import { getFirestore, doc, runTransaction, collection, getDoc, addDoc, updateDoc } from "firebase/firestore";
 import { TransactionItem } from "@/types";
 
-// Purchase carbon credits
 const purchaseCarbonCredits = async (
   userId: string,
   items: TransactionItem[],

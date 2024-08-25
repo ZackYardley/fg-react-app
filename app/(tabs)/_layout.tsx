@@ -69,7 +69,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="my-profile"
+        name="settings"
         options={{
           tabBarLabel: "",
           tabBarActiveTintColor: "#409858",
@@ -79,7 +79,7 @@ export default function TabsLayout() {
             paddingTop: 10,
           },
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" color={color} size={size} />
+            <MaterialCommunityIcons name="cog" color={color} size={size} />
           ),
         }}
       />
