@@ -2,7 +2,8 @@ import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc }
 import { getAuth } from "firebase/auth";
 import { Payment } from "@/types";
 
-const getRecentPayments = async (count: number = 5): Promise<Payment[]> => {
+// todo: add function to get paginated payments, currently we show only 99 payments (probably enough )
+const getRecentPayments = async (count: number = 99): Promise<Payment[]> => {
   const auth = getAuth();
   const userId = auth.currentUser?.uid;
 

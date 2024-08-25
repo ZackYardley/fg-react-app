@@ -169,4 +169,50 @@ const fetchSubscriptionPaymentSheetParams = async (
   }
 };
 
-export { purchaseCarbonCredits, fetchOneTimePaymentSheetParams, fetchSubscriptionPaymentSheetParams };
+const fetchSetupPaymentSheetParams = async (
+  uid: string
+): Promise<{
+  setupIntent: string;
+  ephemeralKey: string;
+  customer: string;
+}> => {
+  const db = getFirestore();
+
+  try {
+    const checkoutSessionRef = collection(db, "users", uid, "checkout_sessions");
+    const newSessionDoc = await addDoc(checkoutSessionRef, {
+      client: "mobile",
+      mode: "setup",
+    });
+
+    const maxAttempts = 10;
+    const delayMs = 1000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      const updatedDoc = await getDoc(newSessionDoc);
+      const data = updatedDoc.data();
+
+      if (data?.setupIntentClientSecret && data?.ephemeralKeySecret && data?.customer) {
+        return {
+          setupIntent: data.setupIntentClientSecret,
+          ephemeralKey: data.ephemeralKeySecret,
+          customer: data.customer,
+        };
+      }
+    }
+
+    throw new Error("Timeout: Additional fields were not added within the expected time.");
+  } catch (error) {
+    console.error("Error creating or retrieving setup session:", error);
+    throw error;
+  }
+};
+
+export {
+  purchaseCarbonCredits,
+  fetchOneTimePaymentSheetParams,
+  fetchSubscriptionPaymentSheetParams,
+  fetchSetupPaymentSheetParams,
+};

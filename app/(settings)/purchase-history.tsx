@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
 import { getRecentPayments } from "@/api/payments";
-import { fetchSpecificCarbonCreditProduct } from "@/api/products";
-import { Payment, CarbonCredit, CartItem } from "@/types";
+import { Payment } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
 
