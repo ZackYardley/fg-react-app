@@ -69,7 +69,7 @@ const ProfileScreen = () => {
               router.push({
                 pathname: "/friends/[uid]",
                 params: {
-                  uid: uid,
+                  uid: uid as string,
                   name: targetUserProfile?.name,
                   type: "Followers",
                 },
@@ -87,7 +87,7 @@ const ProfileScreen = () => {
               router.push({
                 pathname: "/friends/[uid]",
                 params: {
-                  uid: uid,
+                  uid: uid as string,
                   name: targetUserProfile?.name,
                   type: "Following",
                 },

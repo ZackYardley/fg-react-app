@@ -26,10 +26,10 @@ export default function RootLayout() {
       webClientId: "489135632905-iu340mh7lub0iis2q18upvus42fa2roo.apps.googleusercontent.com",
     });
 
-    if (Platform.OS === "android" || Platform.OS === "ios") {
-      Notifications.setupMessaging();
-      Notifications.initializeNotifications();
-    }
+    // if (Platform.OS === "android" || Platform.OS === "ios") {
+    //   Notifications.setupMessaging();
+    //   Notifications.initializeNotifications();
+    // }
     
   }, [loaded]);
 
@@ -51,22 +51,22 @@ export default function RootLayout() {
     [handleURLCallback]
   );
 
-  useEffect(() => {
-    const getUrlAsync = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      handleDeepLink(initialUrl || "");
-    };
+  // useEffect(() => {
+  //   const getUrlAsync = async () => {
+  //     const initialUrl = await Linking.getInitialURL();
+  //     handleDeepLink(initialUrl || "");
+  //   };
 
-    getUrlAsync();
+  //   getUrlAsync();
 
-    const deepLinkListener = Linking.addEventListener("url", (event: { url: string }) => {
-      handleDeepLink(event.url);
-    });
+  //   const deepLinkListener = Linking.addEventListener("url", (event: { url: string }) => {
+  //     handleDeepLink(event.url);
+  //   });
 
-    return () => {
-      deepLinkListener.remove();
-    };
-  }, [handleDeepLink]);
+  //   return () => {
+  //     deepLinkListener.remove();
+  //   };
+  // }, [handleDeepLink]);
 
   if (!loaded) {
     return null;

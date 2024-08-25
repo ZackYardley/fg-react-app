@@ -1,7 +1,7 @@
 import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import dayjs from "dayjs";
-import { stateData } from "@/types";
+import { StateData } from "@/types";
 import { EmissionsData } from "@/types";
 
 // Fetch emissions data for a specific month
@@ -123,7 +123,7 @@ const calculateEmissions = (data: EmissionsData) => {
 
   // Energy Calculation
   let energyEmissions = 0.0;
-  let statesData: stateData[] = require("../constants/states.json");
+  let statesData: StateData[] = require("../constants/states.json");
   if (energyData) {
     const { state, electricBill, waterBill, propaneBill, gasBill, peopleInHome } = energyData;
 

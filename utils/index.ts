@@ -8,9 +8,14 @@ const formatPrice = (price: number) => {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   });
   return formatter.format(price);
 };
 
-export { formatPrice };
+const formatDate = (timestamp: number) => {
+  const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
+  return date.toLocaleDateString();
+};
+
+export { formatPrice, formatDate };

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export const PageHeader = ({
+const PageHeader = ({
   title = "Forever",
   titleAlt = "green",
   subtitle,
@@ -15,7 +15,8 @@ export const PageHeader = ({
     <View style={styles.header}>
       <View style={styles.headerContent}>
         <Text style={styles.title}>
-          {title}<Text style={styles.titleGreen}>{titleAlt}</Text>
+          {title}
+          <Text style={styles.titleGreen}>{titleAlt}</Text>
         </Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
         <Text style={styles.description}>{description}</Text>
@@ -23,6 +24,8 @@ export const PageHeader = ({
     </View>
   );
 };
+
+export default PageHeader;
 
 const styles = StyleSheet.create({
   container: {

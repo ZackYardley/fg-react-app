@@ -6,7 +6,7 @@ import statesData from "@/constants/states.json";
 import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
 import { useEmissions } from "@/contexts";
 import { saveEmissionsData } from "@/api/emissions";
-import { stateData } from "@/types";
+import { StateData } from "@/types";
 import analytics from '@react-native-firebase/analytics';
 
 
@@ -15,7 +15,7 @@ export default function EnergyCalculator() {
 
   // State selection
   const [state, setState] = useState(energyData.state || "");
-  const [stateData, setStateData] = useState<stateData>({} as stateData);
+  const [stateData, setStateData] = useState<StateData>({} as StateData);
   const [menuVisible, setMenuVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const filteredStates = statesData.filter(
@@ -28,7 +28,7 @@ export default function EnergyCalculator() {
     if (state) {
       const selectedState = statesData.find((s) => s.name === state);
       if (selectedState) {
-        setStateData(selectedState as stateData);
+        setStateData(selectedState as StateData);
       }
     }
   }, [state]);

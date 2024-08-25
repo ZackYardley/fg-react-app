@@ -40,7 +40,7 @@ export const Notifications = {
       const notificationType = remoteMessage.data.type;
       const show = await Notifications.shouldShowNotification(notificationType);
 
-      if (show && (Platform.OS == 'ios' || Platform.OS == 'android')) {
+      if (show && (Platform.OS === 'ios' || Platform.OS === 'android')) {
         PushNotification.localNotification({
           title: remoteMessage.data.title || "New Notification",
           message: remoteMessage.data.body || "You have a new notification",
@@ -57,7 +57,7 @@ export const Notifications = {
     // Handle data messages in background and when app is closed
     messaging().setBackgroundMessageHandler(Notifications.handleDataMessage);
 
-    if (Platform.OS == 'ios' || Platform.OS == 'android'){
+    if (Platform.OS === 'ios' || Platform.OS === 'android'){
       PushNotification.configure({
         onNotification: function (notification) {
           console.log("NOTIFICATION:", notification);

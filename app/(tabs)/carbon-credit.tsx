@@ -1,24 +1,15 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, SafeAreaView, StyleSheet } from "react-native";
 import CreditItem from "@/components/carbon-credit/CreditItem";
 import ProjectCard from "@/components/carbon-credit/ProjectCard";
-import { fetchCredits } from "@/api/products";
+import { fetchCarbonCreditProducts } from "@/api/products";
 import { CarbonCredit, CartItem } from "@/types";
 import { subscribeToCart } from "@/api/cart";
 import { Loading, PageHeader } from "@/components/common";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
 
 export default function CarbonCreditScreen() {
-  const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(
-    null
-  );
+  const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
   const [credits, setCredits] = useState<CarbonCredit[]>([]);
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -27,13 +18,25 @@ export default function CarbonCreditScreen() {
     let isMounted = true;
     const initializeData = async () => {
       try {
-        const result = await fetchCredits();
+        const result = await fetchCarbonCreditProducts();
         if (isMounted && result && result.length > 0) {
-          setCredits(result as CarbonCredit[]);
-          setSelectedProject(result[0] as CarbonCredit);
+          const credits = await Promise.all(
+            result.map(async (credit) => {
+              return {
+                ...credit,
+                prices: credit.prices.filter((price) => price.active),
+              } as CarbonCredit;
+            })
+          );
+          setCredits(credits);
+          setSelectedProject(credits[0]);
         }
       } catch (error) {
         console.error("Error fetching credits:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     initializeData();
@@ -42,7 +45,6 @@ export default function CarbonCreditScreen() {
     const unsubscribe = subscribeToCart((items) => {
       if (isMounted) {
         setCartItems(items);
-        setLoading(false);
       }
     });
 
@@ -58,35 +60,29 @@ export default function CarbonCreditScreen() {
   const renderCreditItem = ({ item }: { item: CarbonCredit }) => (
     <CreditItem
       name={item.name}
-      price={item.price}
-      image={item.image}
-      colors={item.colors}
+      price={item.prices[0].unit_amount}
+      image={item.images[0]}
+      colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
       onPress={() => setSelectedProject(item)}
     />
   );
 
   const renderHeader = () => (
     <>
-      <PageHeader
-        subtitle="Carbon Credits"
-        description="Click on a project to learn more or purchase"
-      />
+      <PageHeader subtitle="Carbon Credits" description="Click on a project to learn more or purchase" />
       <ShoppingCartBtn numItems={numItems} />
     </>
   );
 
   const renderFooter = () => (
     <>
-      <View style={styles.projectContainer}>
-        {selectedProject && <ProjectCard project={selectedProject} />}
-      </View>
+      <View style={styles.projectContainer}>{selectedProject && <ProjectCard project={selectedProject} />}</View>
       <View style={styles.footer}>
         <Text style={styles.footerTitle}>Carbon Credit Subscription</Text>
         <Text style={styles.footerText}>
-          The Forevergreen carbon credit subscription includes the purchase of
-          the nearest whole number of carbon credits to make sure you are net
-          zero every month. This is the easiest way to reduce your impact on the
-          planet and support awesome climate projects!
+          The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
+          credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
+          and support awesome climate projects!
         </Text>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>$20/Month</Text>

@@ -1,64 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
-import { getRecentTransactions } from "@/api/transaction";
-import { fetchSpecificCredit } from "@/api/products";
-import { Transaction, TransactionItem, CarbonCredit } from "@/types";
+import { getRecentPayments } from "@/api/payments";
+import { fetchSpecificCarbonCreditProduct } from "@/api/products";
+import { Payment, CarbonCredit, CartItem } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
-import { formatPrice } from "@/utils";
+import { formatDate, formatPrice } from "@/utils";
 
-interface EnhancedTransactionItem extends TransactionItem {
-  creditInfo?: CarbonCredit;
-}
-
-interface EnhancedTransaction extends Omit<Transaction, "items"> {
-  items: EnhancedTransactionItem[];
+interface PaymentWithCarbonCredit extends Omit<Payment, "metadata"> {
+  metadata: {
+    items: (CarbonCredit & CartItem)[];
+  };
 }
 
 const PurchaseHistoryScreen = () => {
-  const [transactions, setTransactions] = useState<EnhancedTransaction[]>([]);
+  const [paymentsWithCarbonCredits, setPaymentsWithCarbonCredits] = useState<PaymentWithCarbonCredit[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchPayments = async () => {
       try {
-        const recentTransactions = await getRecentTransactions(10);
-        const enhancedTransactions = await Promise.all(
-          recentTransactions.map(async (transaction) => {
-            const enhancedItems = await Promise.all(
-              transaction.items.map(async (item) => {
-                const creditInfo = await fetchSpecificCredit(item.id);
-                return { ...item, creditInfo };
+        const payments = await getRecentPayments();
+        const updatedPayments = await Promise.all(
+          payments.map(async (payment) => {
+            const updatedItems = await Promise.all(
+              payment.metadata.items.map(async (item) => {
+                const productInfo = await fetchSpecificCarbonCreditProduct(item.id);
+                return { ...item, ...productInfo } as CarbonCredit & CartItem;
               })
             );
-            return { ...transaction, items: enhancedItems };
+            return {
+              ...payment,
+              metadata: { ...payment.metadata, items: updatedItems },
+            } as PaymentWithCarbonCredit;
           })
         );
-        setTransactions(enhancedTransactions as EnhancedTransaction[]);
+        setPaymentsWithCarbonCredits(updatedPayments);
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        console.error("Error fetching payments:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTransactions();
+    fetchPayments();
   }, []);
 
-  const renderTransactionItem = ({ item }: { item: EnhancedTransaction }) => (
-    <View style={styles.transactionCard}>
-      <View style={styles.transactionHeader}>
-        <Text style={styles.date}>
-          {new Date(item.purchaseDate).toLocaleDateString()}
-        </Text>
-        <Text style={styles.amount}>{formatPrice(item.totalAmount)}</Text>
+  const renderPaymentItem = ({ item }: { item: PaymentWithCarbonCredit }) => (
+    <View style={styles.paymentCard}>
+      <View style={styles.paymentHeader}>
+        <Text style={styles.date}>{formatDate(item.created)}</Text>
+        <Text style={styles.amount}>{formatPrice(item.amount)}</Text>
       </View>
-      {item.items.map((credit, index) => (
+      {item.metadata.items.map((credit, index) => (
         <View key={index} style={styles.creditItem}>
-          <Text style={styles.creditName}>
-            {`${credit.creditInfo?.type} Credit` || "Unknown Credit"}
-          </Text>
+          <Text style={styles.creditName}>{credit?.name || "Unknown Credit"}</Text>
           <Text style={styles.creditQuantity}>
-            {credit.quantity} x {formatPrice(credit.price)}
+            {credit.quantity} x{" "}
+            {formatPrice(credit.prices.filter((price) => price.active)[0].unit_amount * credit.quantity)}
           </Text>
         </View>
       ))}
@@ -78,8 +76,8 @@ const PurchaseHistoryScreen = () => {
       <PageHeader subtitle="Purchase History" />
       <BackButton />
       <FlatList
-        data={transactions}
-        renderItem={renderTransactionItem}
+        data={paymentsWithCarbonCredits}
+        renderItem={renderPaymentItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
@@ -95,13 +93,13 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  transactionCard: {
+  paymentCard: {
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
   },
-  transactionHeader: {
+  paymentHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,

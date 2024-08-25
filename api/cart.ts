@@ -1,11 +1,4 @@
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-  Unsubscribe,
-} from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, Unsubscribe } from "firebase/firestore";
 import { getAuth, User } from "firebase/auth";
 import { CartItem } from "@/types";
 
@@ -16,7 +9,7 @@ const getCartRef = (user: User) => {
 };
 
 // Add an item to the cart
-const addToCart = async (creditId: string, quantity: number = 1) => {
+const addToCart = async (productId: string, productType: string, quantity: number = 1) => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -25,19 +18,19 @@ const addToCart = async (creditId: string, quantity: number = 1) => {
   const cartDoc = await getDoc(cartRef);
   let items: CartItem[] = cartDoc.exists() ? cartDoc.data().items || [] : [];
 
-  const existingItemIndex = items.findIndex((i) => i.id === creditId);
+  const existingItemIndex = items.findIndex((i) => i.id === productId);
 
   if (existingItemIndex !== -1) {
     items[existingItemIndex].quantity += quantity;
   } else {
-    items.push({ id: creditId, quantity });
+    items.push({ id: productId, productType, quantity });
   }
 
   await setDoc(cartRef, { items });
 };
 
 // Remove an item from the cart
-const removeFromCart = async (creditId: string) => {
+const removeFromCart = async (productId: string) => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -46,7 +39,7 @@ const removeFromCart = async (creditId: string) => {
   const cartDoc = await getDoc(cartRef);
   let items: CartItem[] = cartDoc.exists() ? cartDoc.data().items || [] : [];
 
-  const updatedItems = items.filter((item) => item.id !== creditId);
+  const updatedItems = items.filter((item) => item.id !== productId);
   await setDoc(cartRef, { items: updatedItems });
 };
 
@@ -72,7 +65,7 @@ const clearCart = async () => {
 };
 
 // Increment item quantity
-const incrementQuantity = async (creditId: string) => {
+const incrementQuantity = async (productId: string) => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -81,15 +74,13 @@ const incrementQuantity = async (creditId: string) => {
   const cartDoc = await getDoc(cartRef);
   let items: CartItem[] = cartDoc.exists() ? cartDoc.data().items || [] : [];
 
-  const updatedItems = items.map((item) =>
-    item.id === creditId ? { ...item, quantity: item.quantity + 1 } : item
-  );
+  const updatedItems = items.map((item) => (item.id === productId ? { ...item, quantity: item.quantity + 1 } : item));
 
   await setDoc(cartRef, { items: updatedItems });
 };
 
 // Decrement item quantity
-const decrementQuantity = async (creditId: string) => {
+const decrementQuantity = async (productId: string) => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -98,21 +89,17 @@ const decrementQuantity = async (creditId: string) => {
   const cartDoc = await getDoc(cartRef);
   let items: CartItem[] = cartDoc.exists() ? cartDoc.data().items || [] : [];
 
-  const item = items.find((i) => i.id === creditId);
+  const item = items.find((i) => i.id === productId);
   if (item && item.quantity === 1) {
-    await removeFromCart(creditId);
+    await removeFromCart(productId);
   } else {
-    const updatedItems = items.map((item) =>
-      item.id === creditId ? { ...item, quantity: item.quantity - 1 } : item
-    );
+    const updatedItems = items.map((item) => (item.id === productId ? { ...item, quantity: item.quantity - 1 } : item));
     await setDoc(cartRef, { items: updatedItems });
   }
 };
 
 // Subscribe to cart changes
-const subscribeToCart = (
-  callback: (items: CartItem[]) => void
-): Unsubscribe => {
+const subscribeToCart = (callback: (items: CartItem[]) => void): Unsubscribe => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -124,12 +111,4 @@ const subscribeToCart = (
   });
 };
 
-export {
-  addToCart,
-  removeFromCart,
-  getCart,
-  clearCart,
-  incrementQuantity,
-  decrementQuantity,
-  subscribeToCart,
-};
+export { addToCart, removeFromCart, getCart, clearCart, incrementQuantity, decrementQuantity, subscribeToCart };

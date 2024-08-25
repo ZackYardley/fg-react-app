@@ -1,158 +1,167 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
-import { BackButton } from "@/components/common";
-import { LinearGradient } from "expo-linear-gradient";
-import { PageHeader } from "@/components/common";
-import { useLocalSearchParams } from "expo-router";
-import { getTransactionById } from "@/api/transaction";
-import { fetchSpecificCredit } from "@/api/products";
-import { CarbonCredit, Transaction } from "@/types";
+import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
 import { Image } from "expo-image";
+import { Link, useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { BackButton, Loading, PageHeader, NotFoundComponent } from "@/components/common";
+import { getPaymentById } from "@/api/payments";
 import { Pamona } from "@/constants/Images";
-import { Link } from "expo-router";
-import { Loading } from "@/components/common";
+import { CarbonCredit, Payment } from "@/types";
+import { fetchSpecificCarbonCreditProduct } from "@/api/products";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-interface TransactionWithCredits extends Transaction {
-  items: (CarbonCredit & { quantity: number })[];
+interface CreditWithQuantity extends CarbonCredit {
+  quantity: number;
 }
 
 const PurchaseCompleteScreen = () => {
-  const { transactionId } = useLocalSearchParams<{ transactionId: string }>();
-  const [transaction, setTransaction] = useState<TransactionWithCredits | null>(
-    null
-  );
+  const { paymentIntentId } = useLocalSearchParams<{ paymentIntentId: string }>();
+  const [payment, setPayment] = useState<Payment | null>(null);
+  const [credits, setCredits] = useState<CreditWithQuantity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTransactionAndCredits = async () => {
-      if (!transactionId) {
-        console.error("No transactionId provided");
+    const fetchPaymentAndCredits = async () => {
+      if (!paymentIntentId) {
+        console.error("No paymentIntentId provided");
         setLoading(false);
         return;
       }
 
-      try {
-        const fetchedTransaction = await getTransactionById(transactionId);
-        if (fetchedTransaction) {
-          const itemsWithCredits = await Promise.all(
-            fetchedTransaction.items.map(async (item) => {
-              const credit = await fetchSpecificCredit(item.id);
-              return { ...credit, quantity: item.quantity } as CarbonCredit & {
-                quantity: number;
-              };
-            })
-          );
-          setTransaction({ ...fetchedTransaction, items: itemsWithCredits });
-        } else {
-          console.error("Transaction not found for ID:", transactionId);
+      const maxAttempts = 5;
+      const retryDelay = 2000; // 2 seconds
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+          const fetchedPayment = await getPaymentById(paymentIntentId);
+          if (fetchedPayment) {
+            setPayment(fetchedPayment);
+
+            const carbonCredits = fetchedPayment.metadata.items;
+            const fetchedCredits = await Promise.all(
+              carbonCredits.map(async (credit) => {
+                const creditData = await fetchSpecificCarbonCreditProduct(credit.id);
+                if (!creditData) {
+                  throw new Error(`Carbon credit with ID ${credit.id} does not exist`);
+                }
+                return { ...creditData, quantity: credit.quantity };
+              })
+            );
+            setCredits(fetchedCredits);
+            break; // Exit the loop if successful
+          } else {
+            console.log(`Attempt ${attempt + 1}: Payment not found, retrying...`);
+            if (attempt === maxAttempts - 1) {
+              // This is the last attempt
+              console.error("Payment not found after all attempts");
+              Alert.alert("Error", "Unable to retrieve payment information. Please try again later.");
+            } else {
+              await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching payment or credits:", error);
+          if (attempt === maxAttempts - 1) {
+            Alert.alert(
+              "Error",
+              "An error occurred while retrieving your purchase information. Please try again later."
+            );
+          }
         }
-      } catch (error) {
-        console.error("Error fetching transaction or credits:", error);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
 
-    fetchTransactionAndCredits();
-  }, [transactionId]);
+    fetchPaymentAndCredits();
+  }, [paymentIntentId]);
 
   if (loading) {
     return <Loading />;
   }
 
-  if (!transaction) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: {"Transaction not found"}</Text>
-        <Text>Transaction ID: {transactionId}</Text>
-      </View>
-    );
+  if (!payment) {
+    return <NotFoundComponent />;
   }
 
   // Calculate total CO2 offset
-  const totalCO2Offset = transaction.items.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
+  const totalCO2Offset = payment.metadata.items.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <ScrollView style={styles.container}>
-      <PageHeader title="Thank you for your " titleAlt="purchase!" />
-      <BackButton />
-      <View style={{ padding: 16 }}>
-        <LinearGradient
-          style={styles.card}
-          colors={["#EFEFEF", "#E5F5F6"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-        >
-          <View style={{ display: "flex", flexDirection: "row", gap: 32 }}>
-            {transaction.items.map((credit, index) => (
-              <View
-                key={index}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                  justifyContent: "center",
-                }}
-              >
-                <LinearGradient
-                  colors={credit.colors}
-                  start={{ x: 0.5, y: 0 }}
-                  end={{ x: 0.5, y: 1 }}
-                  style={styles.gradient}
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={{ flexGrow: 1 }}>
+        <PageHeader title="Thank you for your " titleAlt="purchase!" />
+        <BackButton />
+        <View style={{ padding: 16 }}>
+          <LinearGradient
+            style={styles.card}
+            colors={["#EFEFEF", "#E5F5F6"]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          >
+            <View style={{ display: "flex", flexDirection: "row", gap: 32 }}>
+              {credits.map((credit, index) => (
+                <View
+                  key={index}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    alignItems: "center",
+                  }}
                 >
-                  <Image
-                    source={credit.image}
-                    style={{ height: 104, width: 98 }}
-                  />
+                  <LinearGradient
+                    colors={[
+                      credit.stripe_metadata_color_0,
+                      credit.stripe_metadata_color_1,
+                      credit.stripe_metadata_color_2,
+                    ]}
+                    start={{ x: 0.5, y: 0 }}
+                    end={{ x: 0.5, y: 1 }}
+                    style={styles.gradient}
+                  >
+                    <Image source={credit.images[0]} style={{ height: 104, width: 98 }} />
+                  </LinearGradient>
+
+                  <Text style={styles.itemDescription}>{`${
+                    credit.quantity
+                  } ${credit.stripe_metadata_carbon_credit_type} Credits`}</Text>
+                </View>
+              ))}
+            </View>
+            <Text style={styles.offsetText}>
+              <Text>{totalCO2Offset} tons of CO</Text>
+              <Text style={{ fontSize: 18 }}>2</Text>
+              <Text> Offset</Text>
+            </Text>
+          </LinearGradient>
+
+          <LinearGradient
+            style={styles.infoContainer}
+            colors={["#EFEFEF", "#E5F5F6"]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          >
+            <Text style={styles.infoTitle}>
+              You will be receiving an email with more
+              <Text style={{ color: "#409858" }}> information shortly!</Text>
+            </Text>
+            <Image source={Pamona} style={styles.infoImage} />
+            <View style={styles.buttonContainer}>
+              <Link href="/home" style={styles.linkStyle}>
+                <LinearGradient
+                  style={styles.button}
+                  colors={["#409858", "#B1E8C0"]}
+                  start={{ x: 0.4, y: 0 }}
+                  end={{ x: 0.9, y: 1 }}
+                >
+                  <Text style={styles.buttonText}>Back Home</Text>
                 </LinearGradient>
-
-                <Text style={styles.itemDescription}>
-                  {`${credit.quantity} ${credit.type} Credits`}
-                </Text>
-              </View>
-            ))}
-          </View>
-          <Text style={styles.offsetText}>
-            <Text>{totalCO2Offset} tons of CO</Text>
-            <Text style={{ fontSize: 18 }}>2</Text>
-            <Text> Offset</Text>
-          </Text>
-        </LinearGradient>
-
-        <LinearGradient
-          style={styles.infoContainer}
-          colors={["#EFEFEF", "#E5F5F6"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-        >
-          <Text style={styles.infoTitle}>
-            You will be receiving an email with more
-            <Text style={{ color: "#409858" }}> information shortly!</Text>
-          </Text>
-          <Image source={Pamona} style={styles.infoImage} />
-          <View style={styles.buttonContainer}>
-            <Link href="/home" style={styles.linkStyle}>
-              <LinearGradient
-                style={styles.button}
-                colors={["#409858", "#B1E8C0"]}
-                start={{ x: 0.4, y: 0 }}
-                end={{ x: 0.9, y: 1 }}
-              >
-                <Text style={styles.buttonText}>Back Home</Text>
-              </LinearGradient>
-            </Link>
-          </View>
-        </LinearGradient>
-      </View>
-    </ScrollView>
+              </Link>
+            </View>
+          </LinearGradient>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -160,7 +169,7 @@ export default PurchaseCompleteScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "white",
   },
   card: {
