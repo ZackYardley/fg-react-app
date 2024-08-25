@@ -11,7 +11,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="settings" />
       <Stack.Screen name="profile-settings" />
       <Stack.Screen name="purchase-history" />
-      <Stack.Screen name="payment-methods" />
       <Stack.Screen name="notifications-settings" />
     </Stack>
   );
