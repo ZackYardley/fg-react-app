@@ -1,10 +1,10 @@
 import { getFirestore, doc, runTransaction, collection, getDoc, addDoc, updateDoc } from "firebase/firestore";
-import { CartItem } from "@/types";
+import { TransactionItem } from "@/types";
 
 // Purchase carbon credits
 const purchaseCarbonCredits = async (
   userId: string,
-  items: CartItem[],
+  items: TransactionItem[],
   paymentIntentId: string
 ): Promise<{ success: boolean; error?: string }> => {
   const db = getFirestore();
@@ -21,7 +21,7 @@ const purchaseCarbonCredits = async (
       // Update user's carbon credits
       const existingCredits = userDoc.data().carbonCredits || [];
       const updatedCredits = items.map((item) => {
-        const existingCredit = existingCredits.find((credit: CartItem) => credit.id === item.id);
+        const existingCredit = existingCredits.find((credit: TransactionItem) => credit.id === item.id);
         if (existingCredit) {
           // If the credit already exists, update the quantity
           return {
@@ -36,7 +36,7 @@ const purchaseCarbonCredits = async (
 
       // Merge the updated credits with the existing ones
       const finalCredits = existingCredits
-        .filter((credit: CartItem) => !updatedCredits.some((uc) => uc.id === credit.id))
+        .filter((credit: TransactionItem) => !updatedCredits.some((uc) => uc.id === credit.id))
         .concat(updatedCredits);
 
       transaction.update(userRef, {
@@ -49,8 +49,10 @@ const purchaseCarbonCredits = async (
     // Prepare simplified cart items for metadata
     const simplifiedItems = items.map((item) => ({
       id: item.id,
+      name: item.name,
       productType: "carbon_credit",
       quantity: item.quantity,
+      price: item.price,
     }));
 
     const updateData = {

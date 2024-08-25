@@ -9,7 +9,7 @@ const getCartRef = (user: User) => {
 };
 
 // Add an item to the cart
-const addToCart = async (productId: string, productType: string, quantity: number = 1) => {
+const addToCart = async (productId: string, productName: string, productType: string, quantity: number = 1) => {
   const auth = getAuth();
   const user = auth.currentUser;
   if (!user) throw new Error("User is not authenticated");
@@ -23,7 +23,7 @@ const addToCart = async (productId: string, productType: string, quantity: numbe
   if (existingItemIndex !== -1) {
     items[existingItemIndex].quantity += quantity;
   } else {
-    items.push({ id: productId, productType, quantity });
+    items.push({ id: productId, name: productName, productType, quantity });
   }
 
   await setDoc(cartRef, { items });

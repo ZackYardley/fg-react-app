@@ -39,7 +39,7 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
   );
 
   const handleAddToCart = useCallback(() => {
-    addToCart(project.id, "carbon_credit", quantity);
+    addToCart(project.id, project.name, "carbon_credit", quantity);
     setQuantity(1);
   }, [project, quantity]);
 

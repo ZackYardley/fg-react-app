@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth } from "firebase/auth";
 import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
-import { CartItem, CarbonCredit } from "@/types";
+import { TransactionItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
 import { PageHeader, BackButton, Loading } from "@/components/common";
 import { purchaseCarbonCredits, fetchOneTimePaymentSheetParams } from "@/api/purchase";
@@ -13,7 +13,7 @@ import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
 
-interface CartCarbonCredits extends CartItem, CarbonCredit {}
+interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 
 export default function ShoppingCartScreen() {
   const auth = getAuth();
@@ -44,7 +44,11 @@ export default function ShoppingCartScreen() {
             .filter((item) => item.productType === "carbon_credit")
             .map(async (item) => {
               const creditDetails = await fetchSpecificCarbonCreditProduct(item.id);
-              return { ...item, ...creditDetails };
+              return {
+                ...item,
+                price: creditDetails?.prices.filter((price) => price.active)[0].unit_amount,
+                ...creditDetails,
+              };
             })
         );
         setCredits(creditDetails as CartCarbonCredits[]);

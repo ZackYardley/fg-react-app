@@ -1,4 +1,4 @@
-/* Generic Product Type */
+/* Payment Types */
 interface Product {
   id: string;
   active: boolean;
@@ -11,7 +11,6 @@ interface Product {
   prices: Price[];
 }
 
-/* Price Type */
 interface Price {
   id: string;
   active: boolean;
@@ -39,7 +38,6 @@ interface Price {
   unit_amount: number;
 }
 
-/* Carbon Credit Type */
 interface CarbonCredit extends Product {
   stripe_metadata_carbon_credit_type: string;
   stripe_metadata_color_0: string;
@@ -54,14 +52,21 @@ interface CarbonCredit extends Product {
   stripe_metadata_your_purchase: string;
 }
 
-/* Cart Item Type */
 interface CartItem {
   id: string;
+  name: string;
   productType: string;
   quantity: number;
 }
 
-/* Payment Type */
+interface TransactionItem {
+  id: string;
+  name: string;
+  productType: string;
+  quantity: number;
+  price: number;
+}
+
 interface Payment {
   amount: number;
   amount_capturable: number;
@@ -91,7 +96,7 @@ interface Payment {
   latest_charge: string;
   livemode: boolean;
   metadata: {
-    items: CartItem[];
+    items: TransactionItem[];
   };
   next_action?: string;
   object: string;
@@ -193,6 +198,7 @@ export {
   Price,
   CarbonCredit,
   CartItem,
+  TransactionItem,
   Payment,
   StateData,
   TransportationData,

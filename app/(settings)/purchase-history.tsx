@@ -6,35 +6,15 @@ import { Payment, CarbonCredit, CartItem } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
 
-interface PaymentWithCarbonCredit extends Omit<Payment, "metadata"> {
-  metadata: {
-    items: (CarbonCredit & CartItem)[];
-  };
-}
-
 const PurchaseHistoryScreen = () => {
-  const [paymentsWithCarbonCredits, setPaymentsWithCarbonCredits] = useState<PaymentWithCarbonCredit[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const payments = await getRecentPayments();
-        const updatedPayments = await Promise.all(
-          payments.map(async (payment) => {
-            const updatedItems = await Promise.all(
-              payment.metadata.items.map(async (item) => {
-                const productInfo = await fetchSpecificCarbonCreditProduct(item.id);
-                return { ...item, ...productInfo } as CarbonCredit & CartItem;
-              })
-            );
-            return {
-              ...payment,
-              metadata: { ...payment.metadata, items: updatedItems },
-            } as PaymentWithCarbonCredit;
-          })
-        );
-        setPaymentsWithCarbonCredits(updatedPayments);
+        const fetchedPayments = await getRecentPayments();
+        setPayments(fetchedPayments);
       } catch (error) {
         console.error("Error fetching payments:", error);
       } finally {
@@ -45,7 +25,7 @@ const PurchaseHistoryScreen = () => {
     fetchPayments();
   }, []);
 
-  const renderPaymentItem = ({ item }: { item: PaymentWithCarbonCredit }) => (
+  const renderPaymentItem = ({ item }: { item: Payment }) => (
     <View style={styles.paymentCard}>
       <View style={styles.paymentHeader}>
         <Text style={styles.date}>{formatDate(item.created)}</Text>
@@ -55,8 +35,7 @@ const PurchaseHistoryScreen = () => {
         <View key={index} style={styles.creditItem}>
           <Text style={styles.creditName}>{credit?.name || "Unknown Credit"}</Text>
           <Text style={styles.creditQuantity}>
-            {credit.quantity} x{" "}
-            {formatPrice(credit.prices.filter((price) => price.active)[0].unit_amount * credit.quantity)}
+            {credit.quantity} x {formatPrice(credit.price)}
           </Text>
         </View>
       ))}
@@ -76,7 +55,7 @@ const PurchaseHistoryScreen = () => {
       <PageHeader subtitle="Purchase History" />
       <BackButton />
       <FlatList
-        data={paymentsWithCarbonCredits}
+        data={payments}
         renderItem={renderPaymentItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
