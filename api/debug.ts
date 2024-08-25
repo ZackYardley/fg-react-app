@@ -1,4 +1,4 @@
-import { fetchCarbonCreditProducts, fetchSpecificCarbonCreditProduct } from "./products";
+import { fetchCarbonCreditProducts, fetchSpecificCarbonCreditProduct, fetchCarbonCreditSubscription } from "./products";
 
 // Test function to print out the data
 const testFetchCarbonCreditProducts = async () => {
@@ -104,4 +104,33 @@ const testFetchSpecificCarbonCreditProduct = async (productId: string) => {
   }
 };
 
-export { testFetchCarbonCreditProducts, testFetchSpecificCarbonCreditProduct };
+const testFetchCarbonCreditSubscription = async () => {
+  try {
+    console.log("Testing fetchCarbonCreditSubscription function...");
+
+    const testEmissions = [16.7, 17.1, 18.9, 19.6, 20.5];
+
+    for (const emissions of testEmissions) {
+      console.log(`\nTest Case: Emissions ${emissions}`);
+      const result = await fetchCarbonCreditSubscription(emissions);
+
+      if (result) {
+        console.log("Product:");
+        console.log(`  ID: ${result.product.id}`);
+        console.log(`  Name: ${result.product.name}`);
+        console.log(`  Description: ${result.product.description}`);
+        console.log(`  Product Type: ${result.product.stripe_metadata_product_type}`);
+        console.log(`  Subscription Type: ${result.product.stripe_metadata_subscription_type}`);
+        console.log("Recommended Price:");
+        console.log(`  ID: ${result.recommendedPrice.id}`);
+        console.log(`  Unit Amount: ${result.recommendedPrice.unit_amount}`);
+      } else {
+        console.log("No result returned");
+      }
+    }
+  } catch (error) {
+    console.error("Error in test function:", error);
+  }
+};
+
+export { testFetchCarbonCreditProducts, testFetchSpecificCarbonCreditProduct, testFetchCarbonCreditSubscription };

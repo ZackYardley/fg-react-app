@@ -51,4 +51,9 @@ interface CarbonCredit extends Product {
   stripe_metadata_your_purchase: string;
 }
 
-export { Product, Price, CarbonCredit };
+interface CarbonCreditSubscription extends Product {
+  stripe_metadata_product_type: string;
+  stripe_metadata_subscription_type: string;
+}
+
+export { Product, Price, CarbonCredit, CarbonCreditSubscription };

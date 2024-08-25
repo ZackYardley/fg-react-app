@@ -6,6 +6,7 @@ import { getAuth } from "firebase/auth";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
 import { Loading } from "@/components/common";
+import { testFetchCarbonCreditSubscription } from "@/api/debug";
 
 // Initialize debugMode with useState
 export default function Index() {
@@ -79,6 +80,15 @@ export default function Index() {
             <View style={styles.buttonLabel}>
               <Icon name="map" size={24} color="#FFF" />
               <Text style={styles.buttonText}>Sitemap</Text>
+            </View>
+            <Icon name="arrow-right" size={24} color="#FFF" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={testFetchCarbonCreditSubscription}>
+          <View style={styles.buttonContent}>
+            <View style={styles.buttonLabel}>
+              <Icon name="smile-o" size={24} color="#FFF" />
+              <Text style={styles.buttonText}>Test Button!</Text>
             </View>
             <Icon name="arrow-right" size={24} color="#FFF" />
           </View>
