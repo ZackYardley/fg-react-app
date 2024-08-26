@@ -27,6 +27,7 @@
     "@react-native-google-signin/google-signin": "^12.2.1",
     "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/native": "^6.0.2",
+    "@rneui/base": "^4.0.0-rc.8",
     "@rneui/themed": "^4.0.0-rc.8",
     "@stripe/stripe-react-native": "0.37.2",
     "dayjs": "^1.11.11",
