@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Slider } from "@react-native-assets/slider";
 
@@ -15,19 +15,27 @@ const QuestionSlider = ({
   minimumValue: number;
   maximumValue: number;
 }) => {
-  
-  const getColor = () => {
-    if (value <= 2) {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const getColor = (val: number) => {
+    if (val <= 2) {
       return { trackColor: "#008450", thumbColor: "#008450" }; // Green shades
-    } else if (value <= 5) {
+    } else if (val <= 5) {
       return { trackColor: "#EFB700", thumbColor: "#EFB700" }; // Yellow shades
     } else {
       return { trackColor: "#B81D13", thumbColor: "#B81D13" }; // Red shades
     }
   };
 
-  const { trackColor, thumbColor } = getColor();
+  const { trackColor, thumbColor } = getColor(localValue);
 
+  const handleSlidingComplete = (newValue: number) => {
+    onChange(newValue);
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.questionText}>{question}</Text>
@@ -37,10 +45,10 @@ const QuestionSlider = ({
           maximumValue={maximumValue}
           step={1}
           value={value}
-          onValueChange={onChange}
+          onValueChange={handleSlidingComplete}
           minimumTrackTintColor={trackColor} // Dynamic track color
           maximumTrackTintColor="#D9D9D9"
-          thumbTintColor={thumbColor}        // Dynamic thumb color
+          thumbTintColor={thumbColor} // Dynamic thumb color
           trackHeight={9}
           thumbSize={25}
           CustomMark={({ value, active }) => (

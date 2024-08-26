@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import { useStripe } from "@/utils/stripe";
 import dayjs from "dayjs";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { BackButton, Loading, NotFoundComponent, PageHeader } from "@/components/common";
 import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
 import { fetchCarbonCreditSubscription } from "@/api/products";
@@ -128,6 +129,17 @@ const CarbonCreditSubscriptionScreen = () => {
     // Handle successful purchase (e.g., update database, show confirmation)
   };
 
+  const handleCancelSubscription = async () => {
+    const url = "https://billing.stripe.com/p/login/test_3cscQneUc5zscy43cc";
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.error("Don't know how to open URI: " + url);
+    }
+  };
+
   const SubscriptionDetailsItem = ({
     icon,
     text,
@@ -187,13 +199,18 @@ const CarbonCreditSubscriptionScreen = () => {
               </TouchableOpacity>
             )}
           </View>
-
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Subscription Details</Text>
-            <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
-            <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
-            <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
-          </View>
+          {isSubscribed && (
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>Subscription Details</Text>
+              <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
+              <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
+              <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
+              <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSubscription}>
+                <Icon name="close" size={24} color="#D22626" />
+                <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -300,18 +317,21 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   cancelButton: {
-    backgroundColor: "#ffcccb",
+    backgroundColor: "#DE9D9D",
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 24,
     alignSelf: "stretch",
     marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
   cancelButtonText: {
-    color: "#ff0000",
+    color: "#D22626",
     fontWeight: "bold",
     fontSize: 18,
-    textAlign: "center",
   },
 });
 
