@@ -132,7 +132,7 @@ const calculateEmissions = (data: EmissionsData) => {
 
       if (stateData) {
         const electricityEmissions =
-          (stateData.stateEGridValue / 2000) * (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
+          (stateData.stateEGridValue / 2000 * 1000 * 10500) * (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
         const waterEmissions = (parseFloat(waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
         const propaneEmissions = (parseFloat(propaneBill) / stateData.averageMonthlyPropaneBill) * 0.24;
         const gasEmissions = (parseFloat(gasBill) / stateData.averageMonthlyGasBill) * 2.12;
