@@ -77,7 +77,12 @@ const HomeScreen = () => {
             Forevergreen Fast Fact of the Day
           </Text>
           <Text style={styles.fastFactText}>{fact}</Text>
-          <Button title="See New Fact" onPress={handleNewFact} />
+          <TouchableOpacity
+            style={styles.factButton}
+            onPress={handleNewFact}  // Call the function directly
+          >
+          <Text style={styles.offsetButtonText}>See New Fact</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Carbon Footprint and Calculator */}
