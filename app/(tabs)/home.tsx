@@ -291,7 +291,7 @@ const HomeScreen = () => {
           <View style={styles.chartBox}>
             <Text style={styles.chartText}>
               If everyone lived like you we'd need{" "}
-              {(emissionsPerYear / 6.4).toFixed(2)} Earths
+              {(emissionsPerYear / 16).toFixed(2)} Earths
             </Text>
             <EarthBreakdown emissions={emissionsPerYear} />
           </View>

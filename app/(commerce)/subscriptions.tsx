@@ -1,10 +1,46 @@
+import { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, Loading, PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { fetchCarbonCreditSubscription } from "@/api/products";
+import { fetchEmissionsData } from "@/api/emissions";
+import { formatPrice } from "@/utils";
+import { isSubscribedToProduct } from "@/api/payments";
 
 const ForevergreenSubscriptions = () => {
+  const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const userEmissionsData = await fetchEmissionsData();
+        if (userEmissionsData) {
+          const userEmissions = userEmissionsData?.totalData.totalEmissions;
+          const result = await fetchCarbonCreditSubscription(userEmissions);
+          if (result) {
+            setSubscriptionPrice(result.recommendedPrice.unit_amount);
+            const isSubscribed = await isSubscribedToProduct(result.product.id || "");
+            setIsSubscribed(isSubscribed);
+          } else {
+            console.error("No Carbon Credit Subscription found");
+          }
+        } else {
+          console.error("No user emissions data found");
+        }
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, []);
+
   const SubscriptionCard = ({
     title,
     description,
@@ -20,10 +56,14 @@ const ForevergreenSubscriptions = () => {
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.cardDescription}>{description}</Text>
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>{price}</Text>
+        <Text style={styles.buttonText}>{loading ? "isLoading" : isSubscribed ? "Manage Subscription" : price}</Text>
       </TouchableOpacity>
     </View>
   );
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,20 +75,22 @@ const ForevergreenSubscriptions = () => {
 
         <View style={{ paddingTop: 40 }}>
           <View style={styles.scrollView}>
-            <SubscriptionCard
+            {/* <SubscriptionCard
               title="Tree Planting Subscription"
               description="The Forevergreen tree planting subscription includes 1 tree planted on our reforestation projects. We will populate your forest with all the relevant data and credit the carbon sequestered to you. Build a forest and a sustainable future with a consistent effort."
               price="$10 Month"
-              onPress={() => {
-                /* Handle tree planting subscription */
-              }}
-            />
-            <SubscriptionCard
-              title="Carbon Credit Subscription"
-              description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
-              price="$20 Month"
-              onPress={() => router.push("/carbon-credit-sub")}
-            />
+              onPress={() =>  {}}}
+            />  */}
+            {subscriptionPrice ? (
+              <SubscriptionCard
+                title="Carbon Credit Subscription"
+                description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
+                price={`${formatPrice(subscriptionPrice)} Month`}
+                onPress={() => router.push("/carbon-credit-sub")}
+              />
+            ) : (
+              <Text>Carbon Credit Subscription not available</Text>
+            )}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Newsletter Subscription</Text>
               <Text style={styles.cardDescription}>
@@ -62,12 +104,16 @@ const ForevergreenSubscriptions = () => {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Current Subscriptions</Text>
               <View style={styles.subscriptionContainer}>
-                <View style={styles.subscriptionItem}>
+                {/* <View style={styles.subscriptionItem}>
                   <Ionicons name="close" size={18} color="red" />
                   <Text style={styles.subscriptionText}>Tree Planting Subscription</Text>
-                </View>
+                </View> */}
                 <View style={styles.subscriptionItem}>
-                  <Ionicons name="close" size={18} color="red" />
+                  {isSubscribed ? (
+                    <Ionicons name="checkmark" size={18} color="green" />
+                  ) : (
+                    <Ionicons name="close" size={18} color="red" />
+                  )}
                   <Text style={styles.subscriptionText}>Carbon Credit Subscription</Text>
                 </View>
                 <View style={styles.subscriptionItem}>

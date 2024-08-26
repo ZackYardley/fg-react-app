@@ -1,31 +1,64 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackButton, PageHeader } from "@/components/common";
-import { useStripe } from "@/utils/stripe";
-import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
-import { getAuth } from "firebase/auth";
 import { router } from "expo-router";
-
-const SubscriptionDetailsItem = ({
-  icon,
-  text,
-}: {
-  icon: "time-outline" | "calendar-outline" | "receipt-outline" | undefined;
-  text: string;
-}) => (
-  <View style={styles.detailsItem}>
-    <Ionicons name={icon} size={24} color="#666" />
-    <Text style={styles.detailsText}>{text}</Text>
-  </View>
-);
+import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "firebase/auth";
+import { useStripe } from "@/utils/stripe";
+import dayjs from "dayjs";
+import { BackButton, Loading, NotFoundComponent, PageHeader } from "@/components/common";
+import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
+import { fetchCarbonCreditSubscription } from "@/api/products";
+import { getSubscription, isSubscribedToProduct } from "@/api/payments";
+import { fetchEmissionsData } from "@/api/emissions";
+import { formatPrice } from "@/utils";
+import { CarbonCreditSubscription, Price } from "@/types";
 
 const CarbonCreditSubscriptionScreen = () => {
   const auth = getAuth();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [carbonCreditSubscription, setCarbonCreditSubscription] = useState<{
+    product: CarbonCreditSubscription;
+    recommendedPrice: Price;
+  }>();
+  const [loading, setLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [currentPeriodStart, setCurrentPeriodStart] = useState("");
+  const [currentPeriodEnd, setCurrentPeriodEnd] = useState("");
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const userEmissionsData = await fetchEmissionsData();
+        const userEmissions = userEmissionsData?.totalData.totalEmissions;
+        if (!userEmissions) {
+          console.error("No user emissions data found");
+          return;
+        }
+        const result = await fetchCarbonCreditSubscription(userEmissions);
+        if (result) {
+          const subscriptionStatus = await isSubscribedToProduct(result.product.id || "");
+          setIsSubscribed(subscriptionStatus);
+          if (subscriptionStatus) {
+            const subscription = await getSubscription(result.product.id || "");
+            if (subscription) {
+              setCurrentPeriodEnd(dayjs(subscription.current_period_end.seconds * 1000).format("MMMM D, YYYY"));
+              setCurrentPeriodStart(dayjs(subscription.current_period_start.seconds * 1000).format("MMMM D, YYYY"));
+            }
+          }
+        }
+        setCarbonCreditSubscription(result || undefined);
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, []);
 
   const initializePaymentSheet = useCallback(
     async (price: string) => {
@@ -79,7 +112,7 @@ const CarbonCreditSubscriptionScreen = () => {
   );
 
   const openPaymentSheet = async () => {
-    await initializePaymentSheet("price_1PqeuQJNQHxtxrkGJQdTC7jf");
+    await initializePaymentSheet(carbonCreditSubscription?.recommendedPrice.id || "");
 
     const { error } = await presentPaymentSheet();
 
@@ -94,6 +127,27 @@ const CarbonCreditSubscriptionScreen = () => {
     console.log("Successful purchase with paymentIntentId:", paymentIntentId);
     // Handle successful purchase (e.g., update database, show confirmation)
   };
+
+  const SubscriptionDetailsItem = ({
+    icon,
+    text,
+  }: {
+    icon: "time-outline" | "calendar-outline" | "receipt-outline" | undefined;
+    text: string;
+  }) => (
+    <View style={styles.detailsItem}>
+      <Ionicons name={icon} size={24} color="#000" />
+      <Text style={styles.detailsText}>{text}</Text>
+    </View>
+  );
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!carbonCreditSubscription) {
+    return <NotFoundComponent />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -110,25 +164,34 @@ const CarbonCreditSubscriptionScreen = () => {
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Monthly Subscription</Text>
             <Text style={styles.cardDescription}>
-              The Forevergreen tree planting subscription includes 1 tree planted on our reforestation projects. We will
-              populate your forest with all the relevant data and credit the carbon sequestered to you. Build a forest
-              and a sustainable future with a consistent effort.
+              The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
+              credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the
+              planet and support awesome climate projects!
             </Text>
-            <TouchableOpacity
-              style={[styles.subscribeButton, isProcessingPayment && styles.disabledButton]}
-              onPress={openPaymentSheet}
-              disabled={isProcessingPayment}
-            >
-              <Text style={styles.subscribeButtonText}>
-                {isProcessingPayment ? "Processing..." : "Subscribe for $20/month"}
-              </Text>
-            </TouchableOpacity>
+            {isSubscribed ? (
+              <View style={styles.subscribedContainer}>
+                <Ionicons name="checkmark-circle" size={24} color="#409858" />
+                <Text style={styles.subscribedText}>Subscribed</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.subscribeButton, isProcessingPayment && styles.disabledButton]}
+                onPress={openPaymentSheet}
+                disabled={isProcessingPayment}
+              >
+                <Text style={styles.subscribeButtonText}>
+                  {isProcessingPayment
+                    ? "Processing..."
+                    : `Subscribe for ${formatPrice(carbonCreditSubscription?.recommendedPrice.unit_amount)}/month`}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Subscription Details</Text>
-            <SubscriptionDetailsItem icon="time-outline" text="Payment due on May 1, 2024" />
-            <SubscriptionDetailsItem icon="calendar-outline" text="Ends on May 31, 2024" />
+            <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
+            <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
             <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
           </View>
         </View>

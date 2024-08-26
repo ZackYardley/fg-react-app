@@ -19,8 +19,14 @@ interface Subscription {
   cancel_at_period_end: boolean;
   canceled_at: null;
   created: string;
-  current_period_end: string;
-  current_period_start: string;
+  current_period_end: {
+    nanoseconds: number;
+    seconds: number;
+  };
+  current_period_start: {
+    nanoseconds: number;
+    seconds: number;
+  };
   ended_at: null;
   items: SubscriptionItem[];
   metadata: {

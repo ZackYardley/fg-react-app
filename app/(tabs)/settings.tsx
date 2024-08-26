@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { Href, useRouter } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import { Image } from "expo-image";
-import { BackButton, PageHeader } from "@/components/common";
+import { PageHeader } from "@/components/common";
 import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +16,7 @@ const blurhash =
 
 interface SettingsItemProps {
   title: string;
-  screen: Href<string>;
+  screen?: Href<string>;
   isDisabled?: boolean;
 }
 
@@ -150,7 +150,7 @@ export default function ProfileScreen() {
 
   const SettingsItem: React.FC<SettingsItemProps> = ({ title, screen, isDisabled }) => (
     <TouchableOpacity
-      onPress={() => (title === "Payment Methods" ? handleUpdatePaymentMethod() : router.push(screen))}
+      onPress={() => (title === "Payment Methods" ? handleUpdatePaymentMethod() : screen ? router.push(screen) : null)}
       style={[styles.settingsItem, isDisabled && styles.disabledSettingsItem]}
       disabled={isDisabled}
     >
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
           </View>
 
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
-          <SettingsItem title="Payment Methods" screen="/payment-methods" isDisabled={isUpdatingPaymentMethod} />
+          <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
           <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
