@@ -129,7 +129,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -137,7 +136,22 @@ const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
     justifyContent: "center",
-    paddingBottom: 64,
+    paddingHorizontal: 12,
+    backgroundColor: "white",
+  },
+  header: {
+    fontSize: 48,
+    fontWeight: "bold",
+    textAlign: "center",
+    letterSpacing: -1,
+    marginVertical: 40,
+  },
+  logoContainer: {
+    alignItems: "center",
+  },
+  logo: {
+    width: 250,
+    height: 125,
   },
   title: {
     fontSize: 48,
@@ -149,20 +163,13 @@ const styles = StyleSheet.create({
   titleHighlight: {
     color: "#409858",
   },
-  logoContainer: {
-    alignItems: "center",
-  },
-  logo: {
-    width: 320,
-    height: 160,
-  },
   formContainer: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-    rowGap: 16,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    rowGap: 12,
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 12,
   },
   inputLabel: {
     marginBottom: 8,
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#409858",
     borderRadius: 9999,
     padding: 16,
-    marginTop: 32,
+    marginTop: 12,
     borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
   orContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 16,
+    marginVertical: 8,
   },
   orLine: {
     flex: 1,
@@ -241,7 +248,7 @@ const styles = StyleSheet.create({
   signUpContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 32,
+    marginTop: 12,
   },
   signUpText: {
     fontSize: 20,

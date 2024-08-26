@@ -46,10 +46,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 96,
+    gap: 75,
   },
   title: {
-    fontSize: 50,
+    fontSize: 48,
     fontWeight: "bold",
   },
   titleHighlight: {

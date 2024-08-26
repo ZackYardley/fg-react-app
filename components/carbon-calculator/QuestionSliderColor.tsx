@@ -70,11 +70,12 @@ export default QuestionSlider;
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 32,
+    marginVertical: 12,
+    marginBottom: 24,
   },
   questionText: {
     fontSize: 20,
-    marginTop: 32,
+    marginTop: 12,
   },
   sliderContainer: {
     marginTop: 16,

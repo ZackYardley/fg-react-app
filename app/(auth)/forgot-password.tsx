@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 16,
-    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    backgroundColor: "white",
   },
   header: {
     fontSize: 48,
@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 320,
-    height: 160,
+    width: 250,
+    height: 125,
   },
   formContainer: {
     rowGap: 16,
