@@ -6,7 +6,7 @@
     "averageMonthlyElectricityBill": 186.71,
     "averageMonthlyWaterBill": 30,
     "averageMonthlyGasBill": 81,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 53.15
   },
   {
     "name": "Alaska",
@@ -15,7 +15,7 @@
     "averageMonthlyElectricityBill": 144.36,
     "averageMonthlyWaterBill": 68,
     "averageMonthlyGasBill": 164,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 43.41
   },
   {
     "name": "Arizona",
@@ -24,7 +24,7 @@
     "averageMonthlyElectricityBill": 161.70,
     "averageMonthlyWaterBill": 64,
     "averageMonthlyGasBill": 82,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 55.85
   },
   {
     "name": "Arkansas",
@@ -33,7 +33,7 @@
     "averageMonthlyElectricityBill": 139.86,
     "averageMonthlyWaterBill": 26,
     "averageMonthlyGasBill": 65,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 39.69
   },
   {
     "name": "California",
@@ -42,7 +42,7 @@
     "averageMonthlyElectricityBill": 183.29,
     "averageMonthlyWaterBill": 77,
     "averageMonthlyGasBill": 34,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 70.98
   },
   {
     "name": "Colorado",
@@ -51,7 +51,7 @@
     "averageMonthlyElectricityBill": 102.21,
     "averageMonthlyWaterBill": 39,
     "averageMonthlyGasBill": 47,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 123.08
   },
   {
     "name": "Connecticut",
@@ -60,7 +60,7 @@
     "averageMonthlyElectricityBill": 211.79,
     "averageMonthlyWaterBill": 69,
     "averageMonthlyGasBill": 107,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 90.61
   },
   {
     "name": "Delaware",
@@ -69,7 +69,7 @@
     "averageMonthlyElectricityBill": 172.01,
     "averageMonthlyWaterBill": 46,
     "averageMonthlyGasBill": 80,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 91.46
   },
   {
     "name": "Florida",
@@ -78,7 +78,7 @@
     "averageMonthlyElectricityBill": 162.76,
     "averageMonthlyWaterBill": 33,
     "averageMonthlyGasBill": 105,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 50.72
   },
   {
     "name": "Georgia",
@@ -87,7 +87,7 @@
     "averageMonthlyElectricityBill": 154.54,
     "averageMonthlyWaterBill": 28,
     "averageMonthlyGasBill": 118,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 57.43
   },
   {
     "name": "Hawaii",
@@ -96,7 +96,7 @@
     "averageMonthlyElectricityBill": 232.73,
     "averageMonthlyWaterBill": 64,
     "averageMonthlyGasBill": 122,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 23.92
   },
   {
     "name": "Idaho",
@@ -105,7 +105,7 @@
     "averageMonthlyElectricityBill": 115.07,
     "averageMonthlyWaterBill": 38,
     "averageMonthlyGasBill": 40,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 98.54
   },
   {
     "name": "Illinois",
@@ -114,7 +114,7 @@
     "averageMonthlyElectricityBill": 120.10,
     "averageMonthlyWaterBill": 26,
     "averageMonthlyGasBill": 97,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 128.43
   },
   {
     "name": "Indiana",
@@ -123,7 +123,7 @@
     "averageMonthlyElectricityBill": 145.64,
     "averageMonthlyWaterBill": 30,
     "averageMonthlyGasBill": 122,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 114.85
   },
   {
     "name": "Iowa",
@@ -132,7 +132,7 @@
     "averageMonthlyElectricityBill": 116.33,
     "averageMonthlyWaterBill": 32,
     "averageMonthlyGasBill": 73,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 111.33
   },
   {
     "name": "Kansas",
@@ -141,7 +141,7 @@
     "averageMonthlyElectricityBill": 133.45,
     "averageMonthlyWaterBill": 27,
     "averageMonthlyGasBill": 106,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 79.74
   },
   {
     "name": "Kentucky",
@@ -150,7 +150,7 @@
     "averageMonthlyElectricityBill": 142.22,
     "averageMonthlyWaterBill": 49,
     "averageMonthlyGasBill": 94,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 48.76
   },
   {
     "name": "Louisiana",
@@ -159,7 +159,7 @@
     "averageMonthlyElectricityBill": 148.70,
     "averageMonthlyWaterBill": 21,
     "averageMonthlyGasBill": 55,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 35.46
   },
   {
     "name": "Maine",
@@ -168,7 +168,7 @@
     "averageMonthlyElectricityBill": 119.34,
     "averageMonthlyWaterBill": 24,
     "averageMonthlyGasBill": 104,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 91.84
   },
   {
     "name": "Maryland",
@@ -177,7 +177,7 @@
     "averageMonthlyElectricityBill": 172.79,
     "averageMonthlyWaterBill": 46,
     "averageMonthlyGasBill": 80,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 46.26
   },
   {
     "name": "Massachusetts",
@@ -186,7 +186,7 @@
     "averageMonthlyElectricityBill": 170.22,
     "averageMonthlyWaterBill": 34,
     "averageMonthlyGasBill": 77,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 106.47
   },
   {
     "name": "Michigan",
@@ -195,7 +195,7 @@
     "averageMonthlyElectricityBill": 125.38,
     "averageMonthlyWaterBill": 29,
     "averageMonthlyGasBill": 74,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 152.44
   },
   {
     "name": "Minnesota",
@@ -204,7 +204,7 @@
     "averageMonthlyElectricityBill": 116.57,
     "averageMonthlyWaterBill": 28,
     "averageMonthlyGasBill": 55,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 93.78
   },
   {
     "name": "Mississippi",
@@ -213,7 +213,7 @@
     "averageMonthlyElectricityBill": 173.63,
     "averageMonthlyWaterBill": 23,
     "averageMonthlyGasBill": 63,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 79.65
   },
   {
     "name": "Missouri",
@@ -222,7 +222,7 @@
     "averageMonthlyElectricityBill": 134.84,
     "averageMonthlyWaterBill": 39,
     "averageMonthlyGasBill": 108,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 69.62
   },
   {
     "name": "Montana",
@@ -231,7 +231,7 @@
     "averageMonthlyElectricityBill": 113.68,
     "averageMonthlyWaterBill": 38,
     "averageMonthlyGasBill": 37,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 81.12
   },
   {
     "name": "Nebraska",
@@ -240,7 +240,7 @@
     "averageMonthlyElectricityBill": 123.60,
     "averageMonthlyWaterBill": 23,
     "averageMonthlyGasBill": 68,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 68.02
   },
   {
     "name": "Nevada",
@@ -249,7 +249,7 @@
     "averageMonthlyElectricityBill": 155.78,
     "averageMonthlyWaterBill": 26,
     "averageMonthlyGasBill": 56,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 97.87
   },
   {
     "name": "New Hampshire",
@@ -258,7 +258,7 @@
     "averageMonthlyElectricityBill": 143.29,
     "averageMonthlyWaterBill": 27,
     "averageMonthlyGasBill": 90,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 131.59
   },
   {
     "name": "New Jersey",
@@ -267,7 +267,7 @@
     "averageMonthlyElectricityBill": 125.83,
     "averageMonthlyWaterBill": 72,
     "averageMonthlyGasBill": 66,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 62.70
   },
   {
     "name": "New Mexico",
@@ -276,7 +276,7 @@
     "averageMonthlyElectricityBill": 94.17,
     "averageMonthlyWaterBill": 32,
     "averageMonthlyGasBill": 60,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 118.67
   },
   {
     "name": "New York",
@@ -285,7 +285,7 @@
     "averageMonthlyElectricityBill": 135.98,
     "averageMonthlyWaterBill": 30,
     "averageMonthlyGasBill": 96,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 105.6
   },
   {
     "name": "North Carolina",
@@ -294,7 +294,7 @@
     "averageMonthlyElectricityBill": 160.59,
     "averageMonthlyWaterBill": 20,
     "averageMonthlyGasBill": 63,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 72.66
   },
   {
     "name": "North Dakota",
@@ -303,7 +303,7 @@
     "averageMonthlyElectricityBill": 126.78,
     "averageMonthlyWaterBill": 31,
     "averageMonthlyGasBill": 62,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 88.91
   },
   {
     "name": "Ohio",
@@ -312,7 +312,7 @@
     "averageMonthlyElectricityBill": 146.40,
     "averageMonthlyWaterBill": 27,
     "averageMonthlyGasBill": 148,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 129.21
   },
   {
     "name": "Oklahoma",
@@ -321,7 +321,7 @@
     "averageMonthlyElectricityBill": 143.91,
     "averageMonthlyWaterBill": 35,
     "averageMonthlyGasBill": 71,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 56.27
   },
   {
     "name": "Oregon",
@@ -330,7 +330,7 @@
     "averageMonthlyElectricityBill": 138.12,
     "averageMonthlyWaterBill": 76,
     "averageMonthlyGasBill": 32,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 37.28
   },
   {
     "name": "Pennsylvania",
@@ -339,7 +339,7 @@
     "averageMonthlyElectricityBill": 153.29,
     "averageMonthlyWaterBill": 31,
     "averageMonthlyGasBill": 103,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 81.79
   },
   {
     "name": "Rhode Island",
@@ -348,7 +348,7 @@
     "averageMonthlyElectricityBill": 164.51,
     "averageMonthlyWaterBill": 32,
     "averageMonthlyGasBill": 95,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 47.18
   },
   {
     "name": "South Carolina",
@@ -357,7 +357,7 @@
     "averageMonthlyElectricityBill": 162.11,
     "averageMonthlyWaterBill": 33,
     "averageMonthlyGasBill": 96,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 52.96
   },
   {
     "name": "South Dakota",
@@ -366,7 +366,7 @@
     "averageMonthlyElectricityBill": 135.85,
     "averageMonthlyWaterBill": 26,
     "averageMonthlyGasBill": 50,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 91.56
   },
   {
     "name": "Tennessee",
@@ -375,7 +375,7 @@
     "averageMonthlyElectricityBill": 151.59,
     "averageMonthlyWaterBill": 43,
     "averageMonthlyGasBill": 66,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 55.28
   },
   {
     "name": "Texas",
@@ -384,7 +384,7 @@
     "averageMonthlyElectricityBill": 176.94,
     "averageMonthlyWaterBill": 37,
     "averageMonthlyGasBill": 61,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 62.81
   },
   {
     "name": "Utah",
@@ -393,7 +393,7 @@
     "averageMonthlyElectricityBill": 86.68,
     "averageMonthlyWaterBill": 38,
     "averageMonthlyGasBill": 35,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 99.84
   },
   {
     "name": "Vermont",
@@ -402,7 +402,7 @@
     "averageMonthlyElectricityBill": 124.11,
     "averageMonthlyWaterBill": 18,
     "averageMonthlyGasBill": 89,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 106.97
   },
   {
     "name": "Virginia",
@@ -411,7 +411,7 @@
     "averageMonthlyElectricityBill": 162.79,
     "averageMonthlyWaterBill": 36,
     "averageMonthlyGasBill": 80,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 70.16
   },
   {
     "name": "Washington",
@@ -420,7 +420,7 @@
     "averageMonthlyElectricityBill": 119.94,
     "averageMonthlyWaterBill": 75,
     "averageMonthlyGasBill": 33,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 29.50
   },
   {
     "name": "West Virginia",
@@ -429,7 +429,7 @@
     "averageMonthlyElectricityBill": 167.11,
     "averageMonthlyWaterBill": 91,
     "averageMonthlyGasBill": 69,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 61.19
   },
   {
     "name": "Wisconsin",
@@ -438,7 +438,7 @@
     "averageMonthlyElectricityBill": 118.40,
     "averageMonthlyWaterBill": 18,
     "averageMonthlyGasBill": 77,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 106.19
   },
   {
     "name": "Wyoming",
@@ -447,6 +447,6 @@
     "averageMonthlyElectricityBill": 108.70,
     "averageMonthlyWaterBill": 53,
     "averageMonthlyGasBill": 43,
-    "averageMonthlyPropaneBill": 152
+    "averageMonthlyPropaneBill": 134.46
   }
 ]
