@@ -371,13 +371,14 @@ const styles = StyleSheet.create({
   factButton: {
     justifyContent: "center", // Center the text vertically
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 16,
     backgroundColor: "#409858",
     borderRadius: 50,
     height: 40,
     width: 150,
     paddingVertical: 4,
     paddingHorizontal: 16,
+    marginHorizontal: "auto",
   },
   offsetButtonText: {
     color: "white",

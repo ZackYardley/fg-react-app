@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import { View, Text, ScrollView, TouchableOpacity, FlatList, StyleSheet, Dimensions } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Menu, Searchbar } from "react-native-paper";
+import { Picker } from "@react-native-picker/picker";
 import statesData from "@/constants/states.json";
 import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
@@ -11,7 +11,6 @@ import { router } from "expo-router";
 import { Loading } from "@/components/common";
 
 export default function EnergyCalculator() {
-  // Automatically fill state and bills at random,
   // Todo: Use geolocation services to determine which state to choose
   const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
     state: "",
@@ -34,18 +33,9 @@ export default function EnergyCalculator() {
 
   // State selection
   const [stateData, setStateData] = useState<StateData>({} as StateData);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
-  const filteredStates = statesData.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.abbreviation.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     const loadData = async () => {
@@ -64,16 +54,7 @@ export default function EnergyCalculator() {
             }
           } else {
             const randomState = statesData[Math.floor(Math.random() * statesData.length)];
-            setSurveyData({
-              ...surveyData,
-              state: randomState.name,
-              electricBill: randomState.averageMonthlyElectricityBill.toFixed(2),
-              waterBill: randomState.averageMonthlyWaterBill.toFixed(2),
-              propaneBill: randomState.averageMonthlyPropaneBill.toFixed(2),
-              gasBill: randomState.averageMonthlyGasBill.toFixed(2),
-              useWoodStove: "No",
-              peopleInHome: 1,
-            });
+            handleStateChange(randomState.name);
           }
         } else {
         }
@@ -85,6 +66,7 @@ export default function EnergyCalculator() {
     };
 
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -156,8 +138,22 @@ export default function EnergyCalculator() {
     setProgress(0.66 + (completedQuestions / totalQuestions) * 0.33);
   }, [surveyData]);
 
+  const handleStateChange = (itemValue: string) => {
+    const selectedState = statesData.find((s) => s.name === itemValue);
+    if (selectedState) {
+      setSurveyData({
+        ...surveyData,
+        state: itemValue,
+        electricBill: selectedState.averageMonthlyElectricityBill.toFixed(2),
+        waterBill: selectedState.averageMonthlyWaterBill.toFixed(2),
+        propaneBill: selectedState.averageMonthlyPropaneBill.toFixed(2),
+        gasBill: selectedState.averageMonthlyGasBill.toFixed(2),
+      });
+      setStateData(selectedState as StateData);
+    }
+  };
+
   const handleNextButton = async () => {
-    setIsLoading(true);
     try {
       await saveEmissionsData({
         surveyData: { ...surveyData },
@@ -165,42 +161,19 @@ export default function EnergyCalculator() {
         totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
       });
       // [Error: You attempted to use a Firebase module that's not installed natively on your project by calling firebase.analytics().
-      // await analytics().logEvent("energy_emission_calculated", {
-      //   emissionsDocument: {
-      //     surveyData: surveyData,
-      //     surveyEmissions: surveyEmissions,
-      //     totalEmissions: (surveyEmissions.energyEmissions || 0) + transportationEmissions + dietEmissions,
-      //   },
-      // });
-      router.push("/breakdown");
+      await analytics().logEvent("energy_emission_calculated", {
+        emissionsDocument: {
+          surveyData: surveyData,
+          surveyEmissions: surveyEmissions,
+          totalEmissions: (surveyEmissions.energyEmissions || 0) + transportationEmissions + dietEmissions,
+        },
+      });
     } catch (error) {
       console.error("Error saving emissions data:", error);
     } finally {
-      setIsLoading(false);
       router.push("/breakdown");
     }
   };
-
-  const renderItem = useCallback(
-    ({ item }: { item: (typeof statesData)[number] }) => (
-      <Menu.Item
-        onPress={() => {
-          setSurveyData({
-            ...surveyData,
-            state: item.name,
-            electricBill: item.averageMonthlyElectricityBill.toFixed(2),
-            waterBill: item.averageMonthlyWaterBill.toFixed(2),
-            propaneBill: item.averageMonthlyPropaneBill.toFixed(2),
-            gasBill: item.averageMonthlyGasBill.toFixed(2),
-          });
-          setMenuVisible(false);
-        }}
-        title={`${item.name} (${item.abbreviation})`}
-        style={{ width: "100%" }}
-      />
-    ),
-    [surveyData]
-  );
 
   if (isLoading) {
     return <Loading />;
@@ -214,32 +187,15 @@ export default function EnergyCalculator() {
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
-          <Menu
-            visible={menuVisible}
-            onDismiss={() => setMenuVisible(false)}
-            anchor={
-              <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                <View style={styles.stateSelectionButton}>
-                  <Text>{surveyData.state || "Select a state"}</Text>
-                </View>
-              </TouchableOpacity>
-            }
-            style={{ width: screenWidth - 96 }}
-            theme={{ colors: { elevation: { level2: "white" } } }}
-          >
-            <Searchbar
-              placeholder="Search states"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              theme={{ colors: { elevation: { level3: "white" } } }}
-            />
-            <FlatList
-              data={filteredStates}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.abbreviation}
-              style={styles.stateList}
-            />
-          </Menu>
+          <Picker selectedValue={surveyData.state} onValueChange={handleStateChange} style={styles.picker}>
+            {statesData.map((state) => (
+              <Picker.Item
+                key={state.abbreviation}
+                label={`${state.name} (${state.abbreviation})`}
+                value={state.name}
+              />
+            ))}
+          </Picker>
 
           <NumberInput
             question="How much was your electric bill last month? ⚡"
@@ -348,13 +304,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 18,
   },
-  stateSelectionButton: {
+  picker: {
     marginTop: 8,
     backgroundColor: "white",
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 8,
-    padding: 12,
   },
   emissionsContainer: {
     marginTop: 32,
@@ -380,8 +335,5 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontWeight: "bold",
-  },
-  stateList: {
-    maxHeight: 300,
   },
 });
