@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, SafeAreaView, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CreditItem from "@/components/carbon-credit/CreditItem";
 import ProjectCard from "@/components/carbon-credit/ProjectCard";
 import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/products";
@@ -123,16 +124,18 @@ export default function CarbonCreditScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        ListHeaderComponent={renderHeader}
-        data={credits}
-        renderItem={renderCreditItem}
-        keyExtractor={(item) => item.name}
-        numColumns={3}
-        columnWrapperStyle={styles.columnWrapper}
-        style={styles.flatList}
-        ListFooterComponent={renderFooter}
-      />
+      <View style={{ flexGrow: 1 }}>
+        <FlatList
+          ListHeaderComponent={renderHeader}
+          data={credits}
+          renderItem={renderCreditItem}
+          keyExtractor={(item) => item.name}
+          numColumns={3}
+          columnWrapperStyle={styles.columnWrapper}
+          style={styles.flatList}
+          ListFooterComponent={renderFooter}
+        />
+      </View>
     </SafeAreaView>
   );
 }
