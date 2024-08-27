@@ -3,4 +3,4 @@ export * from "./subscription";
 export * from "./plan";
 export * from "./cart";
 export * from "./payment";
-export * from "./emissions-calculator";
+export * from "./emissions";

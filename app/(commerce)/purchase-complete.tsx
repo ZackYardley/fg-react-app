@@ -75,7 +75,7 @@ const PurchaseCompleteScreen = () => {
 
     const userEmissionsData = await fetchEmissionsData();
     if (userEmissionsData) {
-      const userEmissions = userEmissionsData.totalData.totalEmissions;
+      const userEmissions = userEmissionsData.totalEmissions;
       const carbonCreditSubscription = await fetchCarbonCreditSubscription(userEmissions);
       setCarbonCreditSubscription(carbonCreditSubscription?.product || null);
       setTotalCO2Offset(fetchedSubscription.quantity);

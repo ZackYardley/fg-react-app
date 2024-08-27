@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { RadioButton, TextInput, HelperText } from "react-native-paper";
 
@@ -10,21 +10,16 @@ const TransportQuestion = ({
   setFrequency,
   frequencyError,
   label,
-  validateNumber,
-}: any) => {
+}: {
+  question: string;
+  useTransport: string;
+  setUseTransport: (value: string) => void;
+  frequency: string;
+  setFrequency: (value: string) => void;
+  frequencyError?: string;
+  label?: string;
+}) => {
   const inputRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (useTransport === "No") {
-      setFrequency("0");
-    }
-  }, [useTransport, setFrequency]);
-  useEffect(() => {
-    if (useTransport === "Yes") {
-      setFrequency("1");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useTransport]);
 
   return (
     <View style={styles.container}>
@@ -32,11 +27,7 @@ const TransportQuestion = ({
       <View style={styles.optionsContainer}>
         <View style={styles.optionsColumn}>
           {["Yes", "No"].map((option) => (
-            <TouchableOpacity
-              key={option}
-              onPress={() => setUseTransport(option)}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity key={option} onPress={() => setUseTransport(option)} activeOpacity={0.7}>
               <View style={styles.optionRow}>
                 <RadioButton.Android
                   value={option}
@@ -57,7 +48,7 @@ const TransportQuestion = ({
               ref={inputRef}
               placeholder=""
               value={frequency}
-              onChangeText={(value) => validateNumber(value, setFrequency)}
+              onChangeText={(value) => setFrequency(value)}
               keyboardType="numeric"
               mode="outlined"
               outlineStyle={{
@@ -68,11 +59,7 @@ const TransportQuestion = ({
               style={styles.textInput}
               dense={true}
               textColor="#000"
-              right={
-                label ? (
-                  <TextInput.Affix text={label} textStyle={{ color: "#000" }} />
-                ) : null
-              }
+              right={label ? <TextInput.Affix text={label} textStyle={{ color: "#000" }} /> : null}
             />
             <HelperText type="error" visible={!!frequencyError}>
               {frequencyError}

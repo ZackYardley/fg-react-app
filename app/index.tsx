@@ -2,7 +2,7 @@ import { useRootNavigationState, Redirect, router } from "expo-router";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect, useRef } from "react";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
 import { Loading } from "@/components/common";
@@ -12,6 +12,7 @@ import ConfettiCannon from "react-native-confetti-cannon";
 export default function Index() {
   const [debugMode, setDebugMode] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [hasCalculatedEmissions, setHasCalculatedEmissions] = useState(false);
   const [loading, setLoading] = useState(true);
   const rootNavigationState = useRootNavigationState();
@@ -20,36 +21,40 @@ export default function Index() {
   useEffect(() => {
     const checkUserStatus = async () => {
       const auth = getAuth();
-      const user = auth.currentUser;
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          setIsLoggedIn(true);
+          setIsAnonymous(user.isAnonymous);
 
-      if (user) {
-        setIsLoggedIn(true);
+          const emissionsData = await fetchEmissionsData();
+          if (emissionsData?.totalEmissions) {
+            const lastUpdated = emissionsData.lastUpdated?.toDate();
+            const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
 
-        const emissionsData = await fetchEmissionsData();
-        if (emissionsData) {
-          const lastUpdated = emissionsData.lastUpdated?.toDate();
-          const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
+            const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
+            setHasCalculatedEmissions(hasCalculated);
 
-          const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
-          setHasCalculatedEmissions(hasCalculated);
-
-          if (daysSinceLastUpdate === null || daysSinceLastUpdate > 30) {
+            if (daysSinceLastUpdate === null || daysSinceLastUpdate > 30) {
+              router.push({
+                pathname: "/pre-survey",
+                params: { fromIndex: "true" },
+              });
+            }
+          } else {
+            setHasCalculatedEmissions(false);
             router.push({
               pathname: "/pre-survey",
               params: { fromIndex: "true" },
             });
           }
         } else {
-          setHasCalculatedEmissions(false);
-          router.push({
-            pathname: "/pre-survey",
-            params: { fromIndex: "true" },
-          });
+          setIsLoggedIn(false);
+          setIsAnonymous(false);
         }
-      } else {
-        setIsLoggedIn(false);
-      }
-      setLoading(false);
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
     };
 
     checkUserStatus();
@@ -109,14 +114,21 @@ export default function Index() {
     );
   } else {
     // Check if user is logged in and redirect accordingly
+    if (isAnonymous) {
+      if (!hasCalculatedEmissions) {
+        return <Redirect href="/pre-survey" />;
+      } else {
+        return <Redirect href="/signup" />;
+      }
+    }
     if (isLoggedIn) {
       if (!hasCalculatedEmissions) {
-        return <Redirect href="/pre-survey" />; // Redirect to emissions calculation if not done this month
+        return <Redirect href="/pre-survey" />;
+      } else {
+        return <Redirect href="/home" />;
       }
-      return <Redirect href="/home" />;
-    } else {
-      return <Redirect href="/get-started" />;
     }
+    return <Redirect href="/get-started" />;
   }
 }
 

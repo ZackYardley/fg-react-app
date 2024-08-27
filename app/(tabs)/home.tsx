@@ -12,15 +12,9 @@ import {
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
-import {
-  PieChartBreakdown,
-  BarChartBreakdown,
-  EarthBreakdown,
-  LineChartBreakdown,
-} from "@/components/breakdown";
+import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
 import { TARGET_EMISSIONS } from "@/constants";
-
 
 const TextButton = ({ label, style }: { label: string; style: object }) => (
   <View style={[styles.textButton, style]}>
@@ -43,11 +37,10 @@ const HomeScreen = () => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data !== null) {
-        const totalData = data.totalData;
-        setEmissionsPerYear(totalData.totalEmissions);
-        setTransportationEmissions(totalData.transportationEmissions);
-        setDietEmissions(totalData.dietEmissions);
-        setEnergyEmissions(totalData.energyEmissions);
+        setEmissionsPerYear(data.totalEmissions);
+        setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
+        setDietEmissions(data.surveyEmissions.dietEmissions || 0);
+        setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
       }
     };
 
@@ -74,111 +67,56 @@ const HomeScreen = () => {
 
         {/* Fast Fact */}
         <View style={styles.fastFact}>
-          <Text style={styles.fastFactTitle}>
-            Forevergreen Fast Fact of the Day
-          </Text>
+          <Text style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</Text>
           <Text style={styles.fastFactText}>{fact}</Text>
           <TouchableOpacity
             style={styles.factButton}
-            onPress={handleNewFact}  // Call the function directly
+            onPress={handleNewFact} // Call the function directly
           >
-          <Text style={styles.offsetButtonText}>See New Fact</Text>
+            <Text style={styles.offsetButtonText}>See New Fact</Text>
           </TouchableOpacity>
         </View>
 
         {/* Carbon Footprint and Calculator */}
         <View style={styles.footprintContainer}>
-          <TouchableOpacity
-            style={styles.footprintBox}
-            onPress={() => router.push("/breakdown")}
-          >
+          <TouchableOpacity style={styles.footprintBox} onPress={() => router.push("/breakdown")}>
             <Text style={styles.boxTitle}>Your Carbon Footprint</Text>
-            <Text style={styles.boxLargeText}>
-              {Math.min(emissionsPerYear, 99.9).toFixed(1)}
-            </Text>
+            <Text style={styles.boxLargeText}>{Math.min(emissionsPerYear, 99.9).toFixed(1)}</Text>
             <Text style={styles.boxMediumText}>Tons of CO2</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.calculatorBox}
-            onPress={() => router.push("/pre-survey")}
-          >
+          <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
             <Text style={styles.boxTitle}>Calculate your impact</Text>
             <View style={styles.calculator}>
               {/* Calculator buttons */}
               <>
                 <View style={styles.calculatorRow}>
                   <TextButton label="AC" style={styles.grayButton} />
-                  <TextButton
-                    label="+/-"
-                    style={[styles.grayButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="%"
-                    style={[styles.grayButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="/"
-                    style={[styles.greenButton, styles.marginLeft]}
-                  />
+                  <TextButton label="+/-" style={[styles.grayButton, styles.marginLeft]} />
+                  <TextButton label="%" style={[styles.grayButton, styles.marginLeft]} />
+                  <TextButton label="/" style={[styles.greenButton, styles.marginLeft]} />
                 </View>
                 <View style={styles.calculatorRow}>
                   <TextButton label="7" style={styles.darkButton} />
-                  <TextButton
-                    label="8"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="9"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="X"
-                    style={[styles.greenButton, styles.marginLeft]}
-                  />
+                  <TextButton label="8" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="9" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="X" style={[styles.greenButton, styles.marginLeft]} />
                 </View>
                 <View style={styles.calculatorRow}>
                   <TextButton label="4" style={styles.darkButton} />
-                  <TextButton
-                    label="5"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="6"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="-"
-                    style={[styles.greenButton, styles.marginLeft]}
-                  />
+                  <TextButton label="5" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="6" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="-" style={[styles.greenButton, styles.marginLeft]} />
                 </View>
                 <View style={styles.calculatorRow}>
                   <TextButton label="1" style={styles.darkButton} />
-                  <TextButton
-                    label="2"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="3"
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="+"
-                    style={[styles.greenButton, styles.marginLeft]}
-                  />
+                  <TextButton label="2" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="3" style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="+" style={[styles.greenButton, styles.marginLeft]} />
                 </View>
                 <View style={styles.calculatorRow}>
-                  <TextButton
-                    label="0"
-                    style={[styles.darkButton, styles.wideButton]}
-                  />
-                  <TextButton
-                    label="."
-                    style={[styles.darkButton, styles.marginLeft]}
-                  />
-                  <TextButton
-                    label="="
-                    style={[styles.greenButton, styles.marginLeft]}
-                  />
+                  <TextButton label="0" style={[styles.darkButton, styles.wideButton]} />
+                  <TextButton label="." style={[styles.darkButton, styles.marginLeft]} />
+                  <TextButton label="=" style={[styles.greenButton, styles.marginLeft]} />
                 </View>
               </>
             </View>
@@ -231,10 +169,7 @@ const HomeScreen = () => {
                 <Text style={styles.boldText}>3.</Text> zyardley - 8 Referrals
               </Text>
             </View>
-            <Pressable
-              style={styles.referButton}
-              onPress={() => router.push("/referral")}
-            >
+            <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
               <Text style={styles.referButtonText}>Refer a friend!</Text>
             </Pressable>
           </View>
@@ -248,32 +183,22 @@ const HomeScreen = () => {
             <View style={styles.pieChartContainer}>
               <PieChartBreakdown
                 names={["Transportation", "Diet", "Energy"]}
-                values={[
-                  transportationEmissions,
-                  dietEmissions,
-                  energyEmissions,
-                ]}
+                values={[transportationEmissions, dietEmissions, energyEmissions]}
                 colors={["#44945F", "#AEDCA7", "#66A570"]}
                 width={Math.round(width / 3)}
                 height={100}
               />
               <View style={styles.legendContainer}>
                 <View style={styles.legendItem}>
-                  <View
-                    style={[styles.legendColor, { backgroundColor: "#44945F" }]}
-                  />
+                  <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
                   <Text>Transportation</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View
-                    style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]}
-                  />
+                  <View style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]} />
                   <Text>Diet</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View
-                    style={[styles.legendColor, { backgroundColor: "#66A570" }]}
-                  />
+                  <View style={[styles.legendColor, { backgroundColor: "#66A570" }]} />
                   <Text>Energy</Text>
                 </View>
               </View>
@@ -283,9 +208,7 @@ const HomeScreen = () => {
           {/* You vs the Average American */}
           <View style={styles.chartBox}>
             <Text style={styles.chartTitle}>You vs the Average American</Text>
-            <Text style={styles.chartSubtitle}>
-              See how you rank vs the average American
-            </Text>
+            <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
             <BarChartBreakdown
               names={["You", "Average American"]}
               values={[emissionsPerYear, 21]}
@@ -296,8 +219,7 @@ const HomeScreen = () => {
           {/* If everyone lived like you */}
           <View style={styles.chartBox}>
             <Text style={styles.chartText}>
-              If everyone lived like you we'd need{" "}
-              {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths
+              If everyone lived like you we'd need {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths
             </Text>
             <EarthBreakdown emissions={emissionsPerYear} />
           </View>
@@ -447,8 +369,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   factButton: {
-    justifyContent: 'center', // Center the text vertically
-    alignItems: 'center',
+    justifyContent: "center", // Center the text vertically
+    alignItems: "center",
     marginTop: 10,
     backgroundColor: "#409858",
     borderRadius: 50,

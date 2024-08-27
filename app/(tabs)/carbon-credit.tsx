@@ -41,7 +41,7 @@ export default function CarbonCreditScreen() {
         }
 
         if (userEmissionsData) {
-          const userEmissions = userEmissionsData.totalData.totalEmissions;
+          const userEmissions = userEmissionsData.totalEmissions;
           const subscriptionResult = await fetchCarbonCreditSubscription(userEmissions);
           if (subscriptionResult) {
             setSubscriptionPrice(subscriptionResult.recommendedPrice.unit_amount);
