@@ -35,7 +35,7 @@ const fetchSubscriptionStatus = async (subscriptionId: string): Promise<boolean>
   }
 };
 
-const fetchSubscriptionById = async (invoiceId: string): Promise<Subscription | null> => {
+const fetchSubscriptionByInvoice = async (invoiceId: string): Promise<Subscription | null> => {
   const auth = getAuth();
   const userId = auth.currentUser?.uid;
 
@@ -51,6 +51,39 @@ const fetchSubscriptionById = async (invoiceId: string): Promise<Subscription | 
     if (subscription.exists()) {
       return subscription.data() as Subscription;
     }
+    return null;
+  } catch (error) {
+    console.error("Error checking Carbon Credit subscription:", error);
+    throw error;
+  }
+};
+
+const fetchSubscriptionByProduct = async (productId: string): Promise<Subscription | null> => {
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+
+  if (!userId) {
+    throw new Error("User is not authenticated");
+  }
+
+  const db = getFirestore();
+  const subscriptionsRef = collection(db, "users", userId, "subscriptions");
+
+  try {
+    // Query for active subscriptions
+    const activeSubscriptionsQuery = query(subscriptionsRef, where("status", "==", "active"));
+
+    const querySnapshot = await getDocs(activeSubscriptionsQuery);
+
+    // Check each subscription's items for the product ID
+    for (const doc of querySnapshot.docs) {
+      const subscription = doc.data() as Subscription;
+      const hasProduct = subscription.items.some((item) => item.plan.product === productId);
+      if (hasProduct) {
+        return subscription;
+      }
+    }
+
     return null;
   } catch (error) {
     console.error("Error checking Carbon Credit subscription:", error);
@@ -143,4 +176,10 @@ const fetchInvoiceById = async (invoiceId: string): Promise<Invoice | null> => {
   }
 };
 
-export { fetchSubscriptionStatus, fetchSubscriptionById, fetchRecentInvoices, fetchInvoiceById };
+export {
+  fetchSubscriptionStatus,
+  fetchSubscriptionByInvoice,
+  fetchSubscriptionByProduct,
+  fetchRecentInvoices,
+  fetchInvoiceById,
+};

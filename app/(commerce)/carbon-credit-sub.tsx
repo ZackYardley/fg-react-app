@@ -10,7 +10,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { BackButton, Loading, NotFoundComponent, PageHeader } from "@/components/common";
 import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
 import { fetchCarbonCreditSubscription } from "@/api/products";
-import { fetchSubscriptionStatus, fetchSubscriptionById } from "@/api/subscriptions";
+import { fetchSubscriptionStatus, fetchSubscriptionByProduct } from "@/api/subscriptions";
 import { fetchEmissionsData } from "@/api/emissions";
 import { formatPrice } from "@/utils";
 import { CarbonCreditSubscription, Price } from "@/types";
@@ -45,7 +45,7 @@ const CarbonCreditSubscriptionScreen = () => {
           const subscriptionStatus = await fetchSubscriptionStatus(result.product.id || "");
           setIsSubscribed(subscriptionStatus);
           if (subscriptionStatus) {
-            const subscription = await fetchSubscriptionById(result.product.id || "");
+            const subscription = await fetchSubscriptionByProduct(result.product.id || "");
             if (subscription) {
               setCurrentPeriodEnd(dayjs(subscription.current_period_end.seconds * 1000).format("MMMM D, YYYY"));
               setCurrentPeriodStart(dayjs(subscription.current_period_start.seconds * 1000).format("MMMM D, YYYY"));

@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
 import { BackButton, Loading, PageHeader, NotFoundComponent } from "@/components/common";
 import { getPaymentById } from "@/api/payments";
-import { fetchInvoiceById, fetchSubscriptionById } from "@/api/subscriptions";
+import { fetchInvoiceById, fetchSubscriptionByInvoice } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription, fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Pamona } from "@/constants/Images";
@@ -67,7 +67,7 @@ const PurchaseCompleteScreen = () => {
     }
     setPrice(invoice.amount_paid);
 
-    const fetchedSubscription = await fetchSubscriptionById(invoice.subscription);
+    const fetchedSubscription = await fetchSubscriptionByInvoice(invoice.subscription);
     if (!fetchedSubscription) {
       throw new Error("Subscription not found");
     }
