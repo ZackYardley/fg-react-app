@@ -88,17 +88,17 @@ export default TransportQuestion;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 32,
+    marginTop: 12,
   },
   questionText: {
     fontSize: 20,
-    marginTop: 32,
+    marginTop: 12,
   },
   optionsContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 24,
+    marginTop: 12,
   },
   optionsColumn: {
     marginLeft: -8,
@@ -122,6 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     width: "auto",
     borderRadius: 10,
-    marginTop: 16,
+    marginTop: 12,
   },
 });

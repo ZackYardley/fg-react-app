@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   validButton: {
     borderColor: "black",
-    backgroundColor: "#AEDCA7",
+    backgroundColor: "#409858",
   },
   invalidButton: {
     borderColor: "#D1D5DB", // Equivalent to Tailwind's gray-300

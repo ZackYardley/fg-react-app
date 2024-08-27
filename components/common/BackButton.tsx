@@ -1,9 +1,9 @@
 import React from "react";
 import { Text, Pressable, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 
-export const BackButton = ({ link }: { link?: string }) => {
+const BackButton = ({ link }: { link?: Href<string> }) => {
   const navigate = () => {
     if (link) {
       router.replace(link);
@@ -21,6 +21,8 @@ export const BackButton = ({ link }: { link?: string }) => {
     </Pressable>
   );
 };
+
+export default BackButton;
 
 const styles = StyleSheet.create({
   container: {

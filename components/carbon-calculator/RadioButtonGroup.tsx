@@ -44,10 +44,10 @@ export default RadioButtonGroup;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
+    marginTop: 12,
   },
   questionText: {
-    marginTop: 24,
+    marginTop: 12,
     marginBottom: 12,
     fontSize: 20,
   },

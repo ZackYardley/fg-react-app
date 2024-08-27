@@ -2,28 +2,23 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { Href, router, useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import { Image } from "expo-image";
-import { BackButton, PageHeader } from "@/components/common";
+import { PageHeader } from "@/components/common";
 import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { fetchSetupPaymentSheetParams } from "@/api/purchase";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 interface SettingsItemProps {
   title: string;
-  screen: Href<string>;
+  screen?: Href<string>;
+  isDisabled?: boolean;
 }
-
-const SettingsItem: React.FC<SettingsItemProps> = ({ title, screen }) => (
-  <TouchableOpacity onPress={() => router.push(screen)} style={styles.settingsItem}>
-    <Text style={styles.settingsItemTitle}>{title}</Text>
-    <Icon name="chevron-right" size={48} />
-  </TouchableOpacity>
-);
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<User | null>(null);
@@ -31,7 +26,8 @@ export default function ProfileScreen() {
   const auth = getAuth();
   const [totalEmissions, setTotalEmissions] = useState<number>(0);
   const profileIcon = auth.currentUser?.photoURL;
-  const { resetPaymentSheetCustomer } = useStripe();
+  const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
@@ -107,11 +103,66 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleUpdatePaymentMethod = async () => {
+    if (!user) {
+      Alert.alert("Error", "You must be logged in to update your payment method.");
+      return;
+    }
+
+    if (isUpdatingPaymentMethod) {
+      return; // Prevent multiple calls while already processing
+    }
+
+    setIsUpdatingPaymentMethod(true);
+
+    try {
+      const { setupIntent, ephemeralKey, customer } = await fetchSetupPaymentSheetParams(user.uid);
+
+      const { error } = await initPaymentSheet({
+        merchantDisplayName: "Forevergreen",
+        customerId: customer,
+        customerEphemeralKeySecret: ephemeralKey,
+        setupIntentClientSecret: setupIntent,
+        allowsDelayedPaymentMethods: true,
+        returnURL: "com.fgdevteam.fgreactapp://stripe-redirect",
+      });
+
+      if (error) {
+        console.error("Error initializing payment sheet:", error);
+        Alert.alert("Error", "Failed to initialize payment update. Please try again.");
+        return;
+      }
+
+      const { error: presentError } = await presentPaymentSheet();
+
+      if (presentError) {
+        Alert.alert(`Error code: ${presentError.code}`, presentError.message);
+      } else {
+        Alert.alert("Success", "Your payment method has been updated successfully.");
+      }
+    } catch (error) {
+      console.error("Error updating payment method:", error);
+      Alert.alert("Error", "Failed to update payment method. Please try again.");
+    } finally {
+      setIsUpdatingPaymentMethod(false);
+    }
+  };
+
+  const SettingsItem: React.FC<SettingsItemProps> = ({ title, screen, isDisabled }) => (
+    <TouchableOpacity
+      onPress={() => (title === "Payment Methods" ? handleUpdatePaymentMethod() : screen ? router.push(screen) : null)}
+      style={[styles.settingsItem, isDisabled && styles.disabledSettingsItem]}
+      disabled={isDisabled}
+    >
+      <Text style={[styles.settingsItemTitle, isDisabled && styles.disabledSettingsItemTitle]}>{title}</Text>
+      <Icon name="chevron-right" size={48} color={isDisabled ? "#999" : "#000"} />
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={{ flexGrow: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
-        <BackButton />
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
             <View style={styles.profileImageBG}>
@@ -138,9 +189,10 @@ export default function ProfileScreen() {
           </View>
 
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
-          <SettingsItem title="Payment Methods" screen="/payment-methods" />
+          <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
           <SettingsItem title="Notifications" screen="/notifications-settings" />
+          <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <View style={styles.carbonFootprint}>
             <Text style={styles.carbonFootprintTitle}>Your carbon footprint...</Text>
@@ -151,23 +203,6 @@ export default function ProfileScreen() {
               </Text>
               <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
                 <Text style={styles.offsetButtonText}>Offset Now!</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.manageSubscriptions}>
-            <Text style={styles.manageSubscriptionsTitle}>Manage Subscriptions</Text>
-            <View style={styles.subscriptionButtons}>
-              <TouchableOpacity
-                onPress={() => router.push("/subscriptions-settings")}
-                style={styles.subscriptionButton}
-              >
-                <Text style={styles.subscriptionEmoji}>⚙️</Text>
-                <Text style={styles.subscriptionButtonText}>Settings</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push("/subscriptions")} style={styles.subscriptionButton}>
-                <Text style={styles.subscriptionEmoji}>🛒</Text>
-                <Text style={styles.subscriptionButtonText}>View Subscriptions</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -294,6 +329,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
+  disabledSettingsItem: {
+    opacity: 0.5,
+  },
+  disabledSettingsItemTitle: {
+    color: "#999",
+  },
   carbonFootprint: {
     padding: 16,
     borderRadius: 8,
@@ -331,30 +372,6 @@ const styles = StyleSheet.create({
   offsetButtonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "600",
-  },
-  manageSubscriptions: {
-    backgroundColor: "#e5e7eb",
-    padding: 16,
-    borderRadius: 8,
-  },
-  manageSubscriptionsTitle: {
-    fontSize: 20,
-    textAlign: "center",
-    marginBottom: 12,
-    fontWeight: "700",
-  },
-  subscriptionButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  subscriptionButton: {
-    alignItems: "center",
-  },
-  subscriptionEmoji: {
-    fontSize: 24,
-  },
-  subscriptionButtonText: {
     fontWeight: "600",
   },
   logoutButton: {

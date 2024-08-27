@@ -163,7 +163,6 @@ export default function TransportationCalculator() {
             <Text>
               First you will calculate your transportation emissions! These are all the related emissions for how you choose to get around.
             </Text>
-
             <QuestionSliderColor
               question="In the last year, how many long round-trip flights have you been on? (more than 10 hours round trip) ✈️"
               value={longFlights}

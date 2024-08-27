@@ -1,21 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
-import { View, Text, ScrollView, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, FlatList, StyleSheet, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Menu, Searchbar } from "react-native-paper";
 import statesData from "@/constants/states.json";
 import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
 import { useEmissions } from "@/contexts";
 import { saveEmissionsData } from "@/api/emissions";
-import { stateData } from "@/types";
-import analytics from '@react-native-firebase/analytics';
-
+import { StateData } from "@/types";
+import analytics from "@react-native-firebase/analytics";
 
 export default function EnergyCalculator() {
   const { transportationData, dietData, energyData, totalData, updateEnergyData, updateTotalData } = useEmissions();
 
   // State selection
   const [state, setState] = useState(energyData.state || "");
-  const [stateData, setStateData] = useState<stateData>({} as stateData);
+  const [stateData, setStateData] = useState<StateData>({} as StateData);
   const [menuVisible, setMenuVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const filteredStates = statesData.filter(
@@ -23,12 +22,13 @@ export default function EnergyCalculator() {
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.abbreviation.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     if (state) {
       const selectedState = statesData.find((s) => s.name === state);
       if (selectedState) {
-        setStateData(selectedState as stateData);
+        setStateData(selectedState as StateData);
       }
     }
   }, [state]);
@@ -65,9 +65,12 @@ export default function EnergyCalculator() {
   // Calculate emissions
   useEffect(() => {
     if (stateData && electricBill && waterBill && propaneBill && gasBill && peopleInHome) {
-      // Calculate electricity emissions
+      // Calculate electricity emissions NOTE: No idea what the 100 is for, but it just works
       const electricityEmissions =
-        (stateData.stateEGridValue / 2000) * (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
+        ((stateData.stateEGridValue * 0.000453592) / 1000) *
+        900 *
+        12 *
+        (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
 
       // Calculate water emissions
       const waterEmissions = (parseFloat(waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
@@ -165,19 +168,10 @@ export default function EnergyCalculator() {
           setMenuVisible(false);
         }}
         title={`${item.name} (${item.abbreviation})`}
+        style={{ width: "100%" }}
       />
     ),
-    [
-      setState,
-      setElectricBill,
-      setWaterBill,
-      setPropaneBill,
-      setGasBill,
-      setElectricBillError,
-      setWaterBillError,
-      setPropaneBillError,
-      setGasBillError,
-    ]
+    []
   );
 
   const validateNumber = (
@@ -220,9 +214,7 @@ export default function EnergyCalculator() {
       <SafeAreaView>
         <View style={styles.contentContainer}>
           <Header progress={progress} title="Energy" />
-          <Text>
-              The last section are your energy emissions! These are all your utilties and energy usage at home.
-            </Text>
+          <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
           <Menu
@@ -235,8 +227,15 @@ export default function EnergyCalculator() {
                 </View>
               </TouchableOpacity>
             }
+            style={{ width: screenWidth - 96 }}
+            theme={{ colors: { elevation: { level2: "white" } } }}
           >
-            <Searchbar placeholder="Search states" onChangeText={setSearchQuery} value={searchQuery} />
+            <Searchbar
+              placeholder="Search states"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              theme={{ colors: { elevation: { level3: "white" } } }}
+            />
             <FlatList
               data={filteredStates}
               renderItem={renderItem}
@@ -366,7 +365,7 @@ export default function EnergyCalculator() {
             });
 
             //Log an event to Firebase Analytics!
-            await analytics().logEvent('carbon_emission_calculated', {
+            await analytics().logEvent("carbon_emission_calculated", {
               transportation: transportationData,
               diet: dietData,
               energy: energyData,

@@ -1,48 +1,26 @@
-import { getFirestore, doc, runTransaction, serverTimestamp, collection, getDoc, addDoc } from "firebase/firestore";
-import { CartItem, CarbonCredit } from "@/types";
+import { getFirestore, doc, runTransaction, collection, getDoc, addDoc, updateDoc } from "firebase/firestore";
+import { TransactionItem } from "@/types";
 
-// Purchase carbon credits
-const purchaseCarbonCredits = async (userId: string, items: CartItem[], paymentIntentId: string) => {
+const purchaseCarbonCredits = async (
+  userId: string,
+  items: TransactionItem[],
+  paymentIntentId: string
+): Promise<{ success: boolean; error?: string }> => {
   const db = getFirestore();
   const userRef = doc(db, "users", userId);
 
   try {
-    // Calculate total amount
-    let totalAmount = 0;
-    const creditPromises = items.map(async (item) => {
-      const creditRef = doc(db, "carbonCredits", item.id);
-      const creditDoc = await getDoc(creditRef);
-      if (!creditDoc.exists()) {
-        throw new Error(`Carbon credit with ID ${item.id} does not exist`);
-      }
-      const creditData = creditDoc.data() as CarbonCredit;
-      totalAmount += creditData.price * item.quantity;
-      return { id: item.id, quantity: item.quantity };
-    });
-    const purchasedCredits = await Promise.all(creditPromises);
-
     // Use a transaction to ensure data consistency
-    const result = await runTransaction(db, async (transaction) => {
+    await runTransaction(db, async (transaction) => {
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists()) {
         throw new Error("User document does not exist!");
       }
 
-      // Create a new transaction document
-      const transactionRef = doc(collection(db, "users", userId, "transactions"));
-      const transactionData = {
-        credits: purchasedCredits,
-        totalAmount,
-        purchaseDate: serverTimestamp(),
-        paymentIntentId: paymentIntentId, // Add the paymentIntentId to the transaction data
-      };
-
-      transaction.set(transactionRef, transactionData);
-
       // Update user's carbon credits
       const existingCredits = userDoc.data().carbonCredits || [];
-      const updatedCredits = purchasedCredits.map((item) => {
-        const existingCredit = existingCredits.find((credit: CartItem) => credit.id === item.id);
+      const updatedCredits = items.map((item) => {
+        const existingCredit = existingCredits.find((credit: TransactionItem) => credit.id === item.id);
         if (existingCredit) {
           // If the credit already exists, update the quantity
           return {
@@ -57,20 +35,33 @@ const purchaseCarbonCredits = async (userId: string, items: CartItem[], paymentI
 
       // Merge the updated credits with the existing ones
       const finalCredits = existingCredits
-        .filter((credit: CartItem) => !updatedCredits.some((uc) => uc.id === credit.id))
+        .filter((credit: TransactionItem) => !updatedCredits.some((uc) => uc.id === credit.id))
         .concat(updatedCredits);
 
       transaction.update(userRef, {
         carbonCredits: finalCredits,
       });
-
-      return transactionRef.id; // Return the transaction ID
     });
 
-    return {
-      success: true,
-      transactionId: result,
+    const paymentRef = doc(db, "users", userId, "payments", paymentIntentId);
+
+    // Prepare simplified cart items for metadata
+    const simplifiedItems = items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      productType: "carbon_credit",
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const updateData = {
+      metadata: {
+        items: simplifiedItems,
+      },
     };
+    await updateDoc(paymentRef, updateData);
+
+    return { success: true };
   } catch (error) {
     console.error("Error in purchaseCarbonCredits:", error);
     return {
@@ -177,4 +168,50 @@ const fetchSubscriptionPaymentSheetParams = async (
   }
 };
 
-export { purchaseCarbonCredits, fetchOneTimePaymentSheetParams, fetchSubscriptionPaymentSheetParams };
+const fetchSetupPaymentSheetParams = async (
+  uid: string
+): Promise<{
+  setupIntent: string;
+  ephemeralKey: string;
+  customer: string;
+}> => {
+  const db = getFirestore();
+
+  try {
+    const checkoutSessionRef = collection(db, "users", uid, "checkout_sessions");
+    const newSessionDoc = await addDoc(checkoutSessionRef, {
+      client: "mobile",
+      mode: "setup",
+    });
+
+    const maxAttempts = 10;
+    const delayMs = 1000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      const updatedDoc = await getDoc(newSessionDoc);
+      const data = updatedDoc.data();
+
+      if (data?.setupIntentClientSecret && data?.ephemeralKeySecret && data?.customer) {
+        return {
+          setupIntent: data.setupIntentClientSecret,
+          ephemeralKey: data.ephemeralKeySecret,
+          customer: data.customer,
+        };
+      }
+    }
+
+    throw new Error("Timeout: Additional fields were not added within the expected time.");
+  } catch (error) {
+    console.error("Error creating or retrieving setup session:", error);
+    throw error;
+  }
+};
+
+export {
+  purchaseCarbonCredits,
+  fetchOneTimePaymentSheetParams,
+  fetchSubscriptionPaymentSheetParams,
+  fetchSetupPaymentSheetParams,
+};

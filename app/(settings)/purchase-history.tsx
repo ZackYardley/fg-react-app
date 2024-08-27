@@ -1,70 +1,91 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
-import { getRecentTransactions } from "@/api/transaction";
-import { fetchSpecificCredit } from "@/api/products";
-import { Transaction, TransactionItem, CarbonCredit } from "@/types";
+import { getRecentPayments, fetchRecentInvoices } from "@/api/payments";
+import { Payment, Invoice } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
-import { formatPrice } from "@/utils";
+import { formatDate, formatPrice } from "@/utils";
 
-interface EnhancedTransactionItem extends TransactionItem {
-  creditInfo?: CarbonCredit;
-}
-
-interface EnhancedTransaction extends Omit<Transaction, "items"> {
-  items: EnhancedTransactionItem[];
+interface PurchaseItem {
+  type: "payment" | "invoice";
+  data: Payment | Invoice;
 }
 
 const PurchaseHistoryScreen = () => {
-  const [transactions, setTransactions] = useState<EnhancedTransaction[]>([]);
+  const [purchaseHistory, setPurchaseHistory] = useState<PurchaseItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchPurchaseHistory = async () => {
       try {
-        const recentTransactions = await getRecentTransactions(10);
-        const enhancedTransactions = await Promise.all(
-          recentTransactions.map(async (transaction) => {
-            const enhancedItems = await Promise.all(
-              transaction.items.map(async (item) => {
-                const creditInfo = await fetchSpecificCredit(item.id);
-                return { ...item, creditInfo };
-              })
-            );
-            return { ...transaction, items: enhancedItems };
-          })
-        );
-        setTransactions(enhancedTransactions as EnhancedTransaction[]);
+        const [fetchedPayments, fetchedInvoices] = await Promise.all([getRecentPayments(), fetchRecentInvoices()]);
+
+        const combinedHistory: PurchaseItem[] = [
+          ...fetchedPayments.map((payment) => ({ type: "payment" as const, data: payment })),
+          ...fetchedInvoices.map((invoice) => ({ type: "invoice" as const, data: invoice })),
+        ];
+
+        // Sort by date, most recent first
+        combinedHistory.sort((a, b) => {
+          const dateA = a.type === "payment" ? a.data.created : a.data.created;
+          const dateB = b.type === "payment" ? b.data.created : b.data.created;
+          return dateB - dateA;
+        });
+
+        setPurchaseHistory(combinedHistory);
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        console.error("Error fetching purchase history:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTransactions();
+    fetchPurchaseHistory();
   }, []);
 
-  const renderTransactionItem = ({ item }: { item: EnhancedTransaction }) => (
-    <View style={styles.transactionCard}>
-      <View style={styles.transactionHeader}>
-        <Text style={styles.date}>
-          {new Date(item.purchaseDate).toLocaleDateString()}
-        </Text>
-        <Text style={styles.amount}>{formatPrice(item.totalAmount)}</Text>
-      </View>
-      {item.items.map((credit, index) => (
-        <View key={index} style={styles.creditItem}>
-          <Text style={styles.creditName}>
-            {`${credit.creditInfo?.type} Credit` || "Unknown Credit"}
-          </Text>
-          <Text style={styles.creditQuantity}>
-            {credit.quantity} x {formatPrice(credit.price)}
-          </Text>
+  const renderPurchaseItem = ({ item }: { item: PurchaseItem }) => {
+    if (item.type === "payment") {
+      return renderPaymentItem(item.data as Payment);
+    } else {
+      return renderInvoiceItem(item.data as Invoice);
+    }
+  };
+
+  const renderPaymentItem = (item: Payment) =>
+    item.metadata.items ? (
+      <View style={styles.paymentCard}>
+        <View style={styles.paymentHeader}>
+          <Text style={styles.date}>{formatDate(item.created)}</Text>
+          <Text style={styles.amount}>{formatPrice(item.amount)}</Text>
         </View>
-      ))}
+        {item.metadata.items.map((credit, index) => (
+          <View key={index} style={styles.creditItem}>
+            <Text style={styles.creditName}>{credit?.name || "Unknown Credit"}</Text>
+            <Text style={styles.creditQuantity}>
+              {credit.quantity} x {formatPrice(credit.price)}
+            </Text>
+          </View>
+        ))}
+        <View style={styles.paymentMethodContainer}>
+          <Text style={styles.paymentMethod}>Transaction ID:</Text>
+          <Text style={styles.paymentMethod}>{item.id}</Text>
+        </View>
+      </View>
+    ) : null;
+
+  const renderInvoiceItem = (item: Invoice) => (
+    <View style={styles.paymentCard}>
+      <View style={styles.paymentHeader}>
+        <Text style={styles.date}>{formatDate(item.created)}</Text>
+        <Text style={styles.amount}>{formatPrice(item.total)}</Text>
+      </View>
+      {item.lines.data.length > 0 && (
+        <View style={styles.creditItem}>
+          <Text style={styles.creditName}>{item.lines.data[0].description}</Text>
+        </View>
+      )}
       <View style={styles.paymentMethodContainer}>
-        <Text style={styles.paymentMethod}>Transaction ID:</Text>
-        <Text style={styles.paymentMethod}>{item.id}</Text>
+        <Text style={styles.paymentMethod}>Invoice Number:</Text>
+        <Text style={styles.paymentMethod}>{item.number}</Text>
       </View>
     </View>
   );
@@ -78,9 +99,9 @@ const PurchaseHistoryScreen = () => {
       <PageHeader subtitle="Purchase History" />
       <BackButton />
       <FlatList
-        data={transactions}
-        renderItem={renderTransactionItem}
-        keyExtractor={(item) => item.id}
+        data={purchaseHistory}
+        renderItem={renderPurchaseItem}
+        keyExtractor={(item) => `${item.type}-${item.data.id}`}
         contentContainerStyle={styles.listContainer}
       />
     </SafeAreaView>
@@ -95,13 +116,13 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  transactionCard: {
+  paymentCard: {
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
   },
-  transactionHeader: {
+  paymentHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,

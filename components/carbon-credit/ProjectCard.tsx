@@ -1,11 +1,5 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  LayoutAnimation,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from "react-native";
 import { Image } from "expo-image";
 import Icon from "react-native-vector-icons/Feather";
 import { CarbonCredit } from "@/types";
@@ -22,36 +16,36 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
     setExpanded((prev) => !prev);
   }, []);
 
-  const incrementQuantity = useCallback(
-    () => setQuantity((prev) => prev + 1),
-    []
-  );
-  const decrementQuantity = useCallback(
-    () => setQuantity((prev) => Math.max(1, prev - 1)),
-    []
-  );
+  const incrementQuantity = useCallback(() => setQuantity((prev) => prev + 1), []);
+  const decrementQuantity = useCallback(() => setQuantity((prev) => Math.max(1, prev - 1)), []);
+
+  const details = [
+    { title: "Key Features", content: project.stripe_metadata_key_features },
+    { title: "Project Overview", content: project.stripe_metadata_project_overview },
+    { title: "Your Purchase", content: project.stripe_metadata_your_purchase },
+  ];
 
   const navigateDetails = useCallback(
     (direction: "next" | "prev") => {
       setCurrentPage((prev) => {
         if (direction === "next") {
-          return (prev + 1) % project.details.length;
+          return (prev + 1) % details.length;
         } else {
-          return (prev - 1 + project.details.length) % project.details.length;
+          return (prev - 1 + details.length) % details.length;
         }
       });
     },
-    [project.details.length]
+    [details.length]
   );
 
   const handleAddToCart = useCallback(() => {
-    addToCart(project.id, quantity);
+    addToCart(project.id, project.name, "carbon_credit", quantity);
     setQuantity(1);
   }, [project, quantity]);
 
   if (!project) return null;
 
-  const currentDetail = project.details[currentPage];
+  const currentDetail = details[currentPage];
 
   return (
     <View style={styles.container}>
@@ -60,21 +54,13 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
       <View style={styles.detailsContainer}>
         <Text style={styles.detailTitle}>{currentDetail.title}</Text>
         <Text
-          style={[
-            styles.detailContent,
-            !expanded && styles.detailContentCollapsed,
-          ]}
+          style={[styles.detailContent, !expanded && styles.detailContentCollapsed]}
           numberOfLines={expanded ? undefined : 3}
         >
           {currentDetail.content}
         </Text>
-        <TouchableOpacity
-          onPress={toggleExpanded}
-          style={styles.showMoreButton}
-        >
-          <Text style={styles.showMoreText}>
-            {expanded ? "Show Less" : "Show More"}
-          </Text>
+        <TouchableOpacity onPress={toggleExpanded} style={styles.showMoreButton}>
+          <Text style={styles.showMoreText}>{expanded ? "Show Less" : "Show More"}</Text>
         </TouchableOpacity>
       </View>
 
@@ -83,13 +69,11 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
           <Icon name="chevron-left" size={48} />
         </TouchableOpacity>
 
-        <Image source={project.image} style={styles.projectImage} />
+        <Image source={project.images[0]} style={styles.projectImage} />
 
         <View style={styles.priceContainer}>
           <View style={styles.coinContainer}>
-            <Text style={styles.priceText}>
-              {formatPrice(project.price * quantity)}
-            </Text>
+            <Text style={styles.priceText}>{formatPrice(project.prices[0].unit_amount * quantity)}</Text>
           </View>
           <View style={styles.perTonContainer}>
             <Text style={styles.perTonText}>per ton</Text>
@@ -98,17 +82,11 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
         </View>
 
         <View style={styles.quantityContainer}>
-          <TouchableOpacity
-            onPress={decrementQuantity}
-            style={styles.quantityButton}
-          >
+          <TouchableOpacity onPress={decrementQuantity} style={styles.quantityButton}>
             <Icon name="minus" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.quantityText}>{quantity}</Text>
-          <TouchableOpacity
-            onPress={incrementQuantity}
-            style={styles.quantityButton}
-          >
+          <TouchableOpacity onPress={incrementQuantity} style={styles.quantityButton}>
             <Icon name="plus" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -121,20 +99,10 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total:</Text>
         <View style={styles.totalPriceContainer}>
-          <Text style={styles.totalPriceText}>
-            {formatPrice(project.price * quantity)}
-          </Text>
+          <Text style={styles.totalPriceText}>{formatPrice(project.prices[0].unit_amount * quantity)}</Text>
         </View>
-        <TouchableOpacity
-          style={styles.addToCartButton}
-          onPress={handleAddToCart}
-        >
-          <Icon
-            name="shopping-cart"
-            size={18}
-            color="#fff"
-            style={styles.cartIcon}
-          />
+        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+          <Icon name="shopping-cart" size={18} color="#fff" style={styles.cartIcon} />
           <Text style={styles.addToCartText}>Add to Cart</Text>
         </TouchableOpacity>
       </View>

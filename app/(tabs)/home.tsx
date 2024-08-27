@@ -19,6 +19,7 @@ import {
   LineChartBreakdown,
 } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
+import { TARGET_EMISSIONS } from "@/constants";
 
 
 const TextButton = ({ label, style }: { label: string; style: object }) => (
@@ -77,7 +78,12 @@ const HomeScreen = () => {
             Forevergreen Fast Fact of the Day
           </Text>
           <Text style={styles.fastFactText}>{fact}</Text>
-          <Button title="See New Fact" onPress={handleNewFact} />
+          <TouchableOpacity
+            style={styles.factButton}
+            onPress={handleNewFact}  // Call the function directly
+          >
+          <Text style={styles.offsetButtonText}>See New Fact</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Carbon Footprint and Calculator */}
@@ -291,7 +297,7 @@ const HomeScreen = () => {
           <View style={styles.chartBox}>
             <Text style={styles.chartText}>
               If everyone lived like you we'd need{" "}
-              {(emissionsPerYear / 6.4).toFixed(2)} Earths
+              {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths
             </Text>
             <EarthBreakdown emissions={emissionsPerYear} />
           </View>
@@ -435,6 +441,17 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
+    height: 40,
+    width: 150,
+    paddingVertical: 4,
+    paddingHorizontal: 16,
+  },
+  factButton: {
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: "#409858",
+    borderRadius: 50,
     height: 40,
     width: 150,
     paddingVertical: 4,

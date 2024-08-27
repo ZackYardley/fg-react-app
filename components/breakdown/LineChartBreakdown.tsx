@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, ActivityIndicator } from "react-native";
+import { Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";

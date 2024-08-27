@@ -19,7 +19,7 @@ const Header = ({ progress, title }: any) => {
           <Progress.Bar
             progress={progress}
             width={null}
-            color="#AEDCA7"
+            color="#409858"
             unfilledColor="#FFF"
             borderColor="#000"
             borderWidth={1.5}
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 36,
-    marginTop: 24,
+    marginTop: 12,
+    marginBottom: 12,
   },
 });

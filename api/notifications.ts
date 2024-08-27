@@ -1,6 +1,7 @@
 import { Alert, PermissionsAndroid, Platform } from "react-native";
 import messaging from "@react-native-firebase/messaging";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PushNotification from "react-native-push-notification";
 
 export const Notifications = {
   shouldShowNotification: async (notificationType: string | undefined) => {
@@ -32,33 +33,55 @@ export const Notifications = {
     }
   },
 
-  handleNotification: async (remoteMessage: any) => {
-    if (remoteMessage?.notification) {
-      const notificationType = remoteMessage.data?.type;
+  handleDataMessage: async (remoteMessage: any) => {
+    console.log('Received data message:', JSON.stringify(remoteMessage, null, 2));
+    
+    if (remoteMessage.data) {
+      const notificationType = remoteMessage.data.type;
       const show = await Notifications.shouldShowNotification(notificationType);
 
-      if (show) {
-        Alert.alert(
-          remoteMessage.notification.title || "New Notification",
-          remoteMessage.notification.body || "You have a new notification"
-        );
+      if (show && (Platform.OS === 'ios' || Platform.OS === 'android')) {
+        PushNotification.localNotification({
+          title: remoteMessage.data.title || "New Notification",
+          message: remoteMessage.data.body || "You have a new notification",
+          userInfo: remoteMessage.data, // Store the entire data payload
+        });
       }
     }
   },
 
   initializeNotifications: () => {
-    // Foreground state messages
-    const unsubscribe = messaging().onMessage(Notifications.handleNotification);
+    // Handle data messages in foreground
+    messaging().onMessage(Notifications.handleDataMessage);
 
-    // Check whether an initial notification is available
-    messaging().getInitialNotification().then(Notifications.handleNotification);
+    // Handle data messages in background and when app is closed
+    messaging().setBackgroundMessageHandler(Notifications.handleDataMessage);
 
-    // Background state messages
-    messaging().onNotificationOpenedApp(Notifications.handleNotification);
+    if (Platform.OS === 'ios' || Platform.OS === 'android'){
+      PushNotification.configure({
+        onNotification: function (notification) {
+          console.log("NOTIFICATION:", notification);
+          // Handle notification tap here if needed
+        },
+        permissions: {
+          alert: true,
+          badge: true,
+          sound: true,
+        },
+        popInitialNotification: true,
+        requestPermissions: Platform.OS === 'ios',
+      });
+    }
 
-    // Register background handler
-    messaging().setBackgroundMessageHandler(Notifications.handleNotification);
 
-    return unsubscribe;
+    // Check for initial notification that opened the app
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log('App opened by notification:', JSON.stringify(remoteMessage, null, 2));
+          // Handle the initial notification if needed
+        }
+      });
   }
 };

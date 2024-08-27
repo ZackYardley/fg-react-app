@@ -1,7 +1,7 @@
 import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import dayjs from "dayjs";
-import { stateData } from "@/types";
+import { StateData } from "@/types";
 import { EmissionsData } from "@/types";
 
 // Fetch emissions data for a specific month
@@ -123,7 +123,7 @@ const calculateEmissions = (data: EmissionsData) => {
 
   // Energy Calculation
   let energyEmissions = 0.0;
-  let statesData: stateData[] = require("../constants/states.json");
+  let statesData: StateData[] = require("../constants/states.json");
   if (energyData) {
     const { state, electricBill, waterBill, propaneBill, gasBill, peopleInHome } = energyData;
 
@@ -132,7 +132,7 @@ const calculateEmissions = (data: EmissionsData) => {
 
       if (stateData) {
         const electricityEmissions =
-          (stateData.stateEGridValue / 2000) * (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
+          (stateData.stateEGridValue / 2000 * 1000 * 10500) * (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
         const waterEmissions = (parseFloat(waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
         const propaneEmissions = (parseFloat(propaneBill) / stateData.averageMonthlyPropaneBill) * 0.24;
         const gasEmissions = (parseFloat(gasBill) / stateData.averageMonthlyGasBill) * 2.12;

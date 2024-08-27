@@ -1,9 +1,10 @@
 import React from "react";
 import { View, Image, StyleSheet } from "react-native";
 import { Earth } from "@/constants/Images";
+import { TARGET_EMISSIONS } from "@/constants";
 
 const EarthBreakdown = ({ emissions }: any) => {
-  const earthsRequired = parseFloat((emissions / 6.4).toFixed(2)); // 6.4 tonne of CO2 per year as the target
+  const earthsRequired = parseFloat((emissions / TARGET_EMISSIONS).toFixed(2))
   const wholeEarths = Math.floor(earthsRequired);
   const partialEarth = parseFloat((earthsRequired - wholeEarths).toFixed(2));
 

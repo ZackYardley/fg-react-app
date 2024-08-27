@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import React from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useState, useCallback } from "react";
 import {
   ScrollView,
   Text,
@@ -7,12 +7,53 @@ import {
   View,
   Image,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { Map, CostaRica, Brazil, Penn } from "@/constants/Images";
+import { Overlay, Button, Icon } from "@rneui/themed";
 
 export default function TreePlantingScreen() {
+  const [visible, setVisible] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Reset the overlay visibility to true every time the screen comes into focus
+      setVisible(true);
+    }, [])
+  );
+
+  const handleWaitlistYes = () => {
+    setVisible(false);
+    router.push("/waitlist");
+  };
+
+  const handleWaitlistNo = () => {
+    setVisible(false);
+    router.push("/home");
+  };
+
   return (
     <ScrollView style={styles.container}>
+      <Overlay isVisible={visible} onBackdropPress={handleWaitlistNo}>
+        <View style={styles.overlayContent}>
+          <Text style={styles.overlayText}>Coming Soon... Waitlist?</Text>
+          <View style={styles.overlayButtonsContainer}>
+            <TouchableOpacity
+              style={styles.overlayButton}
+              onPress={handleWaitlistYes}
+              >
+                <Text style={styles.overlayButtonText}>Yes</Text>
+              </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.overlayNoButton}
+              onPress={handleWaitlistNo}
+              >
+                <Text style={styles.overlayNoButtonText}>Home</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Overlay>
+      
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
@@ -240,5 +281,48 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     textAlign: "center",
+  },
+  overlayContent: {
+    padding: 20,
+    alignItems: "center",
+  },
+  overlayText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  overlayButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  overlayButton: {
+    marginTop: 16,
+    marginHorizontal: 32,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#409858",
+    borderRadius: 9999,
+  },
+  overlayNoButton: {
+    marginTop: 16,
+    marginHorizontal: 32,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#eeeeee",
+    borderRadius: 9999,
+  },
+  overlayButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  overlayNoButtonText: {
+    color: "black",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

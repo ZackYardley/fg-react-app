@@ -1,18 +1,45 @@
-import { useState, useCallback } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, Loading, PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useStripe } from "@/utils/stripe";
-import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
-import { getAuth } from "firebase/auth";
 import { router } from "expo-router";
+import { fetchCarbonCreditSubscription } from "@/api/products";
+import { fetchEmissionsData } from "@/api/emissions";
+import { formatPrice } from "@/utils";
+import { fetchSubscriptionStatus } from "@/api/subscriptions";
 
 const ForevergreenSubscriptions = () => {
-  const auth = getAuth();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const userEmissionsData = await fetchEmissionsData();
+        if (userEmissionsData) {
+          const userEmissions = userEmissionsData?.totalData.totalEmissions;
+          const result = await fetchCarbonCreditSubscription(userEmissions);
+          if (result) {
+            setSubscriptionPrice(result.recommendedPrice.unit_amount);
+            const isSubscribed = await fetchSubscriptionStatus(result.product.id || "");
+            setIsSubscribed(isSubscribed);
+          } else {
+            console.error("No Carbon Credit Subscription found");
+          }
+        } else {
+          console.error("No user emissions data found");
+        }
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, []);
 
   const SubscriptionCard = ({
     title,
@@ -28,82 +55,15 @@ const ForevergreenSubscriptions = () => {
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.cardDescription}>{description}</Text>
-      <TouchableOpacity style={[styles.button, isProcessingPayment && styles.disabledButton]} onPress={onPress}>
-        <Text style={styles.buttonText}>{isProcessingPayment ? "Processing..." : price}</Text>
+      <TouchableOpacity style={styles.button} onPress={onPress}>
+        <Text style={styles.buttonText}>{loading ? "isLoading" : isSubscribed ? "Manage Subscription" : price}</Text>
       </TouchableOpacity>
     </View>
   );
 
-  const initializePaymentSheet = useCallback(
-    async (price: string) => {
-      if (!auth.currentUser) {
-        router.replace("/login");
-      }
-
-      // Fetch payment sheet parameters
-      try {
-        setIsProcessingPayment(true);
-        const { paymentIntent, ephemeralKey, customer } = await fetchSubscriptionPaymentSheetParams(
-          price,
-          auth.currentUser?.uid || ""
-        );
-
-        setPaymentIntentId(paymentIntent);
-
-        // Stripe configuration to open the payment sheet
-        const { error } = await initPaymentSheet({
-          merchantDisplayName: "Forevergreen",
-          customerId: customer,
-          customerEphemeralKeySecret: ephemeralKey,
-          paymentIntentClientSecret: paymentIntent,
-          allowsDelayedPaymentMethods: true,
-          defaultBillingDetails: {
-            name: auth.currentUser?.displayName || "",
-            email: auth.currentUser?.email || "",
-          },
-          applePay: {
-            merchantCountryCode: "US",
-            testEnv: true,
-          },
-          googlePay: {
-            merchantCountryCode: "US",
-            testEnv: true, // use test environment
-          },
-          returnURL: "com.fgdevteam.fgreactapp://stripe-redirect",
-        });
-
-        if (error) {
-          console.error("Error initializing payment sheet:", error);
-          Alert.alert("Error", "Failed to initialize payment. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error initializing payment:", error);
-        Alert.alert("Error", "Failed to initialize payment. Please try again.");
-      } finally {
-        setIsProcessingPayment(false);
-      }
-    },
-    [auth.currentUser, initPaymentSheet]
-  );
-
-  // Open payment sheet when user taps on "Buy Now"
-  const openPaymentSheet = async (price: string) => {
-    await initializePaymentSheet(price);
-
-    const { error } = await presentPaymentSheet();
-
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      handleSuccessfulPurchase(paymentIntentId || "");
-    }
-  };
-
-  const handleSuccessfulPurchase = async (paymentIntentId: string) => {
-    // Handle successful purchase
-    // You can update your database or perform other actions here
-    console.log("Successful purchase with paymentIntentId:", paymentIntentId);
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -115,18 +75,22 @@ const ForevergreenSubscriptions = () => {
 
         <View style={{ paddingTop: 40 }}>
           <View style={styles.scrollView}>
-            <SubscriptionCard
+            {/* <SubscriptionCard
               title="Tree Planting Subscription"
               description="The Forevergreen tree planting subscription includes 1 tree planted on our reforestation projects. We will populate your forest with all the relevant data and credit the carbon sequestered to you. Build a forest and a sustainable future with a consistent effort."
               price="$10 Month"
-              onPress={() => openPaymentSheet("price_1PqeipJNQHxtxrkGJV3MTk8B")}
-            />
-            <SubscriptionCard
-              title="Carbon Credit Subscription"
-              description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
-              price="$20 Month"
-              onPress={() => openPaymentSheet("price_1PqeuQJNQHxtxrkGJQdTC7jf")}
-            />
+              onPress={() =>  {}}}
+            />  */}
+            {subscriptionPrice ? (
+              <SubscriptionCard
+                title="Carbon Credit Subscription"
+                description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
+                price={`${formatPrice(subscriptionPrice)} Month`}
+                onPress={() => router.push("/carbon-credit-sub")}
+              />
+            ) : (
+              <Text>Carbon Credit Subscription not available</Text>
+            )}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Newsletter Subscription</Text>
               <Text style={styles.cardDescription}>
@@ -140,12 +104,16 @@ const ForevergreenSubscriptions = () => {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Current Subscriptions</Text>
               <View style={styles.subscriptionContainer}>
-                <View style={styles.subscriptionItem}>
+                {/* <View style={styles.subscriptionItem}>
                   <Ionicons name="close" size={18} color="red" />
                   <Text style={styles.subscriptionText}>Tree Planting Subscription</Text>
-                </View>
+                </View> */}
                 <View style={styles.subscriptionItem}>
-                  <Ionicons name="close" size={18} color="red" />
+                  {isSubscribed ? (
+                    <Ionicons name="checkmark" size={18} color="green" />
+                  ) : (
+                    <Ionicons name="close" size={18} color="red" />
+                  )}
                   <Text style={styles.subscriptionText}>Carbon Credit Subscription</Text>
                 </View>
                 <View style={styles.subscriptionItem}>
