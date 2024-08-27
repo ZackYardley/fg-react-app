@@ -1,5 +1,5 @@
 import { useRootNavigationState, Redirect, router } from "expo-router";
-import { View, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect, useRef } from "react";
 import { getAuth } from "firebase/auth";
@@ -16,7 +16,6 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const rootNavigationState = useRootNavigationState();
   const explosionRef = useRef<ConfettiCannon>(null);
-  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -68,7 +67,7 @@ export default function Index() {
         <View style={styles.confettiContainer} pointerEvents="none">
           <ConfettiCannon
             count={200}
-            origin={{ x: -10, y: 0 }}
+            origin={{ x: 0, y: 0 }}
             autoStart={false}
             ref={explosionRef}
             fadeOut
