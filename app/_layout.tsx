@@ -26,14 +26,13 @@ export default function RootLayout() {
       webClientId: "489135632905-iu340mh7lub0iis2q18upvus42fa2roo.apps.googleusercontent.com",
     });
 
+    let unsubscribe;
     if (Platform.OS === "android" || Platform.OS === "ios") {
       Notifications.setupMessaging();
+      unsubscribe = Notifications.initializeNotifications();
     }
 
-    const unsubscribe = Notifications.initializeNotifications();
-
     return unsubscribe;
-
   }, [loaded]);
 
   const { handleURLCallback } = useStripe();
