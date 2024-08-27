@@ -1,12 +1,12 @@
 import { useRootNavigationState, Redirect, router } from "expo-router";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getAuth } from "firebase/auth";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
 import { Loading } from "@/components/common";
-import { testFetchCarbonCreditSubscription } from "@/api/debug";
+import ConfettiCannon from "react-native-confetti-cannon";
 
 // Initialize debugMode with useState
 export default function Index() {
@@ -15,6 +15,8 @@ export default function Index() {
   const [hasCalculatedEmissions, setHasCalculatedEmissions] = useState(false);
   const [loading, setLoading] = useState(true);
   const rootNavigationState = useRootNavigationState();
+  const explosionRef = useRef<ConfettiCannon>(null);
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -63,6 +65,17 @@ export default function Index() {
   if (debugMode) {
     return (
       <View style={styles.container}>
+        <View style={styles.confettiContainer} pointerEvents="none">
+          <ConfettiCannon
+            count={200}
+            origin={{ x: -10, y: 0 }}
+            autoStart={false}
+            ref={explosionRef}
+            fadeOut
+            fallSpeed={3000}
+            explosionSpeed={1}
+          />
+        </View>
         <TouchableOpacity
           style={styles.button}
           onPress={() => setDebugMode(false)} // Update debugMode state
@@ -84,7 +97,7 @@ export default function Index() {
             <Icon name="arrow-right" size={24} color="#FFF" />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={testFetchCarbonCreditSubscription}>
+        <TouchableOpacity style={styles.button} onPress={() => explosionRef.current?.start()}>
           <View style={styles.buttonContent}>
             <View style={styles.buttonLabel}>
               <Icon name="smile-o" size={24} color="#FFF" />
@@ -141,5 +154,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFF",
     fontSize: 24,
+  },
+  confettiContainer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1000, // Ensure it is on top of everything else
   },
 });
