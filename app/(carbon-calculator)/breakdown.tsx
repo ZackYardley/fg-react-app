@@ -2,43 +2,40 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
-// todo: replace fetchEmissionsData with the calculate emissions data function (not written yet)
 import { fetchEmissionsData } from "@/api/emissions";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown } from "@/components/breakdown";
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
+import { EmissionsDocument } from "@/types";
 
 export default function Breakdown() {
-  const [emissionsPerYear, setEmissionsPerYear] = useState(0.0);
-  const emissionsPerMonth = emissionsPerYear / 12;
-  const [transportationEmissions, setTransportationEmissions] = useState(0.0);
-  const [dietEmissions, setDietEmissions] = useState(0.0);
-  const [energyEmissions, setEnergyEmissions] = useState(0.0);
-  const [retryCount, setRetryCount] = useState(0);
+  const [emissionsDocument, setEmissionsDocument] = useState<EmissionsDocument>();
+  const [totalEmissions, setTotalEmissions] = useState(0);
+  const [transportationEmissions, setTransportationEmissions] = useState(0);
+  const [dietEmissions, setDietEmissions] = useState(0);
+  const [energyEmissions, setEnergyEmissions] = useState(0);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+
   const explosionRef = useRef<ConfettiCannon>(null);
 
   useEffect(() => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        const totalData = data.totalData;
-        setEmissionsPerYear(totalData.totalEmissions);
-        setTransportationEmissions(totalData.transportationEmissions);
-        setDietEmissions(totalData.dietEmissions);
-        setEnergyEmissions(totalData.energyEmissions);
+        setEmissionsDocument(data);
+        setTotalEmissions(data.totalEmissions);
+        setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
+        setDietEmissions(data.surveyEmissions.dietEmissions || 0);
+        setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
         setDataLoaded(true);
-      } else if (retryCount < 3) {
-        setTimeout(() => {
-          setRetryCount((prevCount) => prevCount + 1);
-        }, 1000 * (retryCount + 1));
       }
     };
 
     loadData();
-  }, [retryCount]);
+  }, []);
 
   useEffect(() => {
     if (dataLoaded) {
@@ -48,7 +45,6 @@ export default function Breakdown() {
 
   const screenWidth = Dimensions.get("window").width;
 
-  const [isAnonymous, setIsAnonymous] = useState(false);
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -58,7 +54,7 @@ export default function Breakdown() {
     });
 
     return () => unsubscribe();
-  }, [retryCount]);
+  }, []);
 
   if (!dataLoaded) {
     return <CalculatingScreen />;
@@ -79,9 +75,9 @@ export default function Breakdown() {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Your Carbon Footprint</Text>
               <Text>Your total emissions are:</Text>
-              <Text style={styles.greenText}>{emissionsPerYear.toFixed(2)} tons co2/year</Text>
+              <Text style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</Text>
               <Text>Your total monthly emissions are:</Text>
-              <Text style={styles.greenText}>{emissionsPerMonth.toFixed(2)} tons co2/month</Text>
+              <Text style={styles.greenText}>{(totalEmissions / 12).toFixed(2)} tons co2/month</Text>
             </View>
 
             {/* Emission Breakdown */}
@@ -133,7 +129,7 @@ export default function Breakdown() {
               >
                 <BarChartBreakdown
                   names={["You", "Average American"]}
-                  values={[emissionsPerYear, 21]}
+                  values={[totalEmissions, 21]}
                   colors={["#44945F", "#A9A9A9"]}
                 />
               </View>
@@ -143,9 +139,9 @@ export default function Breakdown() {
             <View style={styles.card}>
               <Text style={styles.earthBreakdownTitle}>Earth Breakdown</Text>
               <Text style={styles.earthBreakdownText}>
-                If everyone lived like you we would need {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths!
+                If everyone lived like you we would need {(totalEmissions / TARGET_EMISSIONS).toFixed(2)} Earths!
               </Text>
-              <EarthBreakdown emissions={emissionsPerYear} />
+              <EarthBreakdown emissions={totalEmissions || 0} />
             </View>
 
             {/* Call to Action */}

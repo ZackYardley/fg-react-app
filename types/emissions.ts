@@ -8,7 +8,8 @@ interface StateData {
   averageMonthlyPropaneBill: number;
 }
 
-interface TransportationData {
+interface SurveyData {
+  // Transportation Data
   longFlights: number;
   shortFlights: number;
   carType: string;
@@ -19,24 +20,11 @@ interface TransportationData {
   busFrequency: string;
   walkBike: string;
   walkBikeFrequency: string;
-}
 
-interface TransportationEmissions {
-  flightEmissions: number;
-  carEmissions: number;
-  publicTransportEmissions: number;
-  transportationEmissions: number;
-}
-
-interface DietData {
+  // Diet Data
   diet: string;
-}
 
-interface DietEmissions {
-  dietEmissions: number;
-}
-
-interface EnergyData {
+  // Energy Data
   state: string;
   electricBill: string;
   waterBill: string;
@@ -46,35 +34,28 @@ interface EnergyData {
   peopleInHome: number;
 }
 
-interface EnergyEmissions {
+interface SurveyEmissions {
+  // Transportation Emissions
+  flightEmissions: number;
+  carEmissions: number;
+  publicTransportEmissions: number;
+  transportationEmissions: number;
+
+  // Diet Emissions
+  dietEmissions: number;
+
+  // Energy Emissions
   electricEmissions: number;
   waterEmissions: number;
   otherEnergyEmissions: number;
   energyEmissions: number;
 }
 
-interface SurveyEmissions {
-  transportationEmissions: TransportationEmissions;
-  dietEmissions: DietEmissions;
-  energyEmissions: EnergyEmissions;
+interface EmissionsDocument {
+  surveyData: Partial<SurveyData>;
+  surveyEmissions: Partial<SurveyEmissions>;
   totalEmissions: number;
+  lastUpdated: any;
 }
 
-interface SurveyData {
-  transportationData: TransportationData;
-  dietData: DietData;
-  energyData: EnergyData;
-  surveyEmissions: SurveyEmissions;
-}
-
-export {
-  StateData,
-  TransportationData,
-  TransportationEmissions,
-  DietData,
-  DietEmissions,
-  EnergyData,
-  EnergyEmissions,
-  SurveyEmissions,
-  SurveyData,
-};
+export { StateData, SurveyEmissions, SurveyData, EmissionsDocument };

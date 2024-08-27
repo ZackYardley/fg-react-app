@@ -3,12 +3,13 @@ import { View, Text, ScrollView, KeyboardAvoidingView, StyleSheet, Platform } fr
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header, RadioButtonGroup, NumberInput, TransportQuestion, NextButton } from "@/components/carbon-calculator";
 import QuestionSliderColor from "@/components/carbon-calculator/QuestionSliderColor";
-import { fetchEmissionsData } from "@/api/emissions";
-import { TransportationData, TransportationEmissions } from "@/types";
+import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
+import { SurveyData, SurveyEmissions } from "@/types";
 import { Loading } from "@/components/common";
+import { router } from "expo-router";
 
 export default function TransportationCalculator() {
-  const [transportationData, setTransportationData] = useState<TransportationData>({
+  const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
     longFlights: 0,
     shortFlights: 0,
     carType: "Gas - ⛽️",
@@ -20,12 +21,23 @@ export default function TransportationCalculator() {
     walkBike: "No",
     walkBikeFrequency: "",
   });
-  const [transportationEmissions, setTransportationEmissions] = useState<TransportationEmissions>({
+  const [surveyEmissions, setSurveyEmissions] = useState<Partial<SurveyEmissions>>({
     flightEmissions: 0,
     carEmissions: 0,
     publicTransportEmissions: 0,
     transportationEmissions: 0,
   });
+  const [progress, setProgress] = useState(0);
+  const [completedQuestions, setCompletedQuestions] = useState({
+    longFlights: false,
+    shortFlights: false,
+    carType: false,
+    milesPerWeek: false,
+    useTrain: false,
+    useBus: false,
+    walkBike: false,
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,9 +45,9 @@ export default function TransportationCalculator() {
       setIsLoading(true);
       try {
         const data = await fetchEmissionsData();
-        if (data && data.transportationData && data.surveyEmissions.transportationEmissions) {
-          setTransportationData(data.transportationData);
-          setTransportationEmissions(data.surveyEmissions.transportationEmissions);
+        if (data && data.surveyData && data.surveyEmissions) {
+          setSurveyData(data.surveyData);
+          setSurveyEmissions(data.surveyEmissions);
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -49,18 +61,21 @@ export default function TransportationCalculator() {
 
   useEffect(() => {
     const calculateTransportationEmissions = () => {
-      if (!transportationData) {
+      if (!surveyData) {
         return;
       }
-
-      let flightEmissions = transportationData.longFlights * 1.35 + transportationData.shortFlights * 0.9;
+      let flightEmissions = 0;
       let carEmissions = 0;
       let publicTransportEmissions = 0;
 
-      if (transportationData.carType && transportationData.milesPerWeek) {
+      if (surveyData.longFlights && surveyData.shortFlights) {
+        flightEmissions = surveyData.longFlights * 1.35 + surveyData.shortFlights * 0.9;
+      }
+
+      if (surveyData.carType && surveyData.milesPerWeek) {
         let carEmissionRates = 0;
 
-        switch (transportationData.carType) {
+        switch (surveyData.carType) {
           case "Gas - ⛽️":
             carEmissionRates = 300;
             break;
@@ -74,16 +89,20 @@ export default function TransportationCalculator() {
             carEmissionRates = 300; // Default to gas
         }
 
-        carEmissions = (carEmissionRates * parseFloat(transportationData.milesPerWeek) * 52) / 1000000;
+        carEmissions = (carEmissionRates * parseFloat(surveyData.milesPerWeek) * 52) / 1000000;
       }
 
-      if (transportationData.useTrain && transportationData.trainFrequency) {
-        const trainEmissions = parseFloat(transportationData.trainFrequency) * 0.002912 * 52;
-        const busEmissions = parseFloat(transportationData.busFrequency) * 0.005824 * 52;
-        publicTransportEmissions = trainEmissions + busEmissions;
+      if (surveyData.useTrain && surveyData.trainFrequency) {
+        const trainEmissions = parseFloat(surveyData.trainFrequency) * 0.002912 * 52;
+        if (surveyData.useBus && surveyData.busFrequency) {
+          const busEmissions = parseFloat(surveyData.busFrequency) * 0.005824 * 52;
+          publicTransportEmissions = trainEmissions + busEmissions;
+        } else {
+          publicTransportEmissions = trainEmissions;
+        }
       }
 
-      setTransportationEmissions({
+      setSurveyEmissions({
         flightEmissions,
         carEmissions,
         publicTransportEmissions,
@@ -92,72 +111,38 @@ export default function TransportationCalculator() {
     };
 
     calculateTransportationEmissions();
-  }, [transportationData]);
+  }, [surveyData]);
 
-  // Progress tracking
-  const [progress, setProgress] = useState(0);
-  // const [completedQuestions, setCompletedQuestions] = useState({
-  //   longFlights: false,
-  //   shortFlights: false,
-  //   carType: false,
-  //   milesPerWeek: false,
-  //   useTrain: false,
-  //   useBus: false,
-  //   walkBike: false,
-  // });
+  useEffect(() => {
+    const totalQuestions = Object.keys(completedQuestions).length;
+    const completedCount = Object.values(completedQuestions).filter((value) => value === true).length;
+    setProgress((completedCount / totalQuestions) * 0.33);
+  }, [completedQuestions]);
 
-  // const markQuestionCompleted = (question: string) => {
-  //   setCompletedQuestions((prev) => ({ ...prev, [question]: true }));
-  // };
+  useEffect(() => {
+    const validateForm = () => {
+      const isValid =
+        surveyData.longFlights! > 0 &&
+        surveyData.shortFlights! > 0 &&
+        surveyData.carType !== "" &&
+        surveyData.milesPerWeek !== "" &&
+        surveyData.useTrain !== "" &&
+        surveyData.useBus !== "" &&
+        surveyData.walkBike !== "";
+      setIsFormValid(isValid);
+    };
+    validateForm();
+  }, [surveyData]);
 
-  // useEffect(() => {
-  //   const totalQuestions = Object.keys(completedQuestions).length;
-  //   const completedCount = Object.values(completedQuestions).filter(Boolean).length;
-  //   setProgress((completedCount / totalQuestions) * 0.33);
-  // }, [completedQuestions]);
-
-  // Form validation
-  // const [milesError, setMilesError] = useState("");
-  // const [trainFrequencyError, setTrainFrequencyError] = useState("");
-  // const [busFrequencyError, setBusFrequencyError] = useState("");
-  // const [walkBikeFrequencyError, setWalkBikeFrequencyError] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
-
-  // useEffect(() => {
-  //   const validateForm = () => {
-  //     const isValid =
-  //       parseFloat(transportationData?.milesPerWeek || "0") <= 3500 &&
-  //       parseFloat(transportationData?.trainFrequency || "0") <= 30 &&
-  //       parseFloat(transportationData?.busFrequency || "0") <= 30 &&
-  //       parseFloat(transportationData?.walkBikeFrequency || "0") <= 30;
-  //     setIsFormValid(isValid);
-  //   };
-  //   validateForm();
-  // }, [transportationData]);
-
-  // const validateNumber = (
-  //   value: string,
-  //   setter: (value: string) => void,
-  //   errorSetter: React.Dispatch<React.SetStateAction<string>>,
-  //   type: "miles" | "trainFrequency" | "busFrequency" | "walkBikeFrequency"
-  // ) => {
-  //   if (value === "") {
-  //     setter("");
-  //     errorSetter("");
-  //   } else if (isNaN(Number(value)) || parseFloat(value) < 0) {
-  //     errorSetter("Please enter a valid amount");
-  //   } else if (type === "miles" ? parseFloat(value) > 3500 : parseFloat(value) > 30) {
-  //     errorSetter(type === "miles" ? "Please enter a value less than 3500" : "Please enter a value less than 30");
-  //   } else {
-  //     const decimalPlaces = value.split(".")[1];
-  //     if (decimalPlaces && decimalPlaces.length > 2) {
-  //       setter(value.slice(0, -1));
-  //     } else {
-  //       setter(value);
-  //       errorSetter("");
-  //     }
-  //   }
-  // };
+  const handleNextButton = async () => {
+    // Save data to backend
+    await saveEmissionsData({
+      surveyData: { ...surveyData },
+      surveyEmissions: { ...surveyEmissions },
+    });
+    // Navigate to next screen
+    router.push("/diet");
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -175,10 +160,10 @@ export default function TransportationCalculator() {
             </Text>
             <QuestionSliderColor
               question="In the last year, how many long round-trip flights have you been on? (more than 10 hours round trip) ✈️"
-              value={transportationData.longFlights}
+              value={surveyData.longFlights || 0}
               onChange={(value: number) => {
-                setTransportationData({ ...transportationData, longFlights: value });
-                // markQuestionCompleted("longFlights");
+                setSurveyData({ ...surveyData, longFlights: value });
+                setCompletedQuestions({ ...completedQuestions, longFlights: true });
               }}
               minimumValue={0}
               maximumValue={7}
@@ -186,10 +171,10 @@ export default function TransportationCalculator() {
 
             <QuestionSliderColor
               question="In the last year, how many short round-trip flights have you been on? (less than 10 hours round trip) ✈️"
-              value={transportationData.shortFlights}
+              value={surveyData.shortFlights || 0}
               onChange={(value: number) => {
-                setTransportationData({ ...transportationData, shortFlights: value });
-                // markQuestionCompleted("shortFlights");
+                setSurveyData({ ...surveyData, shortFlights: value });
+                setCompletedQuestions({ ...completedQuestions, shortFlights: true });
               }}
               minimumValue={0}
               maximumValue={7}
@@ -198,20 +183,20 @@ export default function TransportationCalculator() {
             <RadioButtonGroup
               question="What type of car do you drive? 🚗"
               options={["Gas - ⛽️", "Hybrid - ⛽️&⚡", "Electric - ⚡"]}
-              value={transportationData.carType}
+              value={surveyData.carType || "Gas - ⛽️"}
               onChange={(value: string) => {
-                setTransportationData({ ...transportationData, carType: value });
-                // markQuestionCompleted("carType");
+                setSurveyData({ ...surveyData, carType: value });
+                setCompletedQuestions({ ...completedQuestions, carType: true });
               }}
             />
 
             <NumberInput
               question="How many miles do you drive per week? 🛞"
-              value={transportationData.milesPerWeek}
+              value={surveyData.milesPerWeek || "300"}
               onChange={(value: string) => {
-                setTransportationData({ ...transportationData, milesPerWeek: value });
+                setSurveyData({ ...surveyData, milesPerWeek: value });
                 if (value !== "") {
-                  // markQuestionCompleted("milesPerWeek");
+                  setCompletedQuestions({ ...completedQuestions, milesPerWeek: true });
                 }
               }}
               label="Miles per week"
@@ -219,44 +204,41 @@ export default function TransportationCalculator() {
 
             <TransportQuestion
               question="Do you use the train/metro? 🚉"
-              useTransport={transportationData.useTrain}
+              useTransport={surveyData.useTrain || "No"}
               setUseTransport={(value: string) => {
-                setTransportationData({ ...transportationData, useTrain: value });
-                // markQuestionCompleted("useTrain");
+                setSurveyData({ ...surveyData, useTrain: value });
+                setCompletedQuestions({ ...completedQuestions, useTrain: true });
               }}
-              frequency={transportationData.trainFrequency}
+              frequency={surveyData.trainFrequency || ""}
               setFrequency={(value: string) => {
-                setTransportationData({ ...transportationData, trainFrequency: value });
-                // markQuestionCompleted("useTrain");
+                setSurveyData({ ...surveyData, trainFrequency: value });
               }}
               label="time(s)"
             />
             <TransportQuestion
               question="Do you use the bus? 🚌"
-              useTransport={transportationData.useBus}
+              useTransport={surveyData.useBus || "No"}
               setUseTransport={(value: string) => {
-                setTransportationData({ ...transportationData, useBus: value });
-                // markQuestionCompleted("useBus");
+                setSurveyData({ ...surveyData, useBus: value });
+                setCompletedQuestions({ ...completedQuestions, useBus: true });
               }}
-              frequency={transportationData.busFrequency}
+              frequency={surveyData.busFrequency || ""}
               setFrequency={(value: string) => {
-                setTransportationData({ ...transportationData, busFrequency: value });
-                // markQuestionCompleted("useBus");
+                setSurveyData({ ...surveyData, busFrequency: value });
               }}
               label="time(s)"
             />
 
             <TransportQuestion
               question="Do you walk/bike as a method of transportation? 🚲"
-              useTransport={transportationData.walkBike}
+              useTransport={surveyData.walkBike || "No"}
               setUseTransport={(value: string) => {
-                setTransportationData({ ...transportationData, walkBike: value });
-                // markQuestionCompleted("walkBike");
+                setSurveyData({ ...surveyData, walkBike: value });
+                setCompletedQuestions({ ...completedQuestions, walkBike: true });
               }}
-              frequency={transportationData.walkBikeFrequency}
+              frequency={surveyData.walkBikeFrequency || ""}
               setFrequency={(value: string) => {
-                setTransportationData({ ...transportationData, walkBikeFrequency: value });
-                // markQuestionCompleted("walkBike");
+                setSurveyData({ ...surveyData, walkBikeFrequency: value });
               }}
               label="time(s)"
             />
@@ -266,25 +248,25 @@ export default function TransportationCalculator() {
               <View style={styles.emissionsContent}>
                 <View style={styles.emissionRow}>
                   <Text>Flight Emissions:</Text>
-                  <Text>{transportationEmissions.flightEmissions.toFixed(2)}</Text>
+                  <Text>{surveyEmissions.flightEmissions?.toFixed(2)}</Text>
                 </View>
                 <View style={styles.emissionRow}>
                   <Text>Car Emissions:</Text>
-                  <Text>{transportationEmissions.carEmissions.toFixed(2)}</Text>
+                  <Text>{surveyEmissions.carEmissions?.toFixed(2)}</Text>
                 </View>
                 <View style={styles.emissionRow}>
                   <Text>Public Transport:</Text>
-                  <Text>{transportationEmissions.publicTransportEmissions.toFixed(2)}</Text>
+                  <Text>{surveyEmissions.publicTransportEmissions?.toFixed(2)}</Text>
                 </View>
                 <View style={styles.totalRow}>
                   <Text style={styles.totalLabel}>Total:</Text>
-                  <Text>{transportationEmissions.transportationEmissions.toFixed(2)}</Text>
+                  <Text>{surveyEmissions.transportationEmissions?.toFixed(2)}</Text>
                   <Text>tons of CO2 per year</Text>
                 </View>
               </View>
             </View>
           </View>
-          <NextButton isFormValid={isFormValid} onNext="/diet" />
+          <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
         </SafeAreaView>
       </ScrollView>
     </KeyboardAvoidingView>

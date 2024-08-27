@@ -49,8 +49,7 @@ export default function ProfileScreen() {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        const totalData = data.totalData;
-        setTotalEmissions(totalData.totalEmissions);
+        setTotalEmissions(data.totalEmissions);
       }
     };
 
@@ -95,7 +94,7 @@ export default function ProfileScreen() {
       }, 100);
     } finally {
       setDeleteConfirmation(""); // Reset the confirmation text
-    } 
+    }
   };
 
   const handleUpdatePaymentMethod = async () => {

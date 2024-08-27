@@ -1,16 +1,13 @@
-import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import dayjs from "dayjs";
-import { StateData } from "@/types";
-import { SurveyData } from "@/types";
+import { EmissionsDocument } from "@/types";
 
-// Fetch emissions data for a specific month
-const saveEmissionsData = async (data: SurveyData) => {
+const saveEmissionsData = async (data: Partial<EmissionsDocument>): Promise<void> => {
   const auth = getAuth();
   const db = getFirestore();
 
   if (!auth.currentUser) {
-    console.error("No user logged in");
     throw new Error("No user logged in");
   }
 
@@ -19,14 +16,7 @@ const saveEmissionsData = async (data: SurveyData) => {
   const userDocRef = doc(collection(db, "users", userId, "surveys"), formattedMonth);
 
   try {
-    await setDoc(
-      userDocRef,
-      {
-        ...data,
-        lastUpdated: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    await setDoc(userDocRef, { ...data, lastUpdated: serverTimestamp() }, { merge: true });
   } catch (error) {
     console.error("Error saving emissions data:", error);
     throw error;
@@ -35,9 +25,6 @@ const saveEmissionsData = async (data: SurveyData) => {
 
 // Fetch emissions data for a specific month
 const fetchEmissionsData = async (month?: string, userId?: string) => {
-  interface SurveyDataExtended extends SurveyData {
-    lastUpdated: Timestamp;
-  }
   const auth = getAuth();
   const db = getFirestore();
 
@@ -54,7 +41,7 @@ const fetchEmissionsData = async (month?: string, userId?: string) => {
 
   try {
     const Doc = await getDoc(DocRef);
-    return Doc.exists() ? (Doc.data() as SurveyDataExtended) : null;
+    return Doc.exists() ? (Doc.data() as EmissionsDocument) : null;
   } catch (error) {
     console.error("Error fetching data:", error);
     return null;

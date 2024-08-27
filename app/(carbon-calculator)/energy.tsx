@@ -4,19 +4,42 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Menu, Searchbar } from "react-native-paper";
 import statesData from "@/constants/states.json";
 import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
-import { useEmissions } from "@/contexts";
-import { saveEmissionsData } from "@/api/emissions";
-import { StateData } from "@/types";
+import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
+import { StateData, SurveyData, SurveyEmissions } from "@/types";
 import analytics from "@react-native-firebase/analytics";
+import { router } from "expo-router";
+import { Loading } from "@/components/common";
 
 export default function EnergyCalculator() {
-  const { transportationData, dietData, energyData, totalData, updateEnergyData, updateTotalData } = useEmissions();
+  // Automatically fill state and bills at random,
+  // Todo: Use geolocation services to determine which state to choose
+  const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
+    state: "",
+    electricBill: "",
+    waterBill: "",
+    propaneBill: "",
+    gasBill: "",
+    useWoodStove: "No",
+    peopleInHome: 1,
+  });
+
+  const [surveyEmissions, setSurveyEmissions] = useState<Partial<SurveyEmissions>>({
+    electricEmissions: 0,
+    waterEmissions: 0,
+    otherEnergyEmissions: 0,
+    energyEmissions: 0,
+  });
+  const [transportationEmissions, setTransportationEmissions] = useState(0);
+  const [dietEmissions, setDietEmissions] = useState(0);
 
   // State selection
-  const [state, setState] = useState(energyData.state || "");
   const [stateData, setStateData] = useState<StateData>({} as StateData);
   const [menuVisible, setMenuVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
   const filteredStates = statesData.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -25,189 +48,163 @@ export default function EnergyCalculator() {
   const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
-    if (state) {
-      const selectedState = statesData.find((s) => s.name === state);
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchEmissionsData();
+        if (data && data.surveyData && data.surveyEmissions) {
+          setSurveyData(data.surveyData);
+          setSurveyEmissions(data.surveyEmissions);
+          setDietEmissions(data.surveyEmissions.dietEmissions || 0);
+          setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
+          if (data.surveyData.state) {
+            const selectedState = statesData.find((s) => s.name === data.surveyData.state);
+            if (selectedState) {
+              setStateData(selectedState as StateData);
+            }
+          } else {
+            const randomState = statesData[Math.floor(Math.random() * statesData.length)];
+            setSurveyData({
+              ...surveyData,
+              state: randomState.name,
+              electricBill: randomState.averageMonthlyElectricityBill.toFixed(2),
+              waterBill: randomState.averageMonthlyWaterBill.toFixed(2),
+              propaneBill: randomState.averageMonthlyPropaneBill.toFixed(2),
+              gasBill: randomState.averageMonthlyGasBill.toFixed(2),
+              useWoodStove: "No",
+              peopleInHome: 1,
+            });
+          }
+        } else {
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    if (surveyData.state) {
+      const selectedState = statesData.find((s) => s.name === surveyData.state);
       if (selectedState) {
         setStateData(selectedState as StateData);
       }
     }
-  }, [state]);
+  }, [surveyData.state]);
 
-  // Answers to questions
-  const [electricBill, setElectricBill] = useState(energyData.electricBill || "");
-  const [waterBill, setWaterBill] = useState(energyData.waterBill || "");
-  const [propaneBill, setPropaneBill] = useState(energyData.propaneBill || "");
-  const [gasBill, setGasBill] = useState(energyData.gasBill || "");
-  const [useWoodStove, setUseWoodStove] = useState(energyData.useWoodStove || "Yes");
-  const [peopleInHome, setPeopleInHome] = useState(energyData.peopleInHome || 1);
-
-  // Automatically fill state and bills at random,
-  // Todo: Use geolocation services to determine which state to choose
   useEffect(() => {
-    const randomState = statesData[Math.floor(Math.random() * statesData.length)];
-    setState(randomState.name);
-    setStateData(randomState as any);
-    setElectricBill(randomState.averageMonthlyElectricityBill.toFixed(2));
-    setWaterBill(randomState.averageMonthlyWaterBill.toFixed(2));
-    setPropaneBill(randomState.averageMonthlyPropaneBill.toFixed(2));
-    setGasBill(randomState.averageMonthlyGasBill.toFixed(2));
-  }, []);
+    const calculateEnergyEmissions = () => {
+      if (
+        !stateData ||
+        !surveyData.electricBill ||
+        !surveyData.waterBill ||
+        !surveyData.propaneBill ||
+        !surveyData.gasBill ||
+        !surveyData.peopleInHome
+      ) {
+        return;
+      }
 
-  // Emissions data
-  const [electricEmissions, setElectricEmissions] = useState(energyData.electricEmissions || 0.0);
-  const [waterEmissions, setWaterEmissions] = useState(energyData.waterEmissions || 0.0);
-  const [otherEnergyEmissions, setOtherEnergyEmissions] = useState(energyData.otherEnergyEmissions || 0.0);
-  const transportationEmissions = transportationData.transportationEmissions || 0.0;
-  const dietEmissions = dietData.dietEmissions || 0.0;
-  const [energyEmissions, setEnergyEmissions] = useState(energyData.energyEmissions || 0.0);
-  const [totalEmissions, setTotalEmissions] = useState(0.0);
-
-  // Calculate emissions
-  useEffect(() => {
-    if (stateData && electricBill && waterBill && propaneBill && gasBill && peopleInHome) {
-      // Calculate electricity emissions NOTE: No idea what the 100 is for, but it just works
       const electricityEmissions =
         ((stateData.stateEGridValue * 0.000453592) / 1000) *
         900 *
         12 *
-        (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
+        (parseFloat(surveyData.electricBill) / stateData.averageMonthlyElectricityBill);
 
-      // Calculate water emissions
-      const waterEmissions = (parseFloat(waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
+      const waterEmissions = (parseFloat(surveyData.waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
 
-      // Calculate propane emissions
-      const propaneEmissions = (parseFloat(propaneBill) / stateData.averageMonthlyPropaneBill) * 0.24;
+      const propaneEmissions = (parseFloat(surveyData.propaneBill) / stateData.averageMonthlyPropaneBill) * 0.24;
 
-      // Calculate natural gas emissions
-      const gasEmissions = (parseFloat(gasBill) / stateData.averageMonthlyGasBill) * 2.12;
+      const gasEmissions = (parseFloat(surveyData.gasBill) / stateData.averageMonthlyGasBill) * 2.12;
 
-      // Calculate total energy emissions
       const totalEnergyEmissions =
-        (electricityEmissions + waterEmissions + propaneEmissions + gasEmissions) / peopleInHome;
+        (electricityEmissions + waterEmissions + propaneEmissions + gasEmissions) / surveyData.peopleInHome;
 
-      // Update state with new emission values
-      setElectricEmissions(electricityEmissions);
-      setWaterEmissions(waterEmissions);
-      setOtherEnergyEmissions(propaneEmissions + gasEmissions);
-      setEnergyEmissions(totalEnergyEmissions);
-      setTotalEmissions(totalEnergyEmissions + transportationEmissions + dietEmissions);
-
-      updateEnergyData({
-        state,
-        electricBill,
-        waterBill,
-        propaneBill,
-        gasBill,
-        useWoodStove,
-        peopleInHome,
+      setSurveyEmissions({
         electricEmissions: electricityEmissions,
         waterEmissions: waterEmissions,
         otherEnergyEmissions: propaneEmissions + gasEmissions,
         energyEmissions: totalEnergyEmissions,
       });
+    };
 
-      updateTotalData({
-        transportationEmissions,
-        dietEmissions,
-        energyEmissions: totalEnergyEmissions,
-        totalEmissions: totalEnergyEmissions + transportationEmissions + dietEmissions,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    stateData,
-    electricBill,
-    waterBill,
-    propaneBill,
-    gasBill,
-    peopleInHome,
-    transportationEmissions,
-    dietEmissions,
-    energyEmissions,
-  ]);
-
-  // Progress tracking
-  const [progress, setProgress] = useState(0.66);
-  const updateProgress = useCallback(() => {
-    let completedQuestions = 0;
-    const totalQuestions = 7; // Total number of questions
-
-    if (state) completedQuestions++;
-    if (electricBill) completedQuestions++;
-    if (waterBill) completedQuestions++;
-    if (propaneBill) completedQuestions++;
-    if (gasBill) completedQuestions++;
-    if (useWoodStove) completedQuestions++;
-    if (peopleInHome !== 1) completedQuestions++; // Assuming 1 is the default value
-
-    const newProgress = 0.83 + (completedQuestions / totalQuestions) * 0.17;
-    setProgress(newProgress);
-  }, [state, electricBill, waterBill, propaneBill, gasBill, useWoodStove, peopleInHome]);
+    calculateEnergyEmissions();
+  }, [stateData, surveyData]);
 
   useEffect(() => {
-    updateProgress();
-  }, [updateProgress]);
+    const validateForm = () => {
+      const isValid =
+        surveyData.state !== "" &&
+        surveyData.electricBill !== "" &&
+        surveyData.waterBill !== "" &&
+        surveyData.propaneBill !== "" &&
+        surveyData.gasBill !== "" &&
+        surveyData.useWoodStove !== "" &&
+        surveyData.peopleInHome !== undefined;
+      setIsFormValid(isValid);
+    };
+    validateForm();
+  }, [surveyData]);
 
-  const [electricBillError, setElectricBillError] = useState("");
-  const [waterBillError, setWaterBillError] = useState("");
-  const [propaneBillError, setPropaneBillError] = useState("");
-  const [gasBillError, setGasBillError] = useState("");
+  useEffect(() => {
+    const totalQuestions = Object.keys(surveyData).length; // Total number of questions
+    const completedQuestions = Object.values(surveyData).filter((value) => value !== "" && value !== undefined).length;
+    setProgress(0.66 + (completedQuestions / totalQuestions) * 0.33);
+  }, [surveyData]);
+
+  const handleNextButton = async () => {
+    setIsLoading(true);
+    try {
+      await saveEmissionsData({
+        surveyData: { ...surveyData },
+        surveyEmissions: { ...surveyEmissions },
+        totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
+      });
+      // [Error: You attempted to use a Firebase module that's not installed natively on your project by calling firebase.analytics().
+      // await analytics().logEvent("energy_emission_calculated", {
+      //   emissionsDocument: {
+      //     surveyData: surveyData,
+      //     surveyEmissions: surveyEmissions,
+      //     totalEmissions: (surveyEmissions.energyEmissions || 0) + transportationEmissions + dietEmissions,
+      //   },
+      // });
+      router.push("/breakdown");
+    } catch (error) {
+      console.error("Error saving emissions data:", error);
+    } finally {
+      setIsLoading(false);
+      router.push("/breakdown");
+    }
+  };
+
   const renderItem = useCallback(
     ({ item }: { item: (typeof statesData)[number] }) => (
       <Menu.Item
         onPress={() => {
-          setState(item.name);
-          setElectricBill(item.averageMonthlyElectricityBill.toFixed(2));
-          setWaterBill(item.averageMonthlyWaterBill.toFixed(2));
-          setPropaneBill(item.averageMonthlyPropaneBill.toFixed(2));
-          setGasBill(item.averageMonthlyGasBill.toFixed(2));
-          setElectricBillError("");
-          setWaterBillError("");
-          setPropaneBillError("");
-          setGasBillError("");
+          setSurveyData({
+            ...surveyData,
+            state: item.name,
+            electricBill: item.averageMonthlyElectricityBill.toFixed(2),
+            waterBill: item.averageMonthlyWaterBill.toFixed(2),
+            propaneBill: item.averageMonthlyPropaneBill.toFixed(2),
+            gasBill: item.averageMonthlyGasBill.toFixed(2),
+          });
           setMenuVisible(false);
         }}
         title={`${item.name} (${item.abbreviation})`}
         style={{ width: "100%" }}
       />
     ),
-    []
+    [surveyData]
   );
 
-  const validateNumber = (
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<string>>,
-    errorSetter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    if (value === "") {
-      setter("");
-      errorSetter("");
-    } else if (isNaN(Number(value)) || parseFloat(value) < 0) {
-      errorSetter("Please enter a valid amount");
-    } else if (parseFloat(value) > 1000) {
-      // split at the decimal and remove dollar
-      setter("999.99");
-      errorSetter("Please enter an amount under 1000");
-    } else {
-      const decimalPlaces = value.split(".")[1];
-      if (decimalPlaces && decimalPlaces.length > 2) {
-        setter(value.slice(0, -1));
-      } else {
-        setter(value);
-        errorSetter("");
-      }
-    }
-  };
-
-  const [isFormValid, setIsFormValid] = useState(false);
-  useEffect(() => {
-    const isElectricBillValid = electricBill !== "" && parseFloat(gasBill) < 1000;
-    const isWaterBillValid = waterBill !== "" && parseFloat(waterBill) < 1000;
-    const isPropaneBillValid = propaneBill !== "" && parseFloat(propaneBill) < 1000;
-    const isGasBillValid = gasBill !== "" && parseFloat(gasBill) < 1000;
-    const isFormValid = isElectricBillValid && isWaterBillValid && isPropaneBillValid && isGasBillValid;
-    setIsFormValid(isFormValid);
-  }, [state, electricBill, waterBill, propaneBill, gasBill, useWoodStove, peopleInHome]);
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView}>
@@ -223,7 +220,7 @@ export default function EnergyCalculator() {
             anchor={
               <TouchableOpacity onPress={() => setMenuVisible(true)}>
                 <View style={styles.stateSelectionButton}>
-                  <Text>{state || "Select a state"}</Text>
+                  <Text>{surveyData.state || "Select a state"}</Text>
                 </View>
               </TouchableOpacity>
             }
@@ -246,80 +243,58 @@ export default function EnergyCalculator() {
 
           <NumberInput
             question="How much was your electric bill last month? ⚡"
-            value={electricBill}
+            value={surveyData.electricBill || ""}
             onChange={(value: string) => {
-              validateNumber(value, setElectricBill, setElectricBillError);
-              if (electricBillError !== "") {
-                setElectricBill(value);
-                updateEnergyData({ electricBill: value });
-              }
+              setSurveyData({ ...surveyData, electricBill: value });
             }}
             unit="$"
             label="per month"
-            error={electricBillError}
           />
 
           <NumberInput
             question="How much was your water bill last month? 🚰"
-            value={waterBill}
+            value={surveyData.waterBill || ""}
             onChange={(value: string) => {
-              validateNumber(value, setWaterBill, setWaterBillError);
-              if (waterBillError !== "") {
-                setWaterBill(value);
-                updateEnergyData({ waterBill: value });
-              }
+              setSurveyData({ ...surveyData, waterBill: value });
             }}
             unit="$"
             label="per month"
-            error={waterBillError}
           />
 
           <NumberInput
             question="How much was spent on propane last month? 🛢"
-            value={propaneBill}
+            value={surveyData.propaneBill || ""}
             onChange={(value: string) => {
-              validateNumber(value, setPropaneBill, setPropaneBillError);
-              if (propaneBillError !== "") {
-                setPropaneBill(value);
-                updateEnergyData({ propaneBill: value });
-              }
+              setSurveyData({ ...surveyData, propaneBill: value });
             }}
             unit="$"
             label="per month"
-            error={propaneBillError}
           />
 
           <NumberInput
             question="How much was spent on natural gas last month? ⛽"
-            value={gasBill}
+            value={surveyData.gasBill || ""}
             onChange={(value: string) => {
-              validateNumber(value, setGasBill, setGasBillError);
-              if (gasBillError !== "") {
-                setGasBill(value);
-                updateEnergyData({ gasBill: value });
-              }
+              setSurveyData({ ...surveyData, gasBill: value });
             }}
             unit="$"
             label="per month"
-            error={gasBillError}
           />
 
           <RadioButtonGroup
             question="Do you use a wood stove? 🪵"
             options={["Yes", "No"]}
-            value={useWoodStove}
+            value={surveyData.useWoodStove || "No"}
             onChange={(value: string) => {
-              setUseWoodStove(value);
-              updateEnergyData({ useWoodStove: value });
+              setSurveyData({ ...surveyData, useWoodStove: value });
             }}
           />
 
           <QuestionSlider
             question="How many people live in your household?"
-            value={peopleInHome}
+            value={surveyData.peopleInHome || 1}
             onChange={(value: number) => {
-              setPeopleInHome(value);
-              updateEnergyData({ peopleInHome: value });
+              setSurveyData({ ...surveyData, peopleInHome: value });
             }}
             minimumValue={1}
             maximumValue={7}
@@ -330,49 +305,32 @@ export default function EnergyCalculator() {
             <View style={styles.emissionsContent}>
               <View style={styles.emissionRow}>
                 <Text>Electric Emissions:</Text>
-                <Text>{(electricEmissions / peopleInHome).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.electricEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Water:</Text>
-                <Text>{(waterEmissions / peopleInHome).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.waterEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Other Energy:</Text>
-                <Text>{(otherEnergyEmissions / peopleInHome).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.otherEnergyEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Transportation + Diet:</Text>
-                <Text>{(transportationEmissions + dietEmissions).toFixed(2)}</Text>
+                <Text>{(dietEmissions + transportationEmissions).toFixed(2)}</Text>
               </View>
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total:</Text>
-                <Text>{totalEmissions.toFixed(2)}</Text>
+                <Text>
+                  {(transportationEmissions + dietEmissions + (surveyEmissions.energyEmissions || 0)).toFixed(2)}
+                </Text>
                 <Text>tons CO2 per year</Text>
               </View>
             </View>
           </View>
         </View>
 
-        <NextButton
-          isFormValid={isFormValid}
-          onNext="breakdown"
-          saveData={async () => {
-            saveEmissionsData({
-              transportationData,
-              dietData,
-              energyData,
-              totalData,
-            });
-
-            //Log an event to Firebase Analytics!
-            await analytics().logEvent("carbon_emission_calculated", {
-              transportation: transportationData,
-              diet: dietData,
-              energy: energyData,
-              total: totalData,
-            });
-          }}
-        />
+        <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
       </SafeAreaView>
     </ScrollView>
   );
