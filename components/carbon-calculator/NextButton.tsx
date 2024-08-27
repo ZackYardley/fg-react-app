@@ -1,42 +1,20 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Href, useRouter } from "expo-router";
 
-const NextButton = ({
-  isFormValid,
-  onNext,
-  saveData,
-}: {
-  isFormValid: boolean;
-  onNext: Href;
-  saveData?: () => void;
-}) => {
-  const router = useRouter();
-
+// todo: animating this would be cool
+const NextButton = ({ isFormValid, onPress }: { isFormValid: boolean; onPress: () => void }) => {
   const handlePress = async () => {
     if (isFormValid) {
-      router.navigate(onNext);
-      if (saveData) {
-        saveData();
-      }
+      onPress();
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePress}>
-        <View
-          style={[
-            styles.button,
-            isFormValid ? styles.validButton : styles.invalidButton,
-          ]}
-        >
-          <Icon
-            name="arrow-right"
-            size={30}
-            color={isFormValid ? "#000" : "#AAA"}
-          />
+        <View style={[styles.button, isFormValid ? styles.validButton : styles.invalidButton]}>
+          <Icon name="arrow-right" size={30} color={isFormValid ? "#000" : "#AAA"} />
         </View>
       </TouchableOpacity>
     </View>

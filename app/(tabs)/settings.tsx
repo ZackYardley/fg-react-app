@@ -49,8 +49,7 @@ export default function ProfileScreen() {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        const totalData = data.totalData;
-        setTotalEmissions(totalData.totalEmissions);
+        setTotalEmissions(data.totalEmissions);
       }
     };
 
@@ -88,11 +87,6 @@ export default function ProfileScreen() {
     try {
       setIsDeleteModalVisible(false); // Close the modal before proceeding
       await deleteUserAccount(isGoogleUser ? undefined : deleteConfirmation);
-
-      // Use setTimeout to delay the navigation slightly, ensuring the modal is fully closed
-      setTimeout(() => {
-        router.replace("/get-started");
-      }, 100);
     } catch (error: any) {
       // Delay the error alert to ensure the delete modal is closed
       setTimeout(() => {

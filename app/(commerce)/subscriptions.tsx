@@ -19,7 +19,7 @@ const ForevergreenSubscriptions = () => {
       try {
         const userEmissionsData = await fetchEmissionsData();
         if (userEmissionsData) {
-          const userEmissions = userEmissionsData?.totalData.totalEmissions;
+          const userEmissions = userEmissionsData.totalEmissions;
           const result = await fetchCarbonCreditSubscription(userEmissions);
           if (result) {
             setSubscriptionPrice(result.recommendedPrice.unit_amount);

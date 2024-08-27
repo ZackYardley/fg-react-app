@@ -75,7 +75,7 @@ const createUserProfile = async (userData: {
 // Function to handle user redirection based on emissions data
 const handleUserRedirection = async () => {
   const data = await fetchEmissionsData();
-  if (data) {
+  if (data?.totalEmissions) {
     router.replace("/home");
   } else {
     router.replace("/pre-survey");

@@ -2,7 +2,7 @@ import { useRootNavigationState, Redirect, router } from "expo-router";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect, useRef } from "react";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { getAuth, onAuthStateChanged, onAuthStateChanged, User } from "firebase/auth";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
 import { Loading } from "@/components/common";

@@ -35,7 +35,7 @@ const CarbonCreditSubscriptionScreen = () => {
     const fetchSubscriptionData = async () => {
       try {
         const userEmissionsData = await fetchEmissionsData();
-        const userEmissions = userEmissionsData?.totalData.totalEmissions;
+        const userEmissions = userEmissionsData?.totalEmissions;
         if (!userEmissions) {
           console.error("No user emissions data found");
           return;

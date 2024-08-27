@@ -23,12 +23,12 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
       const months = generateLastSixMonths();
       const promises = months.map((month) => fetchEmissionsData(month, userId));
       const results = await Promise.all(promises);
-      setData(results.map((result) => result?.totalData.totalEmissions || 0)); // Extract totalEmissions and default to 0 if no data
+      setData(results.map((result) => result?.totalEmissions || 0)); // Extract totalEmissions and default to 0 if no data
       setLoading(false);
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -39,9 +39,7 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
   return (
     <LineChart
       data={{
-        labels: generateLastSixMonths().map((month) =>
-          dayjs(month).format("MMM")
-        ), // Labels formatted as 'Jan', 'Feb', etc.
+        labels: generateLastSixMonths().map((month) => dayjs(month).format("MMM")), // Labels formatted as 'Jan', 'Feb', etc.
         datasets: [{ data }],
       }}
       width={screenWidth - 67}
