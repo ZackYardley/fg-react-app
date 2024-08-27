@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, FlatList, StyleSheet, Dimensions } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
-import { Menu, Searchbar } from "react-native-paper";
 import statesData from "@/constants/states.json";
 import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
@@ -12,7 +11,6 @@ import { router } from "expo-router";
 import { Loading } from "@/components/common";
 
 export default function EnergyCalculator() {
-  // Automatically fill state and bills at random,
   // Todo: Use geolocation services to determine which state to choose
   const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
     state: "",
@@ -34,22 +32,10 @@ export default function EnergyCalculator() {
   const [dietEmissions, setDietEmissions] = useState(0);
 
   // State selection
-  const [state, setState] = useState("");
   const [stateData, setStateData] = useState<StateData>({} as StateData);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
-  const pickerRef = useRef();
-
-  const filteredStates = statesData.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.abbreviation.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const screenWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,16 +54,7 @@ export default function EnergyCalculator() {
             }
           } else {
             const randomState = statesData[Math.floor(Math.random() * statesData.length)];
-            setSurveyData({
-              ...surveyData,
-              state: randomState.name,
-              electricBill: randomState.averageMonthlyElectricityBill.toFixed(2),
-              waterBill: randomState.averageMonthlyWaterBill.toFixed(2),
-              propaneBill: randomState.averageMonthlyPropaneBill.toFixed(2),
-              gasBill: randomState.averageMonthlyGasBill.toFixed(2),
-              useWoodStove: "No",
-              peopleInHome: 1,
-            });
+            handleStateChange(randomState.name);
           }
         } else {
         }
@@ -89,6 +66,7 @@ export default function EnergyCalculator() {
     };
 
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -196,27 +174,6 @@ export default function EnergyCalculator() {
       router.push("/breakdown");
     }
   };
-
-  const renderItem = useCallback(
-    ({ item }: { item: (typeof statesData)[number] }) => (
-      <Menu.Item
-        onPress={() => {
-          setSurveyData({
-            ...surveyData,
-            state: item.name,
-            electricBill: item.averageMonthlyElectricityBill.toFixed(2),
-            waterBill: item.averageMonthlyWaterBill.toFixed(2),
-            propaneBill: item.averageMonthlyPropaneBill.toFixed(2),
-            gasBill: item.averageMonthlyGasBill.toFixed(2),
-          });
-          setMenuVisible(false);
-        }}
-        title={`${item.name} (${item.abbreviation})`}
-        style={{ width: "100%" }}
-      />
-    ),
-    [surveyData]
-  );
 
   if (isLoading) {
     return <Loading />;
