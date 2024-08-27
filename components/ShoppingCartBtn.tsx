@@ -22,10 +22,8 @@ export const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
 const styles = StyleSheet.create({
   cartContainer: {
     position: "absolute",
-    top: 72,
+    top: 16,
     right: 16,
-    height: 44,
-    width: 44,
     padding: 10,
     backgroundColor: "#409858",
     borderRadius: 9999,

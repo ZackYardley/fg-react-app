@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { getAuth, updateProfile } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { BackButton, PageHeader } from "@/components/common";
 import { Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileSettings() {
   const auth = getAuth();
@@ -78,54 +71,49 @@ export default function ProfileSettings() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <PageHeader subtitle="Profile Settings" />
-      <BackButton />
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.container}>
+        <PageHeader subtitle="Profile Settings" />
+        <BackButton />
 
-      <View style={{ paddingHorizontal: 20 }}>
-        <View style={styles.profileImageContainer}>
-          <TouchableOpacity
-            style={styles.profileImageButton}
-            onPress={pickImage}
-          >
-            {profileImage ? (
-              <>
-                <Image
-                  style={styles.profileImage}
-                  source={{ uri: profileImage }}
-                  contentFit="cover"
-                />
-                <View style={styles.iconOverlay}>
-                  <Feather name="edit-2" size={24} color="white" />
-                </View>
-              </>
-            ) : (
-              <>
-                <Text style={styles.profileImageText}>+</Text>
-                <Text style={styles.uploadText}>Upload a profile picture!</Text>
-              </>
-            )}
+        <View style={{ paddingHorizontal: 20 }}>
+          <View style={styles.profileImageContainer}>
+            <TouchableOpacity style={styles.profileImageButton} onPress={pickImage}>
+              {profileImage ? (
+                <>
+                  <Image style={styles.profileImage} source={{ uri: profileImage }} contentFit="cover" />
+                  <View style={styles.iconOverlay}>
+                    <Feather name="edit-2" size={24} color="white" />
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.profileImageText}>+</Text>
+                  <Text style={styles.uploadText}>Upload a profile picture!</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.form}>
+            <Text style={styles.label}>Display Name</Text>
+            <TextInput
+              style={styles.input}
+              value={displayName}
+              onChangeText={setDisplayName}
+              placeholder="Enter your name"
+            />
+
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.emailText}>{user?.email}</Text>
+          </View>
+
+          <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
+            <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.form}>
-          <Text style={styles.label}>Display Name</Text>
-          <TextInput
-            style={styles.input}
-            value={displayName}
-            onChangeText={setDisplayName}
-            placeholder="Enter your name"
-          />
-
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.emailText}>{user?.email}</Text>
-        </View>
-
-        <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

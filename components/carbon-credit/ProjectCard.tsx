@@ -49,7 +49,10 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{project.name}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <Text style={styles.title}>{project.name}</Text>
+        <Image source={project.images[0]} style={styles.projectImage} />
+      </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailTitle}>{currentDetail.title}</Text>
@@ -69,11 +72,9 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
           <Icon name="chevron-left" size={48} />
         </TouchableOpacity>
 
-        <Image source={project.images[0]} style={styles.projectImage} />
-
         <View style={styles.priceContainer}>
           <View style={styles.coinContainer}>
-            <Text style={styles.priceText}>{formatPrice(project.prices[0].unit_amount * quantity)}</Text>
+            <Text style={styles.priceText}>{formatPrice(project.prices[0].unit_amount)}</Text>
           </View>
           <View style={styles.perTonContainer}>
             <Text style={styles.perTonText}>per ton</Text>

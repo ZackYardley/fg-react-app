@@ -185,7 +185,7 @@ export default function ProfileScreen() {
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
           <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
-          <SettingsItem title="Notifications" screen="/notifications-settings" />
+          {/*<SettingsItem title="Notifications" screen="/notifications-settings" />*/}
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <View style={styles.carbonFootprint}>

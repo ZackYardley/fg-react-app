@@ -161,8 +161,6 @@ const onContinueAnonymously = async () => {
       uid: userCredential.user.uid,
       isAnonymous: true,
     });
-
-    await handleUserRedirection();
   } catch (error: any) {
     Alert.alert("Error", `Code: ${error.code}\nMessage: ${error.message}`);
     console.error(`Error: Code: ${error.code}\nMessage: ${error.message}`);
@@ -211,7 +209,6 @@ const logout = async () => {
   const auth = getAuth();
   try {
     await signOut(auth);
-    router.dismissAll();
   } catch (error: any) {
     Alert.alert("Error", "Failed to logout. Please try again.");
     console.error("Error: Failed to logout. Please try again.", error);
