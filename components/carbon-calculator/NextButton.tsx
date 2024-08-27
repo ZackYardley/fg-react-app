@@ -1,7 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 
 const NextButton = ({
   isFormValid,
@@ -9,7 +9,7 @@ const NextButton = ({
   saveData,
 }: {
   isFormValid: boolean;
-  onNext: string;
+  onNext: Href;
   saveData?: () => void;
 }) => {
   const router = useRouter();

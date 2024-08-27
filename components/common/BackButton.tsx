@@ -16,8 +16,7 @@ const BackButton = ({ link }: { link?: Href<string> }) => {
 
   return (
     <Pressable style={styles.container} onPress={() => navigate()} hitSlop={24}>
-      <Icon name="chevron-left" size={18} color="black" />
-      <Text style={styles.text}>Back</Text>
+      <Icon name="chevron-left" size={36} color="black" />
     </Pressable>
   );
 };
@@ -27,14 +26,9 @@ export default BackButton;
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    top: 8,
+    top: 16,
     left: 8,
-    paddingTop: 72,
     flexDirection: "row",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 18,
-    marginLeft: 4,
   },
 });

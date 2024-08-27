@@ -19,7 +19,7 @@ export default function TransportationCalculator() {
   // Transportation emissions calculation
   const [longFlights, setLongFlights] = useState(transportationData.longFlights || 0);
   const [shortFlights, setShortFlights] = useState(transportationData.shortFlights || 0);
-  const [carType, setCarType] = useState(transportationData.carType || "Gas");
+  const [carType, setCarType] = useState(transportationData.carType || "Gas - ⛽️");
   const [milesPerWeek, setMilesPerWeek] = useState(transportationData.milesPerWeek || "300");
   const [useTrain, setUseTrain] = useState(transportationData.useTrain || "No");
   const [trainFrequency, setTrainFrequency] = useState(transportationData.trainFrequency || "1");
@@ -283,7 +283,7 @@ export default function TransportationCalculator() {
             </View>
           </View>
         </View>
-          <NextButton isFormValid={isFormValid} onNext="diet" />
+          <NextButton isFormValid={isFormValid} onNext="/diet" />
         </SafeAreaView>
       </ScrollView>
     </KeyboardAvoidingView>

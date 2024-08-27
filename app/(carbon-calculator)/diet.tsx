@@ -96,7 +96,7 @@ export default function DietCalculator() {
         </View>
 
         {/* Next Button */}
-        <NextButton isFormValid={isFormValid} onNext="energy" />
+        <NextButton isFormValid={isFormValid} onNext="/energy" />
       </SafeAreaView>
     </ScrollView>
   );

@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StatusBar, Image, TouchableOpacity } from "react-native";
-import { router } from "expo-router";
+import { View, Text, StatusBar, Image } from "react-native";
+import { Link, router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GreenButton } from "@/components/common";
 
 export default function GetStartedScreen() {
   return (
@@ -16,20 +17,17 @@ export default function GetStartedScreen() {
         <Image style={styles.logo} source={TreeLogo} />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        <GreenButton
+          title="Get Started"
           onPress={() => router.push("/signup")}
           style={styles.button}
-        >
-          <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
+          textStyle={styles.buttonText}
+        />
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Already helping our planet? </Text>
-          <TouchableOpacity
-            onPress={() => router.push("/login")}
-            style={styles.loginLink}
-          >
+          <Link href={"/login"} style={styles.loginLink}>
             <Text style={styles.loginLinkText}>Log in</Text>
-          </TouchableOpacity>
+          </Link>
         </View>
       </View>
     </SafeAreaView>
@@ -75,7 +73,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   loginContainer: {
-    marginTop: 16,
+    marginVertical: 40,
     flexDirection: "row",
     justifyContent: "center",
   },

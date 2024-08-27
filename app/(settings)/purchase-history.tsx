@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
-import { getRecentPayments, fetchRecentInvoices } from "@/api/payments";
+import { getRecentPayments } from "@/api/payments";
+import { fetchRecentInvoices } from "@/api/subscriptions";
 import { Payment, Invoice } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
@@ -96,14 +97,16 @@ const PurchaseHistoryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <PageHeader subtitle="Purchase History" />
-      <BackButton />
-      <FlatList
-        data={purchaseHistory}
-        renderItem={renderPurchaseItem}
-        keyExtractor={(item) => `${item.type}-${item.data.id}`}
-        contentContainerStyle={styles.listContainer}
-      />
+      <View style={{ flexGrow: 1 }}>
+        <PageHeader subtitle="Purchase History" />
+        <BackButton />
+        <FlatList
+          data={purchaseHistory}
+          renderItem={renderPurchaseItem}
+          keyExtractor={(item) => `${item.type}-${item.data.id}`}
+          contentContainerStyle={styles.listContainer}
+        />
+      </View>
     </SafeAreaView>
   );
 };

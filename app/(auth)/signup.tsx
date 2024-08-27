@@ -2,19 +2,21 @@ import { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
   KeyboardAvoidingView,
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
   StyleSheet,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native-paper";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { router } from "expo-router";
+import { Link } from "expo-router";
 import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
-import { TreeLogo } from "@/constants/Images";
+import { GreenButton, TitleWithLogo } from "@/components/common";
+import GoogleButton from "@/components/GoogleButton";
+import CustomTextInput from "@/components/CustomTextInput";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
@@ -39,144 +41,65 @@ export default function SignupScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={styles.safeArea}>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContent}
-        >
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
           <View style={[styles.contentContainer, { minHeight: height }]}>
-            <View style={styles.headerContainer}>
-              <Text style={styles.title}>
-                Sign <Text style={styles.titleHighlight}>Up</Text>
-              </Text>
-              <View style={styles.logoContainer}>
-                <Image
-                  style={styles.logo}
-                  source={TreeLogo}
-                  resizeMode="contain"
-                />
-              </View>
-            </View>
+            <TitleWithLogo title="Sign" titleAlt="up" />
             <View style={styles.formContainer}>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <TextInput
-                  placeholder="Ex. abc@example.com"
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                  mode="outlined"
-                  dense={true}
-                  outlineStyle={{ borderColor: "#000" }}
-                  theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                  textColor="#000"
-                  left={
-                    <TextInput.Icon
-                      icon="at"
-                      color="#000"
-                      style={{ height: "100%", width: "100%" }}
-                    />
-                  }
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Your Name</Text>
-                <TextInput
-                  placeholder="Ex. John Smith"
-                  style={styles.input}
-                  value={name}
-                  onChangeText={setName}
-                  mode="outlined"
-                  dense={true}
-                  outlineStyle={{ borderColor: "#000" }}
-                  theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                  textColor="#000"
-                  left={
-                    <TextInput.Icon
-                      icon="account"
-                      color="#000"
-                      style={{ height: "100%", width: "100%" }}
-                    />
-                  }
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Your Password</Text>
-                <TextInput
-                  placeholder="Your Password"
-                  secureTextEntry={!showPassword}
-                  style={styles.input}
-                  value={password}
-                  onChangeText={setPassword}
-                  mode="outlined"
-                  dense={true}
-                  outlineStyle={{ borderColor: "#000" }}
-                  theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                  textColor="#000"
-                  left={
-                    <TextInput.Icon
-                      icon="lock"
-                      color="#000"
-                      style={{ height: "100%", width: "100%" }}
-                    />
-                  }
-                  right={
-                    <TextInput.Icon
-                      icon={showPassword ? "eye-off" : "eye"}
-                      onPress={() => setShowPassword(!showPassword)}
-                      color="#000"
-                      style={{ height: "100%", width: "100%" }}
-                    />
-                  }
-                />
-              </View>
-              <TouchableOpacity
-                style={styles.createAccountButton}
+              <CustomTextInput
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Ex. abc@example.com"
+                leftIcon="at"
+              />
+              <CustomTextInput
+                label="Your Name"
+                value={name}
+                onChangeText={setName}
+                placeholder="Ex. John Smith"
+                leftIcon="account"
+              />
+              <CustomTextInput
+                label="Your Password"
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Your Password"
+                secureTextEntry={!showPassword}
+                leftIcon="lock"
+                rightIcon={showPassword ? "eye-off" : "eye"}
+                onRightIconPress={() => setShowPassword(!showPassword)}
+              />
+              <GreenButton
+                title="Create Account"
                 onPress={() => onSignup(email, password, name)}
-              >
-                <Text style={styles.createAccountButtonText}>
-                  Create Account
-                </Text>
-              </TouchableOpacity>
+                style={styles.createAccountButton}
+                textStyle={styles.createAccountButtonText}
+              />
               <View style={styles.orContainer}>
                 <View style={styles.orLine} />
                 <Text style={styles.orText}>Or</Text>
                 <View style={styles.orLine} />
               </View>
-              <TouchableOpacity
-                style={styles.googleButton}
-                onPress={() => onGoogleSignUp()}
-              >
-                <Image
-                  source={{
-                    uri: "https://img.icons8.com/color/48/000000/google-logo.png",
-                  }}
-                  style={styles.googleIcon}
-                />
-                <Text style={styles.googleButtonText}>
-                  Continue with Google
-                </Text>
-              </TouchableOpacity>
+              <GoogleButton title="Continue with Google" onPress={() => onGoogleSignUp()} />
+
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>
-                  Already helping our planet?
-                </Text>
-                <TouchableOpacity onPress={() => router.navigate("/login")}>
+                <Text style={styles.loginText}>Already helping our planet?</Text>
+                <Link href={"/login"}>
                   <Text style={styles.loginLink}>Log In</Text>
-                </TouchableOpacity>
+                </Link>
               </View>
               {isAnonymous ? (
                 <View style={styles.anonymousContainer}>
                   <Text style={styles.anonymousText}>
-                    Create an account to save your progress, access all
-                    features, and continue making a real impact on the
-                    environment!
+                    Create an account to save your progress, access all features, and continue making a real impact on
+                    the environment!
                   </Text>
                 </View>
               ) : (
                 <View style={styles.guestContainer}>
-                  <TouchableOpacity onPress={() => onContinueAnonymously()}>
+                  <Link onPress={() => onContinueAnonymously()} href={"/pre-survey"} replace>
                     <Text style={styles.guestLink}>Or continue as guest</Text>
-                  </TouchableOpacity>
+                  </Link>
                 </View>
               )}
             </View>
@@ -274,31 +197,6 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "bold",
     fontSize: 20,
-  },
-  googleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 9999,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 2,
-  },
-  googleIcon: {
-    width: 32,
-    height: 32,
-    marginRight: 16,
-  },
-  googleButtonText: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
   },
   loginContainer: {
     marginTop: 16,

@@ -355,7 +355,7 @@ export default function EnergyCalculator() {
 
         <NextButton
           isFormValid={isFormValid}
-          onNext="breakdown"
+          onNext="/breakdown"
           saveData={async () => {
             saveEmissionsData({
               transportationData,

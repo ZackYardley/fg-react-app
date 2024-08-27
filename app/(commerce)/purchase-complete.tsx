@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
@@ -233,16 +233,16 @@ const PurchaseCompleteScreen = () => {
             )}
             <Image source={Pamona} style={styles.infoImage} />
             <View style={styles.buttonContainer}>
-              <Link href="/home" style={styles.linkStyle}>
+              <TouchableOpacity onPress={() => router.push("/home")} style={styles.button}>
                 <LinearGradient
-                  style={styles.button}
+                  style={styles.buttonGradient}
                   colors={["#409858", "#B1E8C0"]}
                   start={{ x: 0.4, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
                 >
                   <Text style={styles.buttonText}>Back Home</Text>
                 </LinearGradient>
-              </Link>
+              </TouchableOpacity>
             </View>
           </LinearGradient>
         </View>
@@ -330,24 +330,28 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   buttonContainer: {
-    display: "flex",
-    justifyContent: "center",
     width: "100%",
-  },
-  linkStyle: {
-    width: "100%",
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 50,
+    marginTop: 20,
+  },
+  button: {
+    width: "80%",
+    maxWidth: 300,
+    minWidth: 200, // Ensure a minimum width
+    height: 50, // Set a fixed height
+  },
+  buttonGradient: {
+    flex: 1,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     color: "white",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center",
   },
   itemDescription: {
     fontSize: 18,

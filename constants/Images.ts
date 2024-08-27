@@ -9,6 +9,7 @@ const OakTree = require("../assets/images/oak-tree-1.png");
 const PepperTree = require("../assets/images/pepper-tree-1.png");
 const Pamona = require("../assets/images/pamona.png");
 const fourofour = require("../assets/images/fourofour.png");
+const GoogleLogo = require("../assets/images/google-logo.png");
 
 export {
   Earth,
@@ -22,4 +23,5 @@ export {
   PepperTree,
   Pamona,
   fourofour,
+  GoogleLogo,
 };

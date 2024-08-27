@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   titleHighlight: {
-    color: "#409858", // Assuming this is your primary color
+    color: "#409858",
   },
   contentContainer: {
     backgroundColor: "#eeeeee",

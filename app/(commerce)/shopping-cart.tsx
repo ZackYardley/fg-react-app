@@ -12,6 +12,7 @@ import { purchaseCarbonCredits, fetchOneTimePaymentSheetParams } from "@/api/pur
 import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 
@@ -268,7 +269,7 @@ export default function ShoppingCartScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
       <FlatList
@@ -280,7 +281,7 @@ export default function ShoppingCartScreen() {
         ListFooterComponent={ListFooterComponent}
         contentContainerStyle={styles.flatList}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
