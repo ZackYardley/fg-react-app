@@ -1,0 +1,4 @@
+const TARGET_EMISSIONS = 16;
+
+export { TARGET_EMISSIONS };
+ 

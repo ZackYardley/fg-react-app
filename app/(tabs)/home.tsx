@@ -19,6 +19,7 @@ import {
   LineChartBreakdown,
 } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
+import { TARGET_EMISSIONS } from "@/constants";
 
 
 const TextButton = ({ label, style }: { label: string; style: object }) => (
@@ -296,7 +297,7 @@ const HomeScreen = () => {
           <View style={styles.chartBox}>
             <Text style={styles.chartText}>
               If everyone lived like you we'd need{" "}
-              {(emissionsPerYear / 16).toFixed(2)} Earths
+              {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths
             </Text>
             <EarthBreakdown emissions={emissionsPerYear} />
           </View>

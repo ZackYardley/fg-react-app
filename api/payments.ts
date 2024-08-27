@@ -1,6 +1,6 @@
 import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc, where } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { Payment, Subscription } from "@/types";
+import { Payment } from "@/types";
 
 // todo: add function to get paginated payments, currently we show only 99 payments (probably enough )
 const getRecentPayments = async (count: number = 99): Promise<Payment[]> => {
@@ -56,70 +56,4 @@ const getPaymentById = async (paymentIntentId: string): Promise<Payment | null> 
   };
 };
 
-const isSubscribedToProduct = async (productId: string): Promise<boolean> => {
-  const auth = getAuth();
-  const userId = auth.currentUser?.uid;
-
-  if (!userId) {
-    throw new Error("User is not authenticated");
-  }
-
-  const db = getFirestore();
-  const subscriptionsRef = collection(db, "users", userId, "subscriptions");
-
-  try {
-    // Query for active subscriptions
-    const activeSubscriptionsQuery = query(subscriptionsRef, where("status", "==", "active"));
-
-    const querySnapshot = await getDocs(activeSubscriptionsQuery);
-
-    // Check each subscription's items for the product ID
-    for (const doc of querySnapshot.docs) {
-      const subscription = doc.data() as Subscription;
-      const hasProduct = subscription.items.some((item) => item.plan.product === productId);
-      if (hasProduct) {
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    console.error("Error checking Carbon Credit subscription:", error);
-    throw error;
-  }
-};
-
-const getSubscription = async (productId: string): Promise<Subscription | null> => {
-  const auth = getAuth();
-  const userId = auth.currentUser?.uid;
-
-  if (!userId) {
-    throw new Error("User is not authenticated");
-  }
-
-  const db = getFirestore();
-  const subscriptionsRef = collection(db, "users", userId, "subscriptions");
-
-  try {
-    // Query for active subscriptions
-    const activeSubscriptionsQuery = query(subscriptionsRef, where("status", "==", "active"));
-
-    const querySnapshot = await getDocs(activeSubscriptionsQuery);
-
-    // Check each subscription's items for the product ID
-    for (const doc of querySnapshot.docs) {
-      const subscription = doc.data() as Subscription;
-      const hasProduct = subscription.items.some((item) => item.plan.product === productId);
-      if (hasProduct) {
-        return subscription;
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error("Error checking Carbon Credit subscription:", error);
-    throw error;
-  }
-};
-
-export { getRecentPayments, getPaymentById, isSubscribedToProduct, getSubscription };
+export { getRecentPayments, getPaymentById };

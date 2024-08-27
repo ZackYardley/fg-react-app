@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { fetchEmissionsData } from "@/api/emissions";
 import { formatPrice } from "@/utils";
-import { isSubscribedToProduct } from "@/api/payments";
+import { fetchSubscriptionStatus } from "@/api/subscriptions";
 
 const ForevergreenSubscriptions = () => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
@@ -23,7 +23,7 @@ const ForevergreenSubscriptions = () => {
           const result = await fetchCarbonCreditSubscription(userEmissions);
           if (result) {
             setSubscriptionPrice(result.recommendedPrice.unit_amount);
-            const isSubscribed = await isSubscribedToProduct(result.product.id || "");
+            const isSubscribed = await fetchSubscriptionStatus(result.product.id || "");
             setIsSubscribed(isSubscribed);
           } else {
             console.error("No Carbon Credit Subscription found");

@@ -20,6 +20,23 @@ const fetchPricesForProduct = async (productId: string): Promise<Price[]> => {
   }
 };
 
+const fetchPricesForSubscription = async (subscriptionId: string): Promise<Price[]> => {
+  const db = getFirestore();
+  const pricesCollection = collection(db, "products", subscriptionId, "prices");
+  const prices: Price[] = [];
+  try {
+    const querySnapshot = await getDocs(pricesCollection);
+    querySnapshot.forEach((doc) => {
+      const price = doc.data() as Omit<Price, "id">;
+      prices.push({ ...price, id: doc.id });
+    });
+    return prices;
+  } catch (error) {
+    console.error(`Error fetching prices for subscription ${subscriptionId}:`, error);
+    throw error;
+  }
+};
+
 // Fetch all Carbon Credit products
 const fetchCarbonCreditProducts = async (): Promise<CarbonCredit[]> => {
   const db = getFirestore();
@@ -125,4 +142,5 @@ export {
   fetchCarbonCreditProducts,
   fetchSpecificCarbonCreditProduct,
   fetchCarbonCreditSubscription,
+  fetchPricesForSubscription,
 };

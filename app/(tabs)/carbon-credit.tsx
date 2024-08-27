@@ -2,34 +2,52 @@ import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, SafeAreaView, StyleSheet } from "react-native";
 import CreditItem from "@/components/carbon-credit/CreditItem";
 import ProjectCard from "@/components/carbon-credit/ProjectCard";
-import { fetchCarbonCreditProducts } from "@/api/products";
-import { CarbonCredit, CartItem } from "@/types";
+import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/products";
 import { subscribeToCart } from "@/api/cart";
+import { fetchSubscriptionStatus } from "@/api/subscriptions";
+import { fetchEmissionsData } from "@/api/emissions";
 import { Loading, PageHeader } from "@/components/common";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
+import { CarbonCredit, CartItem } from "@/types";
+import { formatPrice } from "@/utils";
+import { router } from "expo-router";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
   const [credits, setCredits] = useState<CarbonCredit[]>([]);
   const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     const initializeData = async () => {
       try {
-        const result = await fetchCarbonCreditProducts();
-        if (isMounted && result && result.length > 0) {
+        const [creditsResult, userEmissionsData] = await Promise.all([
+          fetchCarbonCreditProducts(),
+          fetchEmissionsData(),
+        ]);
+
+        if (isMounted && creditsResult && creditsResult.length > 0) {
           const credits = await Promise.all(
-            result.map(async (credit) => {
-              return {
-                ...credit,
-                prices: credit.prices.filter((price) => price.active),
-              } as CarbonCredit;
-            })
+            creditsResult.map(async (credit) => ({
+              ...credit,
+              prices: credit.prices.filter((price) => price.active),
+            }))
           );
           setCredits(credits);
           setSelectedProject(credits[0]);
+        }
+
+        if (userEmissionsData) {
+          const userEmissions = userEmissionsData.totalData.totalEmissions;
+          const subscriptionResult = await fetchCarbonCreditSubscription(userEmissions);
+          if (subscriptionResult) {
+            setSubscriptionPrice(subscriptionResult.recommendedPrice.unit_amount);
+            const subscribed = await fetchSubscriptionStatus(subscriptionResult.product.id || "");
+            setIsSubscribed(subscribed);
+          }
         }
       } catch (error) {
         console.error("Error fetching credits:", error);
@@ -84,8 +102,16 @@ export default function CarbonCreditScreen() {
           credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
           and support awesome climate projects!
         </Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>$20/Month</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/carbon-credit-sub")}>
+          <Text style={styles.buttonText}>
+            {loading
+              ? "Loading..."
+              : isSubscribed
+              ? "Manage Subscription"
+              : subscriptionPrice
+              ? `${formatPrice(subscriptionPrice)}/Month`
+              : "Subscription Unavailable"}
+          </Text>
         </TouchableOpacity>
       </View>
     </>

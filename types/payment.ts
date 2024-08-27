@@ -1,3 +1,4 @@
+import { DocumentReference } from "firebase/firestore";
 import { TransactionItem } from "./cart";
 
 interface Payment {
@@ -29,7 +30,7 @@ interface Payment {
   latest_charge: string;
   livemode: boolean;
   metadata: {
-    items: TransactionItem[];
+    items?: TransactionItem[];
   };
   next_action?: string;
   object: string;
@@ -52,6 +53,7 @@ interface Payment {
     };
   };
   paymentMethodTypes: string[];
+  prices?: DocumentReference[];
   processing?: string;
   receipt_email?: string;
   review?: string;
