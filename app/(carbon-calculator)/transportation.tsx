@@ -122,8 +122,8 @@ export default function TransportationCalculator() {
   useEffect(() => {
     const validateForm = () => {
       const isValid =
-        surveyData.longFlights! > 0 &&
-        surveyData.shortFlights! > 0 &&
+        surveyData.longFlights! >= 0 &&
+        surveyData.shortFlights! >= 0 &&
         surveyData.carType !== "" &&
         surveyData.milesPerWeek !== "" &&
         surveyData.useTrain !== "" &&
@@ -192,7 +192,7 @@ export default function TransportationCalculator() {
 
             <NumberInput
               question="How many miles do you drive per week? 🛞"
-              value={surveyData.milesPerWeek || "300"}
+              value={surveyData.milesPerWeek || ""}
               onChange={(value: string) => {
                 setSurveyData({ ...surveyData, milesPerWeek: value });
                 if (value !== "") {

@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  KeyboardAvoidingView,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native-paper";
 import { router } from "expo-router";
@@ -18,9 +10,9 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <SafeAreaView style={styles.safeAreaView}>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {/* Header */}
           <Text style={styles.header}>
             Reset <Text style={styles.headerHighlight}>Password</Text>
@@ -46,22 +38,15 @@ export default function ForgotPasswordScreen() {
                 outlineStyle={{ borderColor: "#000" }}
                 theme={{ roundness: 9999, colors: { background: "#fff" } }}
                 textColor="#000"
-                left={
-                  <TextInput.Icon
-                    icon="at"
-                    color="#000"
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
+                left={<TextInput.Icon icon="at" color="#000" style={{ height: "100%", width: "100%" }} />}
               />
             </View>
 
             {/* Info */}
             <View style={styles.infoContainer}>
               <Text style={styles.infoText}>
-                By clicking the "Reset Password" button you'll receive an email
-                with a link to create a new password. This helps to ensure your
-                account remains secure and accessible to you.
+                By clicking the "Reset Password" button you'll receive an email with a link to create a new password.
+                This helps to ensure your account remains secure and accessible to you.
               </Text>
             </View>
           </View>
@@ -69,10 +54,7 @@ export default function ForgotPasswordScreen() {
           {/* Controls */}
           <View style={styles.controlsContainer}>
             {/* Reset password button */}
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={() => handleResetPassword(email)}
-            >
+            <TouchableOpacity style={styles.resetButton} onPress={() => handleResetPassword(email)}>
               <Text style={styles.resetButtonText}>Reset Password</Text>
             </TouchableOpacity>
 
@@ -84,31 +66,23 @@ export default function ForgotPasswordScreen() {
             </View>
 
             {/* Back to Log in button */}
-            <TouchableOpacity
-              style={styles.backToLoginButton}
-              onPress={() => router.push("/login")}
-            >
+            <TouchableOpacity style={styles.backToLoginButton} onPress={() => router.push("/login")}>
               <Text style={styles.backToLoginText}>Back to Log in</Text>
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
   },
   scrollViewContent: {
     flexGrow: 1,
-  },
-  safeAreaView: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 12,
-    backgroundColor: "white",
   },
   header: {
     fontSize: 48,
