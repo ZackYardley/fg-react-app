@@ -1,62 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Switch } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { Notifications } from '../../api/notifications';
 
 const NotificationSettingsScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [newMessageNotifications, setNewMessageNotifications] = useState(false);
-  const [promotionalNotifications, setPromotionalNotifications] = useState(false);
-  const [updateNotifications, setUpdateNotifications] = useState(false);
 
   useEffect(() => {
-    loadSettings();
+    checkNotificationPermission();
   }, []);
 
-  const loadSettings = async () => {
-    try {
-      const enabled = await messaging().hasPermission();
-      setNotificationsEnabled(enabled === messaging.AuthorizationStatus.AUTHORIZED);
-
-      const newMessage = await AsyncStorage.getItem('newMessageNotifications');
-      setNewMessageNotifications(newMessage === 'true');
-
-      const promotional = await AsyncStorage.getItem('promotionalNotifications');
-      setPromotionalNotifications(promotional === 'true');
-
-      const update = await AsyncStorage.getItem('updateNotifications');
-      setUpdateNotifications(update === 'true');
-    } catch (error) {
-      console.error('Error loading notification settings:', error);
-    }
+  const checkNotificationPermission = async () => {
+    const authStatus = await messaging().hasPermission();
+    setNotificationsEnabled(authStatus === messaging.AuthorizationStatus.AUTHORIZED);
   };
 
   const toggleNotifications = async (value: boolean) => {
     if (value) {
-      const authStatus = await messaging().requestPermission();
-      if (authStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+      const permissionGranted = await Notifications.requestUserPermission();
+      if (permissionGranted) {
         setNotificationsEnabled(true);
       }
-    } else {
-      setNotificationsEnabled(false);
     }
   };
 
-  const updateSetting = async (key: string, value: boolean) => {
-    try {
-      await AsyncStorage.setItem(key, value.toString());
-    } catch (error) {
-      console.error('Error saving notification setting:', error);
-    }
-  };
-
-  const SettingItem = ({ title, value, onValueChange, disabled = false }: { title: string, value: boolean, onValueChange: (value: boolean) => void, disabled?: boolean }) => (
+  const SettingItem = ({ title, value, onValueChange }: { title: string, value: boolean, onValueChange: (value: boolean) => void }) => (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{title}</Text>
       <Switch
         value={value}
         onValueChange={onValueChange}
-        disabled={disabled}
         trackColor={{ false: "#767577", true: "#409858" }}
         thumbColor={value ? "#f4f3f4" : "#f4f3f4"}
       />
@@ -79,45 +52,13 @@ const NotificationSettingsScreen = () => {
         <SettingItem
           title="Enable Notifications"
           value={notificationsEnabled}
-          onValueChange={(value) => {
-            toggleNotifications(value);
-            updateSetting('allNotifications', value);
-          }}
-        />
-
-        <SettingItem
-          title="New Message Notifications"
-          value={newMessageNotifications}
-          onValueChange={(value) => {
-            setNewMessageNotifications(value);
-            updateSetting('newMessageNotifications', value);
-          }}
-          disabled={!notificationsEnabled}
-        />
-
-        <SettingItem
-          title="Promotional Notifications"
-          value={promotionalNotifications}
-          onValueChange={(value) => {
-            setPromotionalNotifications(value);
-            updateSetting('promotionalNotifications', value);
-          }}
-          disabled={!notificationsEnabled}
-        />
-
-        <SettingItem
-          title="App Update Notifications"
-          value={updateNotifications}
-          onValueChange={(value) => {
-            setUpdateNotifications(value);
-            updateSetting('updateNotifications', value);
-          }}
-          disabled={!notificationsEnabled}
+          onValueChange={toggleNotifications}
         />
       </View>
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

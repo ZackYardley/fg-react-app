@@ -1,26 +1,20 @@
 import { Alert, PermissionsAndroid, Platform } from "react-native";
 import messaging from "@react-native-firebase/messaging";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import PushNotification from "react-native-push-notification";
 
 export const Notifications = {
-  shouldShowNotification: async (notificationType: string | undefined) => {
-    if (!notificationType) return true;
-    const shouldShow = await AsyncStorage.getItem(`${notificationType}Notifications`);
-    return shouldShow !== 'false';
-  },
 
   requestUserPermission: async (): Promise<boolean> => {
+    // Android notification permissions
     if (Platform.OS === 'android') {
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
       );
       return result === PermissionsAndroid.RESULTS.GRANTED;
     }
-
+    // IOS notification permissions
     const authStatus = await messaging().requestPermission();
     return authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
   },
 
   setupMessaging: async () => {
@@ -33,55 +27,28 @@ export const Notifications = {
     }
   },
 
-  handleDataMessage: async (remoteMessage: any) => {
-    console.log('Received data message:', JSON.stringify(remoteMessage, null, 2));
-    
-    if (remoteMessage.data) {
-      const notificationType = remoteMessage.data.type;
-      const show = await Notifications.shouldShowNotification(notificationType);
-
-      if (show && (Platform.OS === 'ios' || Platform.OS === 'android')) {
-        PushNotification.localNotification({
-          title: remoteMessage.data.title || "New Notification",
-          message: remoteMessage.data.body || "You have a new notification",
-          userInfo: remoteMessage.data, // Store the entire data payload
-        });
-      }
+  handleNotification: async (remoteMessage: any) => {
+    if (remoteMessage?.notification) {
+      Alert.alert(
+        remoteMessage.notification.title || "New Notification",
+        remoteMessage.notification.body || "You have a new notification"
+      );
     }
   },
 
   initializeNotifications: () => {
-    // Handle data messages in foreground
-    messaging().onMessage(Notifications.handleDataMessage);
+    // Foreground state messages
+    const unsubscribe = messaging().onMessage(Notifications.handleNotification);
 
-    // Handle data messages in background and when app is closed
-    messaging().setBackgroundMessageHandler(Notifications.handleDataMessage);
+    // Check whether an initial notification is available
+    messaging().getInitialNotification().then(Notifications.handleNotification);
 
-    if (Platform.OS === 'ios' || Platform.OS === 'android'){
-      PushNotification.configure({
-        onNotification: function (notification) {
-          console.log("NOTIFICATION:", notification);
-          // Handle notification tap here if needed
-        },
-        permissions: {
-          alert: true,
-          badge: true,
-          sound: true,
-        },
-        popInitialNotification: true,
-        requestPermissions: Platform.OS === 'ios',
-      });
-    }
+    // Background state messages
+    messaging().onNotificationOpenedApp(Notifications.handleNotification);
 
+    // Register background handler
+    messaging().setBackgroundMessageHandler(Notifications.handleNotification);
 
-    // Check for initial notification that opened the app
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log('App opened by notification:', JSON.stringify(remoteMessage, null, 2));
-          // Handle the initial notification if needed
-        }
-      });
+    return unsubscribe;
   }
 };
