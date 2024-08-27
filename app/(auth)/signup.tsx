@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  ScrollView,
-  TouchableOpacity,
-  useWindowDimensions,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, KeyboardAvoidingView, ScrollView, useWindowDimensions, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput } from "react-native-paper";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "expo-router";
 import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
