@@ -1,4 +1,4 @@
-import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc, where } from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { Payment } from "@/types";
 
