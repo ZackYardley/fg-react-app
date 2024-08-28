@@ -187,15 +187,20 @@ export default function EnergyCalculator() {
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
-          <Picker selectedValue={surveyData.state} onValueChange={handleStateChange} style={styles.picker}>
-            {statesData.map((state) => (
-              <Picker.Item
-                key={state.abbreviation}
-                label={`${state.name} (${state.abbreviation})`}
-                value={state.name}
-              />
-            ))}
-          </Picker>
+          <Picker
+                selectedValue={surveyData.state}
+                onValueChange={handleStateChange}
+                style={styles.picker}
+                itemStyle={styles.pickerItem}
+            >
+                {statesData.map((state) => (
+                    <Picker.Item
+                        key={state.abbreviation}
+                        label={`${state.name} (${state.abbreviation})`}
+                        value={state.name}
+                    />
+                ))}
+            </Picker>
 
           <NumberInput
             question="How much was your electric bill last month? ⚡"
@@ -310,7 +315,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 8,
-  },
+    height: 80, // Set the height to a smaller value to ensure it's just one line
+        width: '100%', // Set width to fit the container or adjust as needed
+    },
+    pickerItem: {
+        fontSize: 16, // Adjust the font size as needed
+        height: 80, // This should match the height of the picker
+    },
   emissionsContainer: {
     marginTop: 32,
     marginBottom: 64,
