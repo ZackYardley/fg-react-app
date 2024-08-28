@@ -8,41 +8,23 @@ const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 interface CreditItemProps {
-  name: string;
-  price: number;
-  image: string;
+  name: string | null;
+  price: number | null;
+  image: string | null;
   colors: string[];
   onPress: () => void;
 }
 
-const CreditItem: React.FC<CreditItemProps> = ({
-  name,
-  price,
-  image,
-  colors,
-  onPress,
-}) => (
+const CreditItem: React.FC<CreditItemProps> = ({ name, price, image, colors, onPress }) => (
   <View style={styles.container}>
     <TouchableOpacity onPress={onPress} style={styles.touchable}>
-      <LinearGradient
-        colors={colors}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradient}
-      >
-        <Image
-          source={image}
-          placeholder={{ blurhash }}
-          style={styles.icon}
-          contentFit="cover"
-        />
+      <LinearGradient colors={colors} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={styles.gradient}>
+        {image && <Image source={image} placeholder={{ blurhash }} style={styles.icon} contentFit="cover" />}
       </LinearGradient>
       <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
         {name}
       </Text>
-      <View style={styles.amountContainer}>
-        <Text style={styles.amount}>{formatPrice(price)}</Text>
-      </View>
+      <View style={styles.amountContainer}>{price && <Text style={styles.amount}>{formatPrice(price)}</Text>}</View>
     </TouchableOpacity>
   </View>
 );
