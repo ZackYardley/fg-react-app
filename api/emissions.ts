@@ -13,7 +13,7 @@ const saveEmissionsData = async (data: Partial<EmissionsDocument>): Promise<void
 
   const userId = auth.currentUser.uid;
   const formattedMonth = dayjs().format("YYYY-MM");
-  const userDocRef = doc(collection(db, "users", userId, "surveys"), formattedMonth);
+  const userDocRef = doc(collection(db, "users", userId, "emissions"), formattedMonth);
 
   try {
     await setDoc(userDocRef, { ...data, lastUpdated: serverTimestamp() }, { merge: true });
@@ -37,7 +37,7 @@ const fetchEmissionsData = async (month?: string, userId?: string) => {
 
   let formattedMonth = month || dayjs().format("YYYY-MM");
 
-  const DocRef = doc(collection(db, "users", userId, "surveys"), formattedMonth);
+  const DocRef = doc(collection(db, "users", userId, "emissions"), formattedMonth);
 
   try {
     const Doc = await getDoc(DocRef);

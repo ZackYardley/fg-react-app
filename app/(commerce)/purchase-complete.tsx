@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
-import { BackButton, Loading, PageHeader, NotFoundComponent } from "@/components/common";
+import { Loading, PageHeader, NotFoundComponent } from "@/components/common";
 import { getPaymentById } from "@/api/payments";
 import { fetchInvoiceById, fetchSubscriptionByInvoice } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription, fetchSpecificCarbonCreditProduct } from "@/api/products";
