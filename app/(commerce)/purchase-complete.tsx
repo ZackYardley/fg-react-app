@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
@@ -187,7 +187,6 @@ const PurchaseCompleteScreen = () => {
           title="Thank you for your "
           titleAlt={productType === "subscription" ? "subscription!" : "purchase!"}
         />
-        <BackButton />
         <View style={{ padding: 16 }}>
           <LinearGradient
             style={styles.card}

@@ -10,8 +10,7 @@ import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
 import { EmissionsDocument } from "@/types";
 
-export default function Breakdown() {
-  const [emissionsDocument, setEmissionsDocument] = useState<EmissionsDocument>();
+const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0);
   const [dietEmissions, setDietEmissions] = useState(0);
@@ -25,7 +24,6 @@ export default function Breakdown() {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        setEmissionsDocument(data);
         setTotalEmissions(data.totalEmissions);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
@@ -210,7 +208,7 @@ export default function Breakdown() {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -326,3 +324,5 @@ const styles = StyleSheet.create({
     zIndex: 1000, // Ensure it is on top of everything else
   },
 });
+
+export default Breakdown;

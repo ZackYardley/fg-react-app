@@ -160,7 +160,6 @@ export default function EnergyCalculator() {
         surveyEmissions: { ...surveyEmissions },
         totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
       });
-      // [Error: You attempted to use a Firebase module that's not installed natively on your project by calling firebase.analytics().
       await analytics().logEvent("energy_emission_calculated", {
         emissionsDocument: {
           surveyData: surveyData,
@@ -187,7 +186,12 @@ export default function EnergyCalculator() {
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
-          <Picker selectedValue={surveyData.state} onValueChange={handleStateChange} style={styles.picker}>
+          <Picker
+            selectedValue={surveyData.state}
+            onValueChange={handleStateChange}
+            style={styles.picker}
+            itemStyle={styles.pickerItem}
+          >
             {statesData.map((state) => (
               <Picker.Item
                 key={state.abbreviation}
@@ -310,6 +314,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 8,
+    height: 80, // Set the height to a smaller value to ensure it's just one line
+    width: "100%", // Set width to fit the container or adjust as needed
+  },
+  pickerItem: {
+    fontSize: 16, // Adjust the font size as needed
+    height: 80, // This should match the height of the picker
   },
   emissionsContainer: {
     marginTop: 32,

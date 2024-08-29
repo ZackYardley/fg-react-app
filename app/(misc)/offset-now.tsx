@@ -1,10 +1,44 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
 import { BackButton, PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
+import { getAuth } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function OffsetNowScreen() {
+  const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const subscribed = await isUserSubscribedMailChimp(user?.uid || "");
+        setIsNewsletterSubscribed(subscribed);
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, [user?.uid]);
+
+  const handleNewsletterSubscription = async () => {
+    try {
+      const newStatus = !isNewsletterSubscribed;
+      await updateUserSubscriptionMailChimp(user?.uid || "", newStatus);
+      setIsNewsletterSubscribed(newStatus);
+    } catch (error) {
+      console.error("Error updating newsletter subscription:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container}>
@@ -53,9 +87,22 @@ export default function OffsetNowScreen() {
               time.
             </Text>
             <View style={styles.centeredButtonContainer}>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Subscribe</Text>
-              </TouchableOpacity>
+              <Pressable
+                style={[styles.button, loading && styles.disabledButton]}
+                onPress={() => !loading && handleNewsletterSubscription()}
+                disabled={loading || isNewsletterSubscribed}
+              >
+                {loading ? (
+                  <Text style={styles.buttonText}>Loading...</Text>
+                ) : isNewsletterSubscribed ? (
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <Ionicons name="checkmark-circle" size={24} color="white" />
+                    <Text style={styles.buttonText}>Subscribed</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.buttonText}>Subscribe</Text>
+                )}
+              </Pressable>
             </View>
           </View>
         </View>
@@ -102,6 +149,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#409858",
     padding: 16,
     borderRadius: 9999,
+  },
+  disabledButton: {
+    backgroundColor: "#A0C0A0",
   },
   buttonText: {
     color: "white",

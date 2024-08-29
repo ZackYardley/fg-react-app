@@ -133,7 +133,7 @@ const CarbonCreditSubscriptionScreen = () => {
     // Handle successful purchase (e.g., update database, show confirmation)
 
     // Navigate to the purchase-complete page with the paymentIntentId
-    router.push({
+    router.replace({
       pathname: "/purchase-complete",
       params: { productType: "subscription", paymentIntentId: paymentIntentId },
     });

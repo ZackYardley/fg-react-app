@@ -154,7 +154,7 @@ export default function ProfileScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flexGrow: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>

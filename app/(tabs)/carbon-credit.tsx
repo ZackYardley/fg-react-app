@@ -76,15 +76,18 @@ export default function CarbonCreditScreen() {
 
   const numItems = cartItems ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
 
-  const renderCreditItem = ({ item }: { item: CarbonCredit }) => (
-    <CreditItem
-      name={item.name}
-      price={item.prices[0].unit_amount}
-      image={item.images[0]}
-      colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
-      onPress={() => setSelectedProject(item)}
-    />
-  );
+  const renderCreditItem = ({ item }: { item: CarbonCredit }) =>
+    loading ? (
+      <CreditItem name={null} price={null} image={null} colors={["#eee", "#ddd", "#ccc"]} onPress={() => {}} />
+    ) : (
+      <CreditItem
+        name={item.name}
+        price={item.prices[0].unit_amount}
+        image={item.images[0]}
+        colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
+        onPress={() => setSelectedProject(item)}
+      />
+    );
 
   const renderHeader = () => (
     <>
@@ -117,10 +120,6 @@ export default function CarbonCreditScreen() {
       </View>
     </>
   );
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <SafeAreaView style={styles.container}>
