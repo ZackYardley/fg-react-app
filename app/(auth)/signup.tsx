@@ -4,9 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "expo-router";
 import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
-import { GreenButton, TitleWithLogo } from "@/components/common";
-import GoogleButton from "@/components/GoogleButton";
-import CustomTextInput from "@/components/CustomTextInput";
+import { GreenButton, TitleWithLogo, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
@@ -34,6 +32,7 @@ export default function SignupScreen() {
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
           <View style={[styles.contentContainer, { minHeight: height }]}>
             <TitleWithLogo title="Sign" titleAlt="up" />
+
             <View style={styles.formContainer}>
               <CustomTextInput
                 label="Email"
@@ -42,6 +41,7 @@ export default function SignupScreen() {
                 placeholder="Ex. abc@example.com"
                 leftIcon="at"
               />
+
               <CustomTextInput
                 label="Your Name"
                 value={name}
@@ -49,6 +49,7 @@ export default function SignupScreen() {
                 placeholder="Ex. John Smith"
                 leftIcon="account"
               />
+
               <CustomTextInput
                 label="Your Password"
                 value={password}
@@ -59,17 +60,16 @@ export default function SignupScreen() {
                 rightIcon={showPassword ? "eye-off" : "eye"}
                 onRightIconPress={() => setShowPassword(!showPassword)}
               />
+
               <GreenButton
                 title="Create Account"
                 onPress={() => onSignup(email, password, name)}
                 style={styles.createAccountButton}
                 textStyle={styles.createAccountButtonText}
               />
-              <View style={styles.orContainer}>
-                <View style={styles.orLine} />
-                <Text style={styles.orText}>Or</Text>
-                <View style={styles.orLine} />
-              </View>
+
+              <OrLine />
+
               <GoogleButton title="Continue with Google" onPress={() => onGoogleSignUp()} />
 
               <View style={styles.loginContainer}>
@@ -82,7 +82,7 @@ export default function SignupScreen() {
                 <View style={styles.anonymousContainer}>
                   <Text style={styles.anonymousText}>
                     Create an account to save your progress, access all features, and continue making a real impact on
-                    the environment!
+                    the the environment!
                   </Text>
                 </View>
               ) : (
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    marginHorizontal: 20,
     paddingBottom: 20,
   },
   headerContainer: {

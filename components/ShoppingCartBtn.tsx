@@ -3,16 +3,11 @@ import Icon from "react-native-vector-icons/Feather";
 import { router } from "expo-router";
 export const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
   return (
-    <TouchableOpacity
-      style={styles.cartContainer}
-      onPress={() => router.navigate("/shopping-cart")}
-    >
+    <TouchableOpacity style={styles.cartContainer} onPress={() => router.navigate("/shopping-cart")}>
       <Icon name="shopping-cart" size={24} color="white" />
       {numItems > 0 && (
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {numItems < 10 ? numItems : "9+"}
-          </Text>
+          <Text style={styles.badgeText}>{numItems < 10 ? numItems : "9+"}</Text>
         </View>
       )}
     </TouchableOpacity>

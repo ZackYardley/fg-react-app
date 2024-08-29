@@ -5,6 +5,7 @@ import { TextInput } from "react-native-paper";
 import { router } from "expo-router";
 import { handleResetPassword } from "@/api/auth";
 import { TreeLogo } from "@/constants/Images";
+import { GreenButton, CustomTextInput, GoogleButton } from "@/components/auth";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -27,18 +28,12 @@ export default function ForgotPasswordScreen() {
           <View style={styles.formContainer}>
             {/* Email Field */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                placeholder="Ex. abc@example.com"
-                style={styles.textInput}
+              <CustomTextInput
+                label="Email"
                 value={email}
-                onChangeText={setEmail}
-                mode="outlined"
-                dense={true}
-                outlineStyle={{ borderColor: "#000" }}
-                theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                textColor="#000"
-                left={<TextInput.Icon icon="at" color="#000" style={{ height: "100%", width: "100%" }} />}
+                onChangeText={(text: string) => setEmail(text)}
+                placeholder="Ex. abc@example.com"
+                leftIcon="at"
               />
             </View>
 
@@ -54,9 +49,12 @@ export default function ForgotPasswordScreen() {
           {/* Controls */}
           <View style={styles.controlsContainer}>
             {/* Reset password button */}
-            <TouchableOpacity style={styles.resetButton} onPress={() => handleResetPassword(email)}>
-              <Text style={styles.resetButtonText}>Reset Password</Text>
-            </TouchableOpacity>
+            <GreenButton
+              title="Reset Password"
+              style={styles.resetButton}
+              textStyle={styles.resetButtonText}
+              onPress={() => handleResetPassword(email)}
+            />
 
             {/* Or */}
             <View style={styles.orContainer}>
@@ -66,16 +64,19 @@ export default function ForgotPasswordScreen() {
             </View>
 
             {/* Back to Log in button */}
-            <TouchableOpacity style={styles.backToLoginButton} onPress={() => router.push("/login")}>
-              <Text style={styles.backToLoginText}>Back to Log in</Text>
-            </TouchableOpacity>
+            <GoogleButton
+              title="Back to Log in"
+              style={styles.backToLoginButton}
+              textStyle={styles.backToLoginText}
+              onPress={() => router.push("/login")}
+              noLogo={true}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+    marginHorizontal: 24,
   },
   header: {
     fontSize: 48,
@@ -103,7 +105,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     rowGap: 16,
-    paddingHorizontal: 48,
     marginTop: 24,
   },
   inputContainer: {
@@ -123,7 +124,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   controlsContainer: {
-    paddingHorizontal: 48,
     marginTop: 24,
   },
   resetButton: {

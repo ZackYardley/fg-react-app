@@ -4,7 +4,7 @@ import { Link, router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GreenButton } from "@/components/common";
+import { GreenButton } from "@/components/auth";
 
 export default function GetStartedScreen() {
   return (
@@ -26,7 +26,7 @@ export default function GetStartedScreen() {
           />
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Already helping our planet? </Text>
-            <Link href={"/login"} style={styles.loginLink}>
+            <Link href={"/login"}>
               <Text style={styles.loginLinkText}>Log in</Text>
             </Link>
           </View>
@@ -43,13 +43,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   scrollViewContent: {
-    flex: 1,
+    flexGrow: 1,
   },
   contentContainer: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    gap: 75,
+    justifyContent: "space-evenly",
   },
   title: {
     fontSize: 48,
@@ -86,9 +85,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: "center",
     fontWeight: "800",
-  },
-  loginLink: {
-    marginRight: 32,
   },
   loginLinkText: {
     fontWeight: "800",
