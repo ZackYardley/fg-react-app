@@ -48,13 +48,12 @@ const createUserProfile = async (userData: {
     await setDoc(
       userDocRef,
       {
-        id: userData.uid,
         isAnonymous: userData.isAnonymous || false,
-        name: userData.name || undefined,
-        photoURL: userData.photoURL || undefined,
+        name: userData.name || "",
+        photoURL: userData.photoURL || "",
         emailAddress: userData.email || "",
-        firstName: userData.name?.split(" ")[0] || undefined,
-        lastName: userData.name?.split(" ")[1] || undefined,
+        firstName: userData.name?.split(" ")[0] || "",
+        lastName: userData.name?.split(" ")[1] || "",
         isSubscribed: true,
       },
       { merge: true }
