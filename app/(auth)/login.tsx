@@ -1,18 +1,13 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  KeyboardAvoidingView,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { onLogin, onGoogleLogin } from "@/api/auth";
 import { TreeLogo } from "@/constants/Images";
+import { TitleWithLogo, GreenButton } from "@/components/common";
+import GoogleButton from "@/components/GoogleButton";
+import CustomTextInput from "@/components/CustomTextInput";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -27,61 +22,28 @@ export default function LoginScreen() {
             Log <Text style={styles.titleHighlight}>in</Text>
           </Text>
           <View style={styles.logoContainer}>
-            <Image
-              style={styles.logo}
-              source={TreeLogo}
-            />
+            <Image style={styles.logo} source={TreeLogo} />
           </View>
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                placeholder="Ex. abc@example.com"
-                style={styles.textInput}
+              <CustomTextInput
+                label="Email"
                 value={email}
                 onChangeText={setEmail}
-                mode="outlined"
-                dense={true}
-                outlineStyle={{ borderColor: "#000" }}
-                theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                textColor="#000"
-                left={
-                  <TextInput.Icon
-                    icon="at"
-                    color={"#000"}
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
+                placeholder="Ex. abc@example.com"
+                leftIcon="at"
               />
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Your Password</Text>
-              <TextInput
-                placeholder="Your Password"
-                secureTextEntry={!showPassword}
-                style={styles.textInput}
+              <CustomTextInput
+                label="password"
                 value={password}
                 onChangeText={setPassword}
-                mode="outlined"
-                dense={true}
-                outlineStyle={{ borderColor: "#000" }}
-                theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                textColor="#000"
-                left={
-                  <TextInput.Icon
-                    icon="lock"
-                    color="#000"
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
-                right={
-                  <TextInput.Icon
-                    icon={showPassword ? "eye-off" : "eye"}
-                    onPress={() => setShowPassword(!showPassword)}
-                    color="#000"
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
+                placeholder="Your Password"
+                secureTextEntry={!showPassword}
+                leftIcon="lock"
+                rightIcon={showPassword ? "eye-off" : "eye"}
+                onRightIconPress={() => setShowPassword(!showPassword)}
               />
             </View>
             <View style={styles.forgotPasswordContainer}>
@@ -89,18 +51,25 @@ export default function LoginScreen() {
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </Link>
             </View>
-            <TouchableOpacity
-              onPress={() => onLogin(email, password)}
+            <GreenButton
+              title="Log in"
+              onPress={() => {
+                onLogin(email, password);
+              }}
               style={styles.loginButton}
-            >
-              <Text style={styles.loginButtonText}>Log in</Text>
-            </TouchableOpacity>
+              textStyle={styles.loginButtonText}
+            />
             <View style={styles.orContainer}>
               <View style={styles.orLine} />
               <Text style={styles.orText}>Or</Text>
               <View style={styles.orLine} />
             </View>
-            <TouchableOpacity
+            <GoogleButton
+              onPress={() => {
+                onGoogleLogin();
+              }}
+            />
+            {/* <Pressable
               onPress={() => {
                 onGoogleLogin();
               }}
@@ -113,11 +82,11 @@ export default function LoginScreen() {
                 style={styles.googleIcon}
               />
               <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
+            </Pressable> */}
             <View style={styles.signUpContainer}>
-              <TouchableOpacity onPress={() => router.navigate("/signup")}>
+              <Link href="/signup">
                 <Text style={styles.signUpText}>Back to Sign Up</Text>
-              </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </SafeAreaView>

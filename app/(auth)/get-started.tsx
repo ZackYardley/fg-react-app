@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Image } from "react-native";
+import { View, Text, StatusBar, Image, ScrollView } from "react-native";
 import { Link, router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
@@ -10,26 +10,28 @@ export default function GetStartedScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>
-          Forever<Text style={styles.titleHighlight}>green</Text>
-        </Text>
-        <Image style={styles.logo} source={TreeLogo} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <GreenButton
-          title="Get Started"
-          onPress={() => router.push("/signup")}
-          style={styles.button}
-          textStyle={styles.buttonText}
-        />
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Already helping our planet? </Text>
-          <Link href={"/login"} style={styles.loginLink}>
-            <Text style={styles.loginLinkText}>Log in</Text>
-          </Link>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>
+            Forever<Text style={styles.titleHighlight}>green</Text>
+          </Text>
+          <Image style={styles.logo} source={TreeLogo} />
         </View>
-      </View>
+        <View style={styles.buttonContainer}>
+          <GreenButton
+            title="Get Started"
+            onPress={() => router.push("/signup")}
+            style={styles.button}
+            textStyle={styles.buttonText}
+          />
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already helping our planet? </Text>
+            <Link href={"/login"} style={styles.loginLink}>
+              <Text style={styles.loginLinkText}>Log in</Text>
+            </Link>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -39,6 +41,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 20,
+  },
+  scrollViewContent: {
+    flex: 1,
   },
   contentContainer: {
     flex: 1,
