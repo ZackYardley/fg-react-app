@@ -1,4 +1,15 @@
-import { getFirestore, collection, query, orderBy, limit, getDocs, doc, where, getDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  doc,
+  where,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { Subscription, Invoice } from "@/types";
 
@@ -176,10 +187,48 @@ const fetchInvoiceById = async (invoiceId: string): Promise<Invoice | null> => {
   }
 };
 
+// Function to check if a user is subscribed
+const isUserSubscribedMailChimp = async (userId: string): Promise<boolean> => {
+  const db = getFirestore();
+
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      return userData.isSubscribed || false;
+    } else {
+      console.error("User document not found");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error checking user subscription status:", error);
+    throw error;
+  }
+};
+
+// Function to update user's subscription status
+const updateUserSubscriptionMailChimp = async (userId: string, isSubscribed: boolean): Promise<void> => {
+  const db = getFirestore();
+
+  try {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      isSubscribed: isSubscribed,
+    });
+  } catch (error) {
+    console.error("Error updating user subscription status:", error);
+    throw error;
+  }
+};
+
 export {
   fetchSubscriptionStatus,
   fetchSubscriptionByInvoice,
   fetchSubscriptionByProduct,
   fetchRecentInvoices,
   fetchInvoiceById,
+  isUserSubscribedMailChimp,
+  updateUserSubscriptionMailChimp,
 };

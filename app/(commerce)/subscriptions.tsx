@@ -7,12 +7,20 @@ import { router } from "expo-router";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { fetchEmissionsData } from "@/api/emissions";
 import { formatPrice } from "@/utils";
-import { fetchSubscriptionStatus } from "@/api/subscriptions";
+import {
+  fetchSubscriptionStatus,
+  isUserSubscribedMailChimp,
+  updateUserSubscriptionMailChimp,
+} from "@/api/subscriptions";
+import { getAuth } from "firebase/auth";
 
 const ForevergreenSubscriptions = () => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
+
+  const user = getAuth().currentUser;
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -31,6 +39,9 @@ const ForevergreenSubscriptions = () => {
         } else {
           console.error("No user emissions data found");
         }
+
+        const subscribed = await isUserSubscribedMailChimp(user?.uid || "");
+        setIsNewsletterSubscribed(subscribed);
       } catch (error) {
         console.error("Error fetching subscription data:", error);
       } finally {
@@ -39,7 +50,17 @@ const ForevergreenSubscriptions = () => {
     };
 
     fetchSubscriptionData();
-  }, []);
+  }, [user?.uid]);
+
+  const handleNewsletterSubscribption = async () => {
+    try {
+      const newStatus = !isNewsletterSubscribed;
+      await updateUserSubscriptionMailChimp(user?.uid || "", newStatus);
+      setIsNewsletterSubscribed(newStatus);
+    } catch (error) {
+      console.error("Error updating newsletter subscription:", error);
+    }
+  };
 
   const SubscriptionCard = ({
     title,
@@ -97,8 +118,8 @@ const ForevergreenSubscriptions = () => {
                 By joining the newsletter you will be sent personalized info about your journey towards net-zero. This
                 is a free an easy way to reduce your emissions.
               </Text>
-              <TouchableOpacity style={styles.button} onPress={() => {}}>
-                <Text style={styles.buttonText}>Subscribe</Text>
+              <TouchableOpacity style={styles.button} onPress={handleNewsletterSubscribption}>
+                <Text style={styles.buttonText}>{isNewsletterSubscribed ? "Unsubscribe" : "Subscribe"}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.card}>
@@ -117,7 +138,11 @@ const ForevergreenSubscriptions = () => {
                   <Text style={styles.subscriptionText}>Carbon Credit Subscription</Text>
                 </View>
                 <View style={styles.subscriptionItem}>
-                  <Ionicons name="close" size={18} color="red" />
+                  {isNewsletterSubscribed ? (
+                    <Ionicons name="checkmark" size={18} color="green" />
+                  ) : (
+                    <Ionicons name="close" size={18} color="red" />
+                  )}
                   <Text style={styles.subscriptionText}>Email Subscription</Text>
                 </View>
               </View>
