@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -20,8 +20,10 @@ const CarbonFootprintSection = ({
 
   return (
     <View style={styles.footprintContainer}>
-      
-      <TouchableOpacity onPress={() => router.navigate("/user-breakdown")} style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}>
+      <TouchableOpacity
+        onPress={() => router.navigate("/user-breakdown")}
+        style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}
+      >
         <Text style={styles.boxTitle}>Your Carbon Footprint</Text>
         <Text style={styles.footprintText}>
           {monthlyEmissions.toFixed(1)}
@@ -37,10 +39,7 @@ const CarbonFootprintSection = ({
           {netImpact.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>
         </Text>
-          <Text style={styles.netZeroCheck}>
-            {isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}
-          </Text>
-        
+        <Text style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
         <Text style={styles.boxTitle}>Calculate your impact</Text>
