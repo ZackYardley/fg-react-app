@@ -187,7 +187,6 @@ const PurchaseCompleteScreen = () => {
           title="Thank you for your "
           titleAlt={productType === "subscription" ? "subscription!" : "purchase!"}
         />
-        <BackButton />
         <View style={{ padding: 16 }}>
           <LinearGradient
             style={styles.card}

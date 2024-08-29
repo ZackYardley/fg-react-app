@@ -140,7 +140,7 @@ export default function ShoppingCartScreen() {
         setCredits([]);
 
         Alert.alert("Purchase Successful", "Your carbon credits have been added to your account.");
-        router.push({
+        router.replace({
           pathname: "/purchase-complete",
           params: { productType: "Carbon Credit", paymentIntentId: paymentIntentId },
         });

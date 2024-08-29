@@ -1,8 +1,46 @@
-import { router } from "expo-router";
-import React from "react";
+import { useState, useEffect } from "react";
 import { ScrollView, Text, Pressable, View, StyleSheet } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
+import { getAuth } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
 
 const LearnScreen = () => {
+  const [loading, setLoading] = useState(true);
+  const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
+
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const subscribed = await isUserSubscribedMailChimp(user?.uid || "");
+        setIsNewsletterSubscribed(subscribed);
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, [user?.uid]);
+
+  const handleOpenLink = async (url: string) => {
+    await WebBrowser.openBrowserAsync(url);
+  };
+
+  const handleNewsletterSubscription = async () => {
+    try {
+      const newStatus = !isNewsletterSubscribed;
+      await updateUserSubscriptionMailChimp(user?.uid || "", newStatus);
+      setIsNewsletterSubscribed(newStatus);
+    } catch (error) {
+      console.error("Error updating newsletter subscription:", error);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -19,13 +57,9 @@ const LearnScreen = () => {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Resources Guides</Text>
           <Text style={styles.cardText}>
-            Check out our resources guides with tons of info about how to live a
-            more sustainable lifestyle!
+            Check out our resources guides with tons of info about how to live a more sustainable lifestyle!
           </Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push("https://www.forevergreen.earth/")}
-          >
+          <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
             <Text style={styles.buttonText}>Learn More</Text>
           </Pressable>
         </View>
@@ -33,13 +67,9 @@ const LearnScreen = () => {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Course</Text>
           <Text style={styles.cardText}>
-            We have created some follow at your own pace courses about
-            sustainable living!
+            We have created some follow at your own pace courses about sustainable living!
           </Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push("https://www.forevergreen.earth/")}
-          >
+          <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
             <Text style={styles.buttonText}>Explore</Text>
           </Pressable>
         </View>
@@ -47,13 +77,9 @@ const LearnScreen = () => {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Blogs</Text>
           <Text style={styles.cardText}>
-            We have tons of blogs about hot climate topics that are easy to read
-            and educational!
+            We have tons of blogs about hot climate topics that are easy to read and educational!
           </Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push("https://www.forevergreen.earth/blog")}
-          >
+          <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/blog")}>
             <Text style={styles.buttonText}>Read Now</Text>
           </Pressable>
         </View>
@@ -61,13 +87,9 @@ const LearnScreen = () => {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Fast Facts</Text>
           <Text style={styles.cardText}>
-            Want a quick fact about climate related topics to expand your view?
-            Check out our fast facts now!
+            Want a quick fact about climate related topics to expand your view? Check out our fast facts now!
           </Text>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push("https://www.forevergreen.earth/")}
-          >
+          <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
             <Text style={styles.buttonText}>View</Text>
           </Pressable>
         </View>
@@ -75,17 +97,24 @@ const LearnScreen = () => {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Newsletter Subscription</Text>
           <Text style={styles.cardText}>
-            By joining the newsletter you will be sent personalized info about
-            your journey towards net-zero. This is a free an easy way to reduce
-            your emissions.
+            By joining the newsletter you will be sent personalized info about your journey towards net-zero. This is a
+            free an easy way to reduce your emissions.
           </Text>
           <Pressable
-            style={styles.button}
-            onPress={() =>
-              router.push("https://www.forevergreen.earth/waitlist")
-            }
+            style={[styles.button, loading && styles.disabledButton]}
+            onPress={() => !loading && handleNewsletterSubscription()}
+            disabled={loading || isNewsletterSubscribed}
           >
-            <Text style={styles.buttonText}>Subscribe</Text>
+            {loading ? (
+              <Text style={styles.buttonText}>Loading...</Text>
+            ) : isNewsletterSubscribed ? (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <Ionicons name="checkmark-circle" size={24} color="white" />
+                <Text style={styles.buttonText}>Subscribed</Text>
+              </View>
+            ) : (
+              <Text style={styles.buttonText}>Subscribe</Text>
+            )}
           </Pressable>
         </View>
       </View>
@@ -158,7 +187,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 40,
-    width: 150,
+    width: 160,
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
     color: "white",
