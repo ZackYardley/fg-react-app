@@ -25,6 +25,7 @@ const TextButton = ({ label, style }: { label: string; style: object }) => (
 const HomeScreen = () => {
   const { width } = useWindowDimensions();
   const [totalEmissions, setTotalEmissions] = useState(0.0);
+  const [monthlyEmissions, setMonthlyEmissions] = useState(0.0);
   const [totalOffset, setTotalOffset] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0.0);
   const [dietEmissions, setDietEmissions] = useState(0.0);
@@ -39,10 +40,12 @@ const HomeScreen = () => {
       const data = await fetchEmissionsData();
       if (data !== null) {
         setTotalEmissions(data.totalEmissions);
+        setMonthlyEmissions(data.monthlyEmissions);
         setTotalOffset(data.totalOffset || 0);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
+
       }
     };
 
@@ -84,7 +87,7 @@ const HomeScreen = () => {
           <TouchableOpacity style={styles.footprintBox} onPress={() => router.push("/breakdown")}>
             <Text style={{}}>Your Carbon Footprint</Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{}}>{Math.min(totalEmissions, 99.9).toFixed(1)}</Text>
+              <Text style={{}}>{Math.min(monthlyEmissions, 99.9).toFixed(1)}</Text>
               <Text style={{}}>Tons of CO2</Text>
             </View>
             <Text style={{}}>Your Carbon Offsets</Text>
@@ -95,7 +98,7 @@ const HomeScreen = () => {
             <View style={{ width: "100%", borderTopWidth: 4 }}></View>
             <Text style={{}}>Net Impact</Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{}}>{Math.min(totalEmissions - totalOffset, 99.9).toFixed(1)}</Text>
+              <Text style={{}}>{Math.min(monthlyEmissions - totalOffset, 99.9).toFixed(1)}</Text>
               <Text style={{}}>Tons of CO2</Text>
             </View>
           </TouchableOpacity>

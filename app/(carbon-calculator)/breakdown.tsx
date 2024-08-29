@@ -12,6 +12,7 @@ import { EmissionsDocument } from "@/types";
 
 const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
+  const [monthlyEmissions, setMonthlyEmissions] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0);
   const [dietEmissions, setDietEmissions] = useState(0);
   const [energyEmissions, setEnergyEmissions] = useState(0);
@@ -25,6 +26,7 @@ const Breakdown = () => {
       const data = await fetchEmissionsData();
       if (data) {
         setTotalEmissions(data.totalEmissions);
+        setMonthlyEmissions(data.monthlyEmissions);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
@@ -75,7 +77,7 @@ const Breakdown = () => {
               <Text>Your total emissions are:</Text>
               <Text style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</Text>
               <Text>Your total monthly emissions are:</Text>
-              <Text style={styles.greenText}>{(totalEmissions / 12).toFixed(2)} tons co2/month</Text>
+              <Text style={styles.greenText}>{(monthlyEmissions).toFixed(2)} tons co2/month</Text>
             </View>
 
             {/* Emission Breakdown */}
