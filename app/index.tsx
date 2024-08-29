@@ -21,26 +21,36 @@ export default function Index() {
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        setIsAnonymous(currentUser.isAnonymous);
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          setIsAnonymous(currentUser.isAnonymous);
 
-        const emissionsData = await fetchEmissionsData();
-        if (emissionsData) {
-          const lastUpdated = emissionsData.lastUpdated?.toDate();
-          const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
+          const emissionsData = await fetchEmissionsData();
+          if (emissionsData) {
+            const lastUpdated = emissionsData.lastUpdated?.toDate();
+            const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
 
-          const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
-          setHasCalculatedEmissions(hasCalculated);
+            const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
+            setHasCalculatedEmissions(hasCalculated);
+          } else {
+            setHasCalculatedEmissions(false);
+          }
         } else {
-          setHasCalculatedEmissions(false);
+          setUser(null);
+          setIsAnonymous(false);
         }
-      } else {
+
+        setDebugMode(!!process.env.EXPO_PUBLIC_APP_ENV);
+      } catch {
         setUser(null);
         setIsAnonymous(false);
+      } finally {
+        console.log("Debug mode:", debugMode);
+        console.log(process.env.EXPO_PUBLIC_APP_ENV)
+        console.log(debugMode);
+        setLoading(false);
       }
-      setDebugMode(process.env.APP_ENV === "development");
-      setLoading(false);
     });
 
     return () => unsubscribe();

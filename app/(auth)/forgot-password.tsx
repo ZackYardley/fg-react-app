@@ -5,7 +5,7 @@ import { TextInput } from "react-native-paper";
 import { router } from "expo-router";
 import { handleResetPassword } from "@/api/auth";
 import { TreeLogo } from "@/constants/Images";
-import { GreenButton, CustomTextInput, GoogleButton } from "@/components/auth";
+import { GreenButton, CustomTextInput, GoogleButton, OrLine } from "@/components/auth";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -57,11 +57,7 @@ export default function ForgotPasswordScreen() {
             />
 
             {/* Or */}
-            <View style={styles.orContainer}>
-              <View style={styles.orLine} />
-              <Text style={styles.orText}>Or</Text>
-              <View style={styles.orLine} />
-            </View>
+            <OrLine />
 
             {/* Back to Log in button */}
             <GoogleButton
