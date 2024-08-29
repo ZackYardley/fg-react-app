@@ -27,11 +27,14 @@ export default function ProfileScreen() {
 
   const [user, setUser] = useState<User | null>(null);
   const [totalEmissions, setTotalEmissions] = useState<number>(0);
+  const [monthlyEmissions, setMonthlyEmissions] = useState<number>(0);
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [totalOffset, setTotalOffset] = useState(0);
+
 
   const router = useRouter();
   const auth = getAuth();
@@ -72,6 +75,8 @@ export default function ProfileScreen() {
       const data = await fetchEmissionsData();
       if (data) {
         setTotalEmissions(data.totalEmissions);
+        setMonthlyEmissions(data.monthlyEmissions);
+        setTotalOffset(data.totalOffset);
       }
     };
 
@@ -220,17 +225,34 @@ export default function ProfileScreen() {
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <View style={styles.carbonFootprint}>
-            <Text style={styles.carbonFootprintTitle}>Your carbon footprint...</Text>
+            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint...</Text>
             <View style={styles.carbonFootprintContent}>
-              <Text style={styles.emissionText}>
-                {totalEmissions.toFixed(2)}
-                <Text style={styles.emissionUnit}> tons of CO₂</Text>
-              </Text>
-              <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
-                <Text style={styles.offsetButtonText}>Offset Now!</Text>
-              </TouchableOpacity>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Emissions</Text>
+                <Text style={styles.emissionText}>
+                  {monthlyEmissions.toFixed(2)}
+                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
+                </Text>
+              </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Offsets</Text>
+                <Text style={styles.offsetText}>
+                  {totalOffset.toFixed(2)}
+                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
+                </Text>
+              </View>
             </View>
-          </View>
+            
+            {monthlyEmissions <= totalOffset ? (
+                <Text style={styles.netZeroText}>You are net zero this month!</Text>
+              ) : (
+                <Text style={styles.netZeroText}>You are not net zero this month!</Text>
+              )}
+
+            <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
+              <Text style={styles.offsetButtonText}>Offset Now!</Text>
+            </TouchableOpacity>
+        </View>
 
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutButtonText}>Logout</Text>
@@ -373,6 +395,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: "700",
   },
+  emissionsTitle: {
+    fontSize: 20,
+    textAlign: "left",
+    marginBottom: 12,
+    fontWeight: "700",
+  },
+  offsetTitle: {
+    fontSize: 20,
+    textAlign: "right",
+    marginBottom: 12,
+    fontWeight: "700",
+  },
   carbonFootprintContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -383,6 +417,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#b91c1c",
   },
+  offsetText: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "green",
+  },
   emissionUnit: {
     fontSize: 16,
     fontWeight: "600",
@@ -390,14 +429,18 @@ const styles = StyleSheet.create({
   },
   offsetButton: {
     backgroundColor: "#409858",
-    borderRadius: 999,
+    borderRadius: 999, // Slightly rounded corners
     paddingHorizontal: 28,
     paddingVertical: 12,
+    width: '50%',  // Set a specific width, adjust as needed
+    alignSelf: 'center',
+    marginTop: 10, // Add some space above the button
   },
   offsetButtonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "600",
+    textAlign: 'center', // Ensure text is centered
   },
   logoutButton: {
     padding: 12,
@@ -483,5 +526,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: "auto",
+  },
+  section: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  netZeroText: {
+    marginTop: 12,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    textAlign: 'center', 
   },
 });
