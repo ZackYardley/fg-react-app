@@ -78,7 +78,7 @@ const PurchaseCompleteScreen = () => {
       const userEmissions = userEmissionsData.totalEmissions;
       const carbonCreditSubscription = await fetchCarbonCreditSubscription(userEmissions);
       setCarbonCreditSubscription(carbonCreditSubscription?.product || null);
-      setTotalCO2Offset(fetchedSubscription.quantity);
+      setTotalCO2Offset(fetchedSubscription.items[0].plan.amount / 1000);
     } else {
       throw new Error("User Emissions not found");
     }

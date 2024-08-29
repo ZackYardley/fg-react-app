@@ -55,6 +55,7 @@ interface EmissionsDocument {
   surveyData: Partial<SurveyData>;
   surveyEmissions: Partial<SurveyEmissions>;
   totalEmissions: number;
+  totalOffset: number;
   lastUpdated: any;
 }
 

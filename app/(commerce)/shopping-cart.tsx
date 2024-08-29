@@ -436,7 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     height: 30,
-    width: 20,
     marginHorizontal: 8,
     textAlign: "center",
   },

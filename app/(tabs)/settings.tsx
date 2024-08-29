@@ -10,6 +10,8 @@ import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchSetupPaymentSheetParams } from "@/api/purchase";
+import { fetchSubscriptionStatus } from "@/api/subscriptions";
+import { fetchCarbonCreditSubscription } from "@/api/products";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -21,29 +23,49 @@ interface SettingsItemProps {
 }
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const auth = getAuth();
-  const [totalEmissions, setTotalEmissions] = useState<number>(0);
-  const profileIcon = auth.currentUser?.photoURL;
   const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [totalEmissions, setTotalEmissions] = useState<number>(0);
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const router = useRouter();
+  const auth = getAuth();
+  const profileIcon = auth.currentUser?.photoURL;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         setIsGoogleUser(currentUser.providerData.some((provider) => provider.providerId === "google.com"));
+        checkSubscriptionStatus();
       } else {
-        router.replace("/login");
+        router.replace("/get-started");
       }
     });
 
     return () => unsubscribe();
   }, [auth, router]);
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      const userEmissionsData = await fetchEmissionsData();
+      if (userEmissionsData) {
+        const userEmissions = userEmissionsData.totalEmissions;
+        const result = await fetchCarbonCreditSubscription(userEmissions);
+        if (result) {
+          const isSubscribed = await fetchSubscriptionStatus(result.product.id || "");
+          setIsSubscribed(isSubscribed);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching subscription status:", error);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -79,6 +101,15 @@ export default function ProfileScreen() {
   };
 
   const handleDeleteAccount = async () => {
+    if (isSubscribed) {
+      Alert.alert(
+        "Active Subscription",
+        "You cannot delete your account while you have an active subscription. Please cancel your subscription first and then try again.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
     if (isGoogleUser && deleteConfirmation !== "DELETE") {
       Alert.alert("Error", "Please type DELETE to confirm account deletion.");
       return;

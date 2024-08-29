@@ -24,7 +24,8 @@ const TextButton = ({ label, style }: { label: string; style: object }) => (
 
 const HomeScreen = () => {
   const { width } = useWindowDimensions();
-  const [emissionsPerYear, setEmissionsPerYear] = useState(0.0);
+  const [totalEmissions, setTotalEmissions] = useState(0.0);
+  const [totalOffset, setTotalOffset] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0.0);
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
@@ -37,7 +38,8 @@ const HomeScreen = () => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data !== null) {
-        setEmissionsPerYear(data.totalEmissions);
+        setTotalEmissions(data.totalEmissions);
+        setTotalOffset(data.totalOffset || 0);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
@@ -80,9 +82,22 @@ const HomeScreen = () => {
         {/* Carbon Footprint and Calculator */}
         <View style={styles.footprintContainer}>
           <TouchableOpacity style={styles.footprintBox} onPress={() => router.push("/breakdown")}>
-            <Text style={styles.boxTitle}>Your Carbon Footprint</Text>
-            <Text style={styles.boxLargeText}>{Math.min(emissionsPerYear, 99.9).toFixed(1)}</Text>
-            <Text style={styles.boxMediumText}>Tons of CO2</Text>
+            <Text style={{}}>Your Carbon Footprint</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{}}>{Math.min(totalEmissions, 99.9).toFixed(1)}</Text>
+              <Text style={{}}>Tons of CO2</Text>
+            </View>
+            <Text style={{}}>Your Carbon Offsets</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{}}>{Math.min(totalOffset, 99.9).toFixed(1)}</Text>
+              <Text style={{}}>Tons of CO2</Text>
+            </View>
+            <View style={{ width: "100%", borderTopWidth: 4 }}></View>
+            <Text style={{}}>Net Impact</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{}}>{Math.min(totalEmissions - totalOffset, 99.9).toFixed(1)}</Text>
+              <Text style={{}}>Tons of CO2</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
             <Text style={styles.boxTitle}>Calculate your impact</Text>
@@ -211,7 +226,7 @@ const HomeScreen = () => {
             <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
             <BarChartBreakdown
               names={["You", "Average American"]}
-              values={[emissionsPerYear, 21]}
+              values={[totalEmissions - totalOffset, 21]}
               colors={["#44945F", "#A9A9A9"]}
             />
           </View>
@@ -219,9 +234,10 @@ const HomeScreen = () => {
           {/* If everyone lived like you */}
           <View style={styles.chartBox}>
             <Text style={styles.chartText}>
-              If everyone lived like you we'd need {(emissionsPerYear / TARGET_EMISSIONS).toFixed(2)} Earths
+              If everyone lived like you we'd need {((totalEmissions - totalOffset) / TARGET_EMISSIONS).toFixed(2)}{" "}
+              Earths
             </Text>
-            <EarthBreakdown emissions={emissionsPerYear} />
+            <EarthBreakdown emissions={totalEmissions - totalOffset} />
           </View>
         </View>
       </View>
@@ -286,6 +302,16 @@ const styles = StyleSheet.create({
     width: "47%",
     height: 288,
     padding: 16,
+  },
+  carbonBoxTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  carbonBoxMediumText: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   boxTitle: {
     fontSize: 24,

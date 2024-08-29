@@ -14,7 +14,8 @@ const generateLastSixMonths = (): string[] => {
 };
 
 const LineChartBreakdown = ({ userId }: { userId?: string }) => {
-  const [data, setData] = useState<number[]>([]);
+  const [emissionsData, setEmissionsData] = useState<number[]>([]);
+  const [offsetData, setOffsetData] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -23,7 +24,8 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
       const months = generateLastSixMonths();
       const promises = months.map((month) => fetchEmissionsData(month, userId));
       const results = await Promise.all(promises);
-      setData(results.map((result) => result?.totalEmissions || 0)); // Extract totalEmissions and default to 0 if no data
+      setEmissionsData(results.map((result) => result?.totalEmissions || 0));
+      setOffsetData(results.map((result) => result?.totalOffset || 0));
       setLoading(false);
     };
 
@@ -40,7 +42,10 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
     <LineChart
       data={{
         labels: generateLastSixMonths().map((month) => dayjs(month).format("MMM")), // Labels formatted as 'Jan', 'Feb', etc.
-        datasets: [{ data }],
+        datasets: [
+          { data: emissionsData, color: (opacity = 1) => `rgba(31, 120, 180, ${opacity})` },
+          { data: offsetData, color: (opacity = 1) => `rgba(180, 103, 31, ${opacity})` },
+        ],
       }}
       width={screenWidth - 67}
       height={220}

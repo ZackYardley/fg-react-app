@@ -6,6 +6,7 @@ import { fetchRecentInvoices } from "@/api/subscriptions";
 import { Payment, Invoice } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
+import { ActivityIndicator } from "react-native-paper";
 
 interface PurchaseItem {
   type: "payment" | "invoice";
@@ -92,15 +93,12 @@ const PurchaseHistoryScreen = () => {
     </View>
   );
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flexGrow: 1 }}>
         <PageHeader subtitle="Purchase History" />
         <BackButton />
+        {loading && <Loading />}
         <FlatList
           data={purchaseHistory}
           renderItem={renderPurchaseItem}
