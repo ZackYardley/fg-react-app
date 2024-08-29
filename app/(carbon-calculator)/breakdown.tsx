@@ -8,7 +8,6 @@ import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
-import { EmissionsDocument } from "@/types";
 
 const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
@@ -25,8 +24,8 @@ const Breakdown = () => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        setTotalEmissions(data.totalEmissions);
-        setMonthlyEmissions(data.monthlyEmissions);
+        setTotalEmissions(data.totalEmissions || 0);
+        setMonthlyEmissions(data.monthlyEmissions || 0);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);

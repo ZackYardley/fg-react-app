@@ -46,9 +46,6 @@ export default function Index() {
         setUser(null);
         setIsAnonymous(false);
       } finally {
-        console.log("Debug mode:", debugMode);
-        console.log(process.env.EXPO_PUBLIC_APP_ENV)
-        console.log(debugMode);
         setLoading(false);
       }
     });
@@ -78,7 +75,7 @@ export default function Index() {
         </View>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {}} // Update debugMode state
+          onPress={() => setDebugMode(false)} // Update debugMode state
         >
           <View style={styles.buttonContent}>
             <View style={styles.buttonLabel}>
