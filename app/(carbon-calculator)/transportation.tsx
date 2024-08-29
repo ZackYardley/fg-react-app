@@ -68,8 +68,12 @@ export default function TransportationCalculator() {
       let carEmissions = 0;
       let publicTransportEmissions = 0;
 
-      if (surveyData.longFlights && surveyData.shortFlights) {
-        flightEmissions = surveyData.longFlights * 1.35 + surveyData.shortFlights * 0.9;
+      if (surveyData.longFlights) {
+        flightEmissions += surveyData.longFlights * 1.35;
+      }
+
+      if (surveyData.shortFlights) {
+        flightEmissions += surveyData.shortFlights * 0.9;
       }
 
       if (surveyData.carType && surveyData.milesPerWeek) {
