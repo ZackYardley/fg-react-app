@@ -132,7 +132,7 @@ const fetchRecentInvoices = async (count: number = 99): Promise<Invoice[]> => {
             id: doc.id,
             subscriptionId: subscriptionDoc.id,
             ...doc.data(),
-          } as unknown as Invoice)
+          }) as unknown as Invoice
       );
 
       allInvoices = allInvoices.concat(subscriptionInvoices);

@@ -13,6 +13,8 @@ import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
 
 interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 
@@ -228,23 +230,28 @@ export default function ShoppingCartScreen() {
     </View>
   );
 
-  if (loading) {
-    return <Loading />;
-  }
-
   const ListHeaderComponent = () => (
-    <>
+    <View style={{ marginBottom: 16 }}>
       <PageHeader subtitle="Shopping Cart" description="Make a Positive Impact on the Environment Today!" />
       <BackButton />
-    </>
+    </View>
   );
 
   // TODO: This needs some flair
-  const ListEmptyComponent = () => (
-    <View style={styles.emptyCartContainer}>
-      <Text style={styles.emptyCartText}>Your cart is empty</Text>
-    </View>
-  );
+  const ListEmptyComponent = () =>
+    loading ? (
+      <View style={[styles.centered, { marginBottom: 16 }]}>
+        <ActivityIndicator size="large" color="#409858" />
+      </View>
+    ) : (
+      <View style={styles.emptyCartContainer}>
+        <Ionicons name="cart" size={64} color="#409858" />
+        <Text style={styles.emptyCartTitle}>Your cart is empty</Text>
+        <Text style={styles.emptyCartText}>
+          Start adding carbon credits to make a positive impact on the environment!
+        </Text>
+      </View>
+    );
 
   const ListFooterComponent = () => (
     <View style={styles.footer}>
@@ -260,7 +267,15 @@ export default function ShoppingCartScreen() {
         onPress={openPaymentSheet}
         disabled={credits.length === 0 || isUpdatingQuantity || isProcessingPayment}
       >
-        <Text style={styles.purchaseButtonText}>{isProcessingPayment ? "Processing..." : "Buy Now"}</Text>
+        <Text style={styles.purchaseButtonText}>
+          {loading
+            ? "Loading..."
+            : isUpdatingQuantity
+            ? "Updating..."
+            : isProcessingPayment
+            ? "Processing..."
+            : "Buy Now"}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.continueButton} onPress={() => router.navigate("/carbon-credit")}>
         <Text style={styles.continueButtonText}>Continue Shopping</Text>
@@ -272,15 +287,17 @@ export default function ShoppingCartScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
-      <FlatList
-        data={credits}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={ListHeaderComponent}
-        ListEmptyComponent={ListEmptyComponent}
-        ListFooterComponent={ListFooterComponent}
-        contentContainerStyle={styles.flatList}
-      />
+      <View>
+        <FlatList
+          data={credits}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={ListHeaderComponent}
+          ListEmptyComponent={ListEmptyComponent}
+          ListFooterComponent={ListFooterComponent}
+          contentContainerStyle={styles.flatList}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -419,7 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     height: 30,
-    width: 20,
     marginHorizontal: 8,
     textAlign: "center",
   },
@@ -443,10 +459,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 16,
+    backgroundColor: "#eee",
+    paddingVertical: 48,
+    borderRadius: 20,
+  },
+  emptyCartTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#409858",
+    marginTop: 16,
+    marginBottom: 8,
   },
   emptyCartText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#666",
+    textAlign: "center",
+    paddingHorizontal: 32,
   },
   disabledButton: {
     backgroundColor: "#ccc",

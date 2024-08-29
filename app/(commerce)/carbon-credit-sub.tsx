@@ -11,7 +11,7 @@ import { BackButton, Loading, NotFoundComponent, PageHeader } from "@/components
 import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { fetchSubscriptionStatus, fetchSubscriptionByProduct } from "@/api/subscriptions";
-import { fetchEmissionsData } from "@/api/emissions";
+import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { formatPrice } from "@/utils";
 import { CarbonCreditSubscription, Price } from "@/types";
 
@@ -34,17 +34,21 @@ const CarbonCreditSubscriptionScreen = () => {
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
+        // First we fetch the user's emissions data
         const userEmissionsData = await fetchEmissionsData();
         const userEmissions = userEmissionsData?.totalEmissions;
         if (!userEmissions) {
           console.error("No user emissions data found");
           return;
         }
+        // Then we fetch the carbon credit subscription based on the user's emissions
         const result = await fetchCarbonCreditSubscription(userEmissions);
         if (result) {
+          // If the user has a carbon credit subscription, we fetch the subscription status
           const subscriptionStatus = await fetchSubscriptionStatus(result.product.id || "");
           setIsSubscribed(subscriptionStatus);
           if (subscriptionStatus) {
+            // If the user has a subscription, we fetch the subscription details
             const subscription = await fetchSubscriptionByProduct(result.product.id || "");
             if (subscription) {
               setCurrentPeriodEnd(dayjs(subscription.current_period_end.seconds * 1000).format("MMMM D, YYYY"));
@@ -130,7 +134,13 @@ const CarbonCreditSubscriptionScreen = () => {
 
   const handleSuccessfulPurchase = async (paymentIntentId: string) => {
     console.log("Successful purchase with subscriptionId:", paymentIntentId);
-    // Handle successful purchase (e.g., update database, show confirmation)
+    let newTotalOffset = 0;
+    if (carbonCreditSubscription?.recommendedPrice.unit_amount) {
+      newTotalOffset = carbonCreditSubscription?.recommendedPrice.unit_amount / 1000 || 0;
+    }
+    const emissionsData = await fetchEmissionsData();
+    const oldTotalOffset = emissionsData?.totalOffset || 0;
+    saveEmissionsData({ totalOffset: oldTotalOffset + newTotalOffset });
 
     // Navigate to the purchase-complete page with the paymentIntentId
     router.replace({
@@ -163,13 +173,69 @@ const CarbonCreditSubscriptionScreen = () => {
     </View>
   );
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!carbonCreditSubscription) {
-    return <NotFoundComponent />;
-  }
+  const renderContent = () => {
+    if (loading) {
+      return <Loading />;
+    } else if (!carbonCreditSubscription) {
+      return <NotFoundComponent />;
+    } else {
+      return (
+        <>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Monthly Subscription</Text>
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+              {formatPrice(carbonCreditSubscription?.recommendedPrice.unit_amount)}
+              <Text style={{ fontSize: 18, fontWeight: "normal" }}>/month</Text>
+            </Text>
+            <Text style={styles.cardDescription}>Offset your calculated carbon emissions</Text>
+            <Text style={styles.cardDescription}>
+              <Icon name="check" size={24} color="#409858" />
+              <Text style={{ fontWeight: "bold" }}>Purchase of Carbon Credits: </Text>
+              Includes buying the nearest whole number of carbon credits to ensure you are net zero.
+            </Text>
+            <Text style={styles.cardDescription}>
+              <Icon name="check" size={24} color="#409858" />
+              <Text style={{ fontWeight: "bold" }}>Hassle-Free: </Text>
+              Easy way to reduce your environmental impact.
+            </Text>
+            <Text style={styles.cardDescription}>
+              <Icon name="check" size={24} color="#409858" />
+              <Text style={{ fontWeight: "bold" }}>Support Climate Projects: </Text>
+              Contributes to awesome climate initiatives.
+            </Text>
+            {isSubscribed ? (
+              <View style={styles.subscribedContainer}>
+                <Ionicons name="checkmark-circle" size={24} color="#409858" />
+                <Text style={styles.subscribedText}>Subscribed</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[styles.subscribeButton, isProcessingPayment && styles.disabledButton]}
+                onPress={openPaymentSheet}
+                disabled={isProcessingPayment}
+              >
+                <Text style={styles.subscribeButtonText}>
+                  {isProcessingPayment ? "Processing..." : `Subscribe now`}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {isSubscribed && (
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>Subscription Details</Text>
+              <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
+              <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
+              <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
+              <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSubscription}>
+                <Icon name="close" size={24} color="#D22626" />
+                <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -183,59 +249,7 @@ const CarbonCreditSubscriptionScreen = () => {
           />
           <BackButton />
 
-          <View style={styles.content}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Monthly Subscription</Text>
-              <Text style={{ fontSize: 30, fontWeight: "bold" }}>
-                {formatPrice(carbonCreditSubscription?.recommendedPrice.unit_amount)}
-                <Text style={{ fontSize: 18, fontWeight: "normal" }}>/month</Text>
-              </Text>
-              <Text style={styles.cardDescription}>Offset your calculated carbon emissions</Text>
-              <Text style={styles.cardDescription}>
-                <Icon name="check" size={24} color="#409858" />
-                <Text style={{ fontWeight: "bold" }}>Purchase of Carbon Credits: </Text>
-                Includes buying the nearest whole number of carbon credits to ensure you are net zero.
-              </Text>
-              <Text style={styles.cardDescription}>
-                <Icon name="check" size={24} color="#409858" />
-                <Text style={{ fontWeight: "bold" }}>Hassle-Free: </Text>
-                Easy way to reduce your environmental impact.
-              </Text>
-              <Text style={styles.cardDescription}>
-                <Icon name="check" size={24} color="#409858" />
-                <Text style={{ fontWeight: "bold" }}>Support Climate Projects: </Text>
-                Contributes to awesome climate initiatives.
-              </Text>
-              {isSubscribed ? (
-                <View style={styles.subscribedContainer}>
-                  <Ionicons name="checkmark-circle" size={24} color="#409858" />
-                  <Text style={styles.subscribedText}>Subscribed</Text>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.subscribeButton, isProcessingPayment && styles.disabledButton]}
-                  onPress={openPaymentSheet}
-                  disabled={isProcessingPayment}
-                >
-                  <Text style={styles.subscribeButtonText}>
-                    {isProcessingPayment ? "Processing..." : `Subscribe now`}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            {isSubscribed && (
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Subscription Details</Text>
-                <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
-                <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
-                <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
-                <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSubscription}>
-                  <Icon name="close" size={24} color="#D22626" />
-                  <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+          <View style={styles.content}>{renderContent()}</View>
         </View>
       </ScrollView>
     </SafeAreaView>

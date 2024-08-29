@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackButton, Loading, PageHeader } from "@/components/common";
+import { BackButton, PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { fetchCarbonCreditSubscription } from "@/api/products";
@@ -13,6 +13,7 @@ import {
   updateUserSubscriptionMailChimp,
 } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
+import { ActivityIndicator } from "react-native-paper";
 
 const ForevergreenSubscriptions = () => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
@@ -77,14 +78,10 @@ const ForevergreenSubscriptions = () => {
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.cardDescription}>{description}</Text>
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>{loading ? "isLoading" : isSubscribed ? "Manage Subscription" : price}</Text>
+        <Text style={styles.buttonText}>{loading ? "Loading..." : isSubscribed ? "Manage Subscription" : price}</Text>
       </TouchableOpacity>
     </View>
   );
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,11 +99,18 @@ const ForevergreenSubscriptions = () => {
               price="$10 Month"
               onPress={() =>  {}}}
             />  */}
-            {subscriptionPrice ? (
+            {loading ? (
               <SubscriptionCard
                 title="Carbon Credit Subscription"
                 description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
-                price={`${formatPrice(subscriptionPrice)} Month`}
+                price={""}
+                onPress={() => {}}
+              />
+            ) : subscriptionPrice ? (
+              <SubscriptionCard
+                title="Carbon Credit Subscription"
+                description="The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet and support awesome climate projects!"
+                price={`${formatPrice(subscriptionPrice)}/Month`}
                 onPress={() => router.push("/carbon-credit-sub")}
               />
             ) : (
@@ -119,7 +123,9 @@ const ForevergreenSubscriptions = () => {
                 is a free an easy way to reduce your emissions.
               </Text>
               <TouchableOpacity style={styles.button} onPress={handleNewsletterSubscribption}>
-                <Text style={styles.buttonText}>{isNewsletterSubscribed ? "Unsubscribe" : "Subscribe"}</Text>
+                <Text style={styles.buttonText}>
+                  {loading ? "Loading..." : isNewsletterSubscribed ? "Unsubscribe" : "Subscribe"}
+                </Text>
               </TouchableOpacity>
             </View>
             <View style={styles.card}>
@@ -130,7 +136,9 @@ const ForevergreenSubscriptions = () => {
                   <Text style={styles.subscriptionText}>Tree Planting Subscription</Text>
                 </View> */}
                 <View style={styles.subscriptionItem}>
-                  {isSubscribed ? (
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#409858" />
+                  ) : isSubscribed ? (
                     <Ionicons name="checkmark" size={18} color="green" />
                   ) : (
                     <Ionicons name="close" size={18} color="red" />
@@ -138,7 +146,9 @@ const ForevergreenSubscriptions = () => {
                   <Text style={styles.subscriptionText}>Carbon Credit Subscription</Text>
                 </View>
                 <View style={styles.subscriptionItem}>
-                  {isNewsletterSubscribed ? (
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#409858" />
+                  ) : isNewsletterSubscribed ? (
                     <Ionicons name="checkmark" size={18} color="green" />
                   ) : (
                     <Ionicons name="close" size={18} color="red" />

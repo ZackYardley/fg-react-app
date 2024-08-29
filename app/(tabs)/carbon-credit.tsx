@@ -7,7 +7,7 @@ import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/
 import { subscribeToCart } from "@/api/cart";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
 import { fetchEmissionsData } from "@/api/emissions";
-import { Loading, PageHeader } from "@/components/common";
+import { PageHeader } from "@/components/common";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
 import { CarbonCredit, CartItem } from "@/types";
 import { formatPrice } from "@/utils";
@@ -22,7 +22,6 @@ export default function CarbonCreditScreen() {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
     const initializeData = async () => {
       try {
         const [creditsResult, userEmissionsData] = await Promise.all([
@@ -30,7 +29,7 @@ export default function CarbonCreditScreen() {
           fetchEmissionsData(),
         ]);
 
-        if (isMounted && creditsResult && creditsResult.length > 0) {
+        if (creditsResult && creditsResult.length > 0) {
           const credits = await Promise.all(
             creditsResult.map(async (credit) => ({
               ...credit,
@@ -53,23 +52,18 @@ export default function CarbonCreditScreen() {
       } catch (error) {
         console.error("Error fetching credits:", error);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
     initializeData();
 
     // Subscribe to cart changes
     const unsubscribe = subscribeToCart((items) => {
-      if (isMounted) {
-        setCartItems(items);
-      }
+      setCartItems(items);
     });
 
     // Cleanup subscription and prevent state updates on unmounted component
     return () => {
-      isMounted = false;
       unsubscribe();
     };
   }, []);

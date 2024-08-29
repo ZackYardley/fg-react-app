@@ -21,7 +21,6 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
     }
-
     GoogleSignin.configure({
       webClientId: "489135632905-iu340mh7lub0iis2q18upvus42fa2roo.apps.googleusercontent.com",
     });
@@ -31,13 +30,12 @@ export default function RootLayout() {
       Notifications.setupMessaging();
       unsubscribe = Notifications.initializeNotifications();
     }
-
     return unsubscribe;
   }, [loaded]);
 
   const { handleURLCallback } = useStripe();
 
-  const handleDeepLink = useCallback(
+  /* const handleDeepLink = useCallback(
     async (url: string) => {
       if (url) {
         const stripeHandled = await handleURLCallback(url);
@@ -52,23 +50,25 @@ export default function RootLayout() {
     },
     [handleURLCallback]
   );
+  */
 
-  // useEffect(() => {
-  //   const getUrlAsync = async () => {
-  //     const initialUrl = await Linking.getInitialURL();
-  //     handleDeepLink(initialUrl || "");
-  //   };
+  /* useEffect(() => {
+    const getUrlAsync = async () => {
+      const initialUrl = await Linking.getInitialURL();
+      handleDeepLink(initialUrl || "");
+    };
 
-  //   getUrlAsync();
+    getUrlAsync();
 
-  //   const deepLinkListener = Linking.addEventListener("url", (event: { url: string }) => {
-  //     handleDeepLink(event.url);
-  //   });
+    const deepLinkListener = Linking.addEventListener("url", (event: { url: string }) => {
+      handleDeepLink(event.url);
+    });
 
-  //   return () => {
-  //     deepLinkListener.remove();
-  //   };
-  // }, [handleDeepLink]);
+    return () => {
+      deepLinkListener.remove();
+    };
+  }, [handleDeepLink]);
+  */
 
   if (!loaded) {
     return null;
