@@ -4,7 +4,6 @@ import { fetchEmissionsData } from "@/api/emissions";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
 import { router } from "expo-router";
 import dayjs from "dayjs";
@@ -19,6 +18,7 @@ const userbreakdown = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
   const [userName, setUserName] = useState("");
+
 
   const auth = getAuth();
 
@@ -254,9 +254,10 @@ const userbreakdown = () => {
                 <Text style={styles.ctaButtonText}>Start the Pledge today!</Text>
               </TouchableOpacity>
             </View>
-
+        
       </View>
     </ScrollView>
+    
   );
 };
 
