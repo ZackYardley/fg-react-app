@@ -15,16 +15,12 @@ import dayjs from "dayjs";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
 import { TARGET_EMISSIONS } from "@/constants";
-
-const TextButton = ({ label, style }: { label: string; style: object }) => (
-  <View style={[styles.textButton, style]}>
-    <Text style={styles.textButtonLabel}>{label}</Text>
-  </View>
-);
+import { CarbonFootprint } from "@/components/home";
 
 const HomeScreen = () => {
   const { width } = useWindowDimensions();
   const [totalEmissions, setTotalEmissions] = useState(0.0);
+  const [monthlyEmissions, setMonthlyEmissions] = useState(0.0);
   const [totalOffset, setTotalOffset] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0.0);
   const [dietEmissions, setDietEmissions] = useState(0.0);
@@ -38,7 +34,8 @@ const HomeScreen = () => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data !== null) {
-        setTotalEmissions(data.totalEmissions);
+        setTotalEmissions(data.totalEmissions || 0);
+        setMonthlyEmissions(data.monthlyEmissions || 0);
         setTotalOffset(data.totalOffset || 0);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
@@ -80,63 +77,7 @@ const HomeScreen = () => {
         </View>
 
         {/* Carbon Footprint and Calculator */}
-        <View style={styles.footprintContainer}>
-          <TouchableOpacity style={styles.footprintBox} onPress={() => router.push("/breakdown")}>
-            <Text style={{}}>Your Carbon Footprint</Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{}}>{Math.min(totalEmissions, 99.9).toFixed(1)}</Text>
-              <Text style={{}}>Tons of CO2</Text>
-            </View>
-            <Text style={{}}>Your Carbon Offsets</Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{}}>{Math.min(totalOffset, 99.9).toFixed(1)}</Text>
-              <Text style={{}}>Tons of CO2</Text>
-            </View>
-            <View style={{ width: "100%", borderTopWidth: 4 }}></View>
-            <Text style={{}}>Net Impact</Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={{}}>{Math.min(totalEmissions - totalOffset, 99.9).toFixed(1)}</Text>
-              <Text style={{}}>Tons of CO2</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
-            <Text style={styles.boxTitle}>Calculate your impact</Text>
-            <View style={styles.calculator}>
-              {/* Calculator buttons */}
-              <>
-                <View style={styles.calculatorRow}>
-                  <TextButton label="AC" style={styles.grayButton} />
-                  <TextButton label="+/-" style={[styles.grayButton, styles.marginLeft]} />
-                  <TextButton label="%" style={[styles.grayButton, styles.marginLeft]} />
-                  <TextButton label="/" style={[styles.greenButton, styles.marginLeft]} />
-                </View>
-                <View style={styles.calculatorRow}>
-                  <TextButton label="7" style={styles.darkButton} />
-                  <TextButton label="8" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="9" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="X" style={[styles.greenButton, styles.marginLeft]} />
-                </View>
-                <View style={styles.calculatorRow}>
-                  <TextButton label="4" style={styles.darkButton} />
-                  <TextButton label="5" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="6" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="-" style={[styles.greenButton, styles.marginLeft]} />
-                </View>
-                <View style={styles.calculatorRow}>
-                  <TextButton label="1" style={styles.darkButton} />
-                  <TextButton label="2" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="3" style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="+" style={[styles.greenButton, styles.marginLeft]} />
-                </View>
-                <View style={styles.calculatorRow}>
-                  <TextButton label="0" style={[styles.darkButton, styles.wideButton]} />
-                  <TextButton label="." style={[styles.darkButton, styles.marginLeft]} />
-                  <TextButton label="=" style={[styles.greenButton, styles.marginLeft]} />
-                </View>
-              </>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <CarbonFootprint monthlyEmissions={monthlyEmissions} totalOffset={totalOffset} />
 
         {/* Monthly Graph of Emissions */}
         <View style={styles.emissionsGraph}>
@@ -154,13 +95,44 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Emissions vs Offset */}
+        <View style={styles.carbonFootprint}>
+          <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint...</Text>
+          <View style={styles.carbonFootprintContent}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Emissions</Text>
+              <Text style={styles.emissionText}>
+                {monthlyEmissions.toFixed(2)}
+                <Text style={styles.emissionUnit}> tons of CO₂</Text>
+              </Text>
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Offsets</Text>
+              <Text style={styles.offsetText}>
+                {totalOffset.toFixed(2)}
+                <Text style={styles.emissionUnit}> tons of CO₂</Text>
+              </Text>
+            </View>
+          </View>
+
+          {monthlyEmissions <= totalOffset ? (
+            <Text style={styles.netZeroText}>You are net zero this month!</Text>
+          ) : (
+            <Text style={styles.netZeroText}>You are not net zero this month!</Text>
+          )}
+
+          <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
+            <Text style={styles.offsetButtonText}>Offset Now!</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Community */}
         <View style={styles.communitySection}>
           <Text style={styles.sectionTitle}>Forevergreen Community</Text>
           <View style={styles.communityStatsContainer}>
             <View style={styles.communityStatBox}>
               <Text style={styles.statLargeText}>10,000</Text>
-              <Text style={styles.statMediumText}>Trees Planted</Text>
+              <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
             </View>
             <View style={styles.communityStatBox}>
               <Text style={styles.statLargeText}>10,000</Text>
@@ -288,13 +260,48 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 24,
   },
+  footprintTitle: {
+    fontSize: 22,
+    textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  emissionsTitle: {
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: "light",
+    marginBottom: 6,
+  },
+  footprintText: {
+    fontSize: 32,
+    textAlign: "center",
+    fontWeight: "bold",
+    marginBottom: 0,
+  },
+  footprintUnit: {
+    fontSize: 12,
+    marginLeft: 16,
+    textAlign: "right",
+  },
   footprintBox: {
-    backgroundColor: "#f0caca",
+    backgroundColor: "#eeeeee",
     borderRadius: 16,
     width: "47%",
     height: 288,
     justifyContent: "center",
-    padding: 16,
+    alignItems: "center",
+    padding: 12,
+  },
+  dataRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    marginTop: 5,
+  },
+  divider: {
+    borderTopWidth: 2,
+    borderColor: "black",
+    marginVertical: 15,
   },
   calculatorBox: {
     backgroundColor: "#eeeeee",
@@ -330,46 +337,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  textButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-  },
-  textButtonLabel: {
-    color: "white",
-    fontSize: 16,
-  },
-  calculator: {
-    flex: 1,
-    backgroundColor: "#eeeeee",
-    borderRadius: 8,
-    justifyContent: "center",
-  },
-  calculatorRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  grayButton: {
-    backgroundColor: "#a5a5a5",
-    width: "22%",
-  },
-  darkButton: {
-    backgroundColor: "#333333",
-    width: "22%",
-  },
-  greenButton: {
-    backgroundColor: "#409858",
-    width: "22%",
-  },
-  wideButton: {
-    width: "48%",
-  },
-  marginLeft: {
-    marginLeft: "4%",
-  },
+
   emissionsGraph: {
     backgroundColor: "#eeeeee",
     marginBottom: 24,
@@ -388,6 +356,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#409858",
     borderRadius: 50,
     alignItems: "center",
+    alignSelf: "center",
     justifyContent: "center",
     height: 40,
     width: 150,
@@ -522,5 +491,55 @@ const styles = StyleSheet.create({
     height: 16,
     width: 16,
     marginRight: 8,
+  },
+  carbonFootprint: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    marginTop: 12,
+    backgroundColor: "#e5e7eb",
+  },
+  carbonFootprintTitle: {
+    fontSize: 20,
+    textAlign: "center",
+    marginBottom: 12,
+    fontWeight: "700",
+  },
+  offsetTitle: {
+    fontSize: 20,
+    textAlign: "right",
+    marginBottom: 12,
+    fontWeight: "700",
+  },
+  carbonFootprintContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  emissionText: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#b91c1c",
+  },
+  offsetText: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "green",
+  },
+  emissionUnit: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "black",
+  },
+  section: {
+    flex: 1,
+    alignItems: "center",
+  },
+  netZeroText: {
+    marginTop: 12,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+    textAlign: "center",
   },
 });

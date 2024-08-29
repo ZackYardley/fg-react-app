@@ -10,7 +10,7 @@ import ConfettiCannon from "react-native-confetti-cannon";
 
 // Initialize debugMode with useState
 export default function Index() {
-  const [debugMode, setDebugMode] = useState(true);
+  const [debugMode, setDebugMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [hasCalculatedEmissions, setHasCalculatedEmissions] = useState(false);
@@ -21,25 +21,33 @@ export default function Index() {
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        setIsAnonymous(currentUser.isAnonymous);
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          setIsAnonymous(currentUser.isAnonymous);
 
-        const emissionsData = await fetchEmissionsData();
-        if (emissionsData) {
-          const lastUpdated = emissionsData.lastUpdated?.toDate();
-          const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
+          const emissionsData = await fetchEmissionsData();
+          if (emissionsData) {
+            const lastUpdated = emissionsData.lastUpdated?.toDate();
+            const daysSinceLastUpdate = lastUpdated ? dayjs().diff(dayjs(lastUpdated), "day") : null;
 
-          const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
-          setHasCalculatedEmissions(hasCalculated);
+            const hasCalculated = daysSinceLastUpdate !== null && daysSinceLastUpdate <= 30;
+            setHasCalculatedEmissions(hasCalculated);
+          } else {
+            setHasCalculatedEmissions(false);
+          }
         } else {
-          setHasCalculatedEmissions(false);
+          setUser(null);
+          setIsAnonymous(false);
         }
-      } else {
+
+        setDebugMode(!!process.env.EXPO_PUBLIC_APP_ENV);
+      } catch {
         setUser(null);
         setIsAnonymous(false);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -98,7 +106,6 @@ export default function Index() {
       </View>
     );
   } else {
-    // Updated logic for user flow
     if (!user) {
       return <Redirect href="/get-started" />;
     } else if (isAnonymous) {

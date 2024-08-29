@@ -1,31 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
-import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown } from "@/components/breakdown";
+import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
+import { router } from "expo-router";
+import dayjs from "dayjs";
+import { BackButton } from "@/components/common";
 
-const Breakdown = () => {
+const userbreakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
   const [monthlyEmissions, setMonthlyEmissions] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0);
   const [dietEmissions, setDietEmissions] = useState(0);
   const [energyEmissions, setEnergyEmissions] = useState(0);
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [totalOffset, setTotalOffset] = useState(0);
+  const [userName, setUserName] = useState("");
 
-  const explosionRef = useRef<ConfettiCannon>(null);
+  const auth = getAuth();
 
   useEffect(() => {
     const loadData = async () => {
       const data = await fetchEmissionsData();
-      if (data) {
-        setTotalEmissions(data.totalEmissions || 0);
-        setMonthlyEmissions(data.monthlyEmissions || 0);
+      if (data !== null) {
+        setTotalEmissions(data.totalEmissions);
+        setMonthlyEmissions(data.monthlyEmissions);
+        setTotalOffset(data.totalOffset || 0);
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
@@ -36,11 +39,6 @@ const Breakdown = () => {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (dataLoaded) {
-      explosionRef.current?.start();
-    }
-  }, [dataLoaded]);
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -48,7 +46,9 @@ const Breakdown = () => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setIsAnonymous(user.isAnonymous);
+        setUserName(user.displayName || "User");
+      } else {
+        setUserName("");
       }
     });
 
@@ -59,28 +59,104 @@ const Breakdown = () => {
     return <CalculatingScreen />;
   }
 
+  const netImpact = monthlyEmissions - totalOffset;
+  const isPositiveImpact = netImpact <= 0;
+
+ // Generate a list of 6 months ago to now
+ const months = [];
+
+ for (let i = 0; i < 6; i++) {
+   months.push(dayjs().subtract(i, "month").format("YYYY-MM"));
+ }
+ months.reverse();
+  
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Icon name="arrow-left" size={24} color="black" onPress={() => router.back()} />
-            <Text style={styles.headerTitle}>Results</Text>
-          </View>
+    <ScrollView style={styles.container}>
+      
+        
+      <View style={styles.emissions}>
 
-          <View style={styles.contentContainer}>
-            {/* Carbon Footprint */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Your Carbon Footprint</Text>
-              <Text>Your total emissions are:</Text>
-              <Text style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</Text>
-              <Text>Your total monthly emissions are:</Text>
-              <Text style={styles.greenText}>{(monthlyEmissions).toFixed(2)} tons co2/month</Text>
+        <View style={styles.header}>
+        <BackButton />
+
+          <Text style={styles.titleText}>
+            Forever<Text style={styles.greenText}>green</Text>
+          </Text>
+          <Text style={styles.welcomeUser}>
+              Welcome, {userName}
+            </Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Annual Footprint</Text>
+          <Text style={styles.cardText}>
+            Your total emissions this year:</Text>
+            <Text style={styles.emissionsStat}>
+            {totalEmissions.toFixed(1)}
+              </Text>
+              <Text style={styles.emissionsLabel}>
+              tons of CO2
+          </Text>
+        </View>
+
+        <View style={styles.cardSideBySide}>
+          <View style={styles.communityStatsContainer}>
+            <View style={styles.communityStatBox}>
+              <Text style={styles.cardTitle}>Monthly Carbon Emissions</Text>
             </View>
+            <View style={styles.communityStatBox}>
+            <Text style={styles.emissionsStat}>
+              {monthlyEmissions.toFixed(1)}
+          </Text>
+          <Text style={styles.emissionsLabel}>
+              tons of CO2
+          </Text>
+          
+            </View>
+          </View>
+        </View>
+        <View style={styles.cardSideBySide}>
+          <View style={styles.communityStatsContainer}>
+            <View style={styles.communityStatBox}>
+              <Text style={styles.cardTitle}>Monthly Carbon Offsets</Text>
+            </View>
+            <View style={styles.communityStatBox}>
+            <Text style={styles.emissionsStat}>
+              {totalOffset.toFixed(1)}
+          </Text>
+          <Text style={styles.emissionsLabel}>
+              tons of CO2
+          </Text>
+            </View>
+          </View>
+        </View>
+        
+        <View style={styles.separator} />
 
-            {/* Emission Breakdown */}
-            <View style={styles.card}>
+
+        <View style={[styles.card, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}>
+          <Text style={styles.cardTitle}>Net Impact this month</Text>
+          <Text style={styles.emissionsStat}>
+            {Math.abs(netImpact).toFixed(1)} 
+          </Text>
+          <Text style={styles.emissionsLabel}>
+              tons of CO2
+          </Text>
+          <Text style={styles.emissionsLabel}>
+          {isPositiveImpact ? "You are net Net-Zero! 😊" : "You are not Net-Zero 😥"}
+          </Text>
+        </View>
+
+        {/* Monthly Graph of Emissions */}
+        <View style={styles.emissionsGraph}>
+          <Text style={styles.sectionTitle}>Your net-zero journey</Text>
+          <View style={styles.graphContainer}>
+            <LineChartBreakdown />
+          </View>
+        </View>
+
+        {/* Emission Breakdown */}
+        <View style={styles.card}>
               <Text style={styles.cardTitle}>Your Emission Breakdown</Text>
               <View style={{ alignItems: "center", marginBottom: 16 }}>
                 <PieChartBreakdown
@@ -134,6 +210,7 @@ const Breakdown = () => {
               </View>
             </View>
 
+
             {/* Earth Breakdown */}
             <View style={styles.card}>
               <Text style={styles.earthBreakdownTitle}>Earth Breakdown</Text>
@@ -177,84 +254,147 @@ const Breakdown = () => {
                 <Text style={styles.ctaButtonText}>Start the Pledge today!</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-        {/* Next Button */}
-        <View style={styles.nextButton}>
-          <TouchableOpacity
-            onPress={() => {
-              if (isAnonymous) {
-                router.push("/signup");
-              } else {
-                router.replace("/home");
-              }
-            }}
-          >
-            <View style={styles.nextButtonInner}>
-              <Icon name="arrow-right" size={30} color={"#000"} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-      <View style={styles.confettiContainer} pointerEvents="none">
-        <ConfettiCannon
-          count={200}
-          origin={{ x: screenWidth / 2, y: 0 }}
-          autoStart={false}
-          ref={explosionRef}
-          fadeOut
-          fallSpeed={3000}
-          explosionSpeed={1}
-        />
+
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
+export default userbreakdown;
+
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     flex: 1,
     backgroundColor: "white",
   },
-  container: {
+  content: {
     padding: 24,
   },
   header: {
-    flexDirection: "row",
     alignItems: "center",
-    marginTop: 16,
-    columnGap: 24,
+    marginTop: 32,
   },
-  headerTitle: {
-    fontSize: 36,
-    marginTop: 4,
+  titleText: {
+    fontSize: 48,
+    fontWeight: "bold",
   },
-  contentContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-    paddingTop: 8,
+  welcomeUser: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  greenText: {
+    color: "#409858",
   },
   card: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    borderRadius: 12,
-    backgroundColor: "white",
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: "#eeeeee",
+    marginTop: 10,
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 16,
+    alignItems: "center",
   },
   cardTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    marginVertical: 8,
+    textAlign: "center",
   },
-  greenText: {
-    color: "#16a34a",
+  cardText: {
     fontSize: 20,
+    textAlign: "center",
     marginBottom: 8,
   },
+  
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  buttonText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  positiveImpact: {
+    backgroundColor: "#d4edda", // Light green for positive impact
+  },
+  negativeImpact: {
+    backgroundColor: "#f8d7da", // Light red for negative impact
+  },
+  impactText: {
+    fontWeight: "bold",
+  },
+  separator: {
+    height: 2,
+    backgroundColor: '#000000', // You can change this color as needed
+    marginVertical: 10, // Adjust the vertical margin as needed
+    width: '100%',
+  },
+
+  communitySection: {
+    marginBottom: 10,
+  },
+  communityStatsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  communityStatBox: {
+    backgroundColor: "#eeeeee",
+    borderRadius: 16,
+    width: "47%",
+    height: 160,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+  },
+  statLargeText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  statMediumText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  sectionTitle: {
+    fontSize: 24,
+    marginBottom: 10,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+
+  emissions: {
+    padding: 24,
+  },
+  cardSideBySide: {
+    marginBottom: 10,
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  statBox: {
+    backgroundColor: "#eeeeee",
+    borderRadius: 16,
+    width: "47%",
+    height: 160,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+  },
+  emissionsStat: {
+    fontSize: 36,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emissionsLabel: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+
+  // Pie Chart
   legendContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -270,6 +410,8 @@ const styles = StyleSheet.create({
     width: 16,
     marginRight: 8,
   },
+
+  // Earth Breakdown
   earthBreakdownTitle: {
     fontSize: 36,
     fontWeight: "bold",
@@ -280,6 +422,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 18,
   },
+  // CTA
   ctaTitle: {
     fontSize: 36,
     fontWeight: "bold",
@@ -292,10 +435,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   ctaButton: {
-    borderRadius: 9999,
-    paddingVertical: 12,
-    marginBottom: 16,
     backgroundColor: "#44945F",
+    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    width: '80%',
   },
   ctaButtonText: {
     color: "white",
@@ -303,27 +448,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  nextButton: {
-    alignItems: "flex-end",
-    marginBottom: 40,
-    marginRight: 40,
-  },
-  nextButtonInner: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 9999,
-    borderWidth: 2,
-    height: 64,
-    width: 64,
-    borderColor: "black",
-    backgroundColor: "#409858",
-    justifyContent: "center",
+  emissionsGraph: {
+    backgroundColor: "#eeeeee",
+    marginBottom: 24,
+    padding: 24,
+    borderRadius: 16,
     alignItems: "center",
   },
-  confettiContainer: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1000, // Ensure it is on top of everything else
+  graphContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
   },
 });
-
-export default Breakdown;

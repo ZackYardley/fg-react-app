@@ -7,11 +7,13 @@ const GoogleButton = ({
   onPress,
   style,
   textStyle,
+  noLogo,
 }: {
   title?: string;
   onPress: () => void;
   style?: any;
   textStyle?: any;
+  noLogo?: boolean;
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -38,7 +40,7 @@ const GoogleButton = ({
         onPressOut={handlePressOut}
       >
         <View style={styles.contentContainer}>
-          <Image source={GoogleLogo} style={styles.googleIcon} />
+          {!noLogo && <Image source={GoogleLogo} style={styles.googleIcon} />}
           <Text style={[styles.buttonText, textStyle]}>{title}</Text>
         </View>
       </Pressable>

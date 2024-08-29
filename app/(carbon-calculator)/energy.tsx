@@ -159,12 +159,16 @@ export default function EnergyCalculator() {
         surveyData: { ...surveyData },
         surveyEmissions: { ...surveyEmissions },
         totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
+        monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions)/12,
+
       });
       await analytics().logEvent("energy_emission_calculated", {
         emissionsDocument: {
           surveyData: surveyData,
           surveyEmissions: surveyEmissions,
           totalEmissions: (surveyEmissions.energyEmissions || 0) + transportationEmissions + dietEmissions,
+          monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions)/12,
+
         },
       });
     } catch (error) {

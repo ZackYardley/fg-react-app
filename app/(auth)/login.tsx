@@ -1,18 +1,10 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  KeyboardAvoidingView,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput } from "react-native-paper";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { onLogin, onGoogleLogin } from "@/api/auth";
 import { TreeLogo } from "@/constants/Images";
+import { TitleWithLogo, GreenButton, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -23,65 +15,27 @@ export default function LoginScreen() {
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <SafeAreaView style={styles.safeAreaView}>
-          <Text style={styles.title}>
-            Log <Text style={styles.titleHighlight}>in</Text>
-          </Text>
-          <View style={styles.logoContainer}>
-            <Image
-              style={styles.logo}
-              source={TreeLogo}
-            />
-          </View>
+          <TitleWithLogo title="Log" titleAlt="in" />
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                placeholder="Ex. abc@example.com"
-                style={styles.textInput}
+              <CustomTextInput
+                label="Email"
                 value={email}
                 onChangeText={setEmail}
-                mode="outlined"
-                dense={true}
-                outlineStyle={{ borderColor: "#000" }}
-                theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                textColor="#000"
-                left={
-                  <TextInput.Icon
-                    icon="at"
-                    color={"#000"}
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
+                placeholder="Ex. abc@example.com"
+                leftIcon="at"
               />
             </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Your Password</Text>
-              <TextInput
-                placeholder="Your Password"
-                secureTextEntry={!showPassword}
-                style={styles.textInput}
+              <CustomTextInput
+                label="Password"
                 value={password}
                 onChangeText={setPassword}
-                mode="outlined"
-                dense={true}
-                outlineStyle={{ borderColor: "#000" }}
-                theme={{ roundness: 9999, colors: { background: "#fff" } }}
-                textColor="#000"
-                left={
-                  <TextInput.Icon
-                    icon="lock"
-                    color="#000"
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
-                right={
-                  <TextInput.Icon
-                    icon={showPassword ? "eye-off" : "eye"}
-                    onPress={() => setShowPassword(!showPassword)}
-                    color="#000"
-                    style={{ height: "100%", width: "100%" }}
-                  />
-                }
+                placeholder="Your Password"
+                secureTextEntry={!showPassword}
+                leftIcon="lock"
+                rightIcon={showPassword ? "eye-off" : "eye"}
+                onRightIconPress={() => setShowPassword(!showPassword)}
               />
             </View>
             <View style={styles.forgotPasswordContainer}>
@@ -89,35 +43,24 @@ export default function LoginScreen() {
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </Link>
             </View>
-            <TouchableOpacity
-              onPress={() => onLogin(email, password)}
+            <GreenButton
+              title="Log in"
+              onPress={() => {
+                onLogin(email, password);
+              }}
               style={styles.loginButton}
-            >
-              <Text style={styles.loginButtonText}>Log in</Text>
-            </TouchableOpacity>
-            <View style={styles.orContainer}>
-              <View style={styles.orLine} />
-              <Text style={styles.orText}>Or</Text>
-              <View style={styles.orLine} />
-            </View>
-            <TouchableOpacity
+              textStyle={styles.loginButtonText}
+            />
+            <OrLine />
+            <GoogleButton
               onPress={() => {
                 onGoogleLogin();
               }}
-              style={styles.googleButton}
-            >
-              <Image
-                source={{
-                  uri: "https://img.icons8.com/color/48/000000/google-logo.png",
-                }}
-                style={styles.googleIcon}
-              />
-              <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
+            />
             <View style={styles.signUpContainer}>
-              <TouchableOpacity onPress={() => router.navigate("/signup")}>
+              <Link href="/signup">
                 <Text style={styles.signUpText}>Back to Sign Up</Text>
-              </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </SafeAreaView>
@@ -133,6 +76,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
   },
+  test: {},
   safeAreaView: {
     flex: 1,
     justifyContent: "center",
@@ -146,23 +90,6 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginVertical: 40,
   },
-  logoContainer: {
-    alignItems: "center",
-  },
-  logo: {
-    width: 250,
-    height: 125,
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    textAlign: "center",
-    letterSpacing: -1,
-    marginVertical: 40,
-  },
-  titleHighlight: {
-    color: "#409858",
-  },
   formContainer: {
     marginTop: 12,
     paddingHorizontal: 12,
@@ -170,12 +97,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 12,
-  },
-  inputLabel: {
-    marginBottom: 8,
-  },
-  textInput: {
-    width: "100%",
   },
   forgotPasswordContainer: {
     flexDirection: "row",
@@ -203,46 +124,6 @@ const styles = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
     fontSize: 24,
-    fontWeight: "bold",
-  },
-  orContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 8,
-  },
-  orLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#191C19",
-  },
-  orText: {
-    marginHorizontal: 16,
-    fontWeight: "bold",
-    fontSize: 20,
-  },
-  googleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 9999,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.18,
-    shadowRadius: 1.0,
-    elevation: 1,
-  },
-  googleIcon: {
-    width: 32,
-    height: 32,
-    marginRight: 16,
-  },
-  googleButtonText: {
-    textAlign: "center",
-    fontSize: 20,
     fontWeight: "bold",
   },
   signUpContainer: {
