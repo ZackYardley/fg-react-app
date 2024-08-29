@@ -255,89 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-  footprintContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  footprintTitle: {
-    fontSize: 22,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  emissionsTitle: {
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "light",
-    marginBottom: 6,
-  },
-  footprintText: {
-    fontSize: 32,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 0,
-  },
-  footprintUnit: {
-    fontSize: 12,
-    marginLeft: 16,
-    textAlign: "right",
-  },
-  footprintBox: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 16,
-    width: "47%",
-    height: 288,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 12,
-  },
-  dataRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginTop: 5,
-  },
-  divider: {
-    borderTopWidth: 2,
-    borderColor: "black",
-    marginVertical: 15,
-  },
-  calculatorBox: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 16,
-    width: "47%",
-    height: 288,
-    padding: 16,
-  },
-  carbonBoxTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  carbonBoxMediumText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  boxTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  boxLargeText: {
-    fontSize: 56,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  boxMediumText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-
   emissionsGraph: {
     backgroundColor: "#eeeeee",
     marginBottom: 24,
@@ -502,12 +419,6 @@ const styles = StyleSheet.create({
   carbonFootprintTitle: {
     fontSize: 20,
     textAlign: "center",
-    marginBottom: 12,
-    fontWeight: "700",
-  },
-  offsetTitle: {
-    fontSize: 20,
-    textAlign: "right",
     marginBottom: 12,
     fontWeight: "700",
   },
