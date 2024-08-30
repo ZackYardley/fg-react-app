@@ -10,6 +10,13 @@ const PepperTree = require("../assets/images/pepper-tree-1.png");
 const Pamona = require("../assets/images/pamona.png");
 const fourofour = require("../assets/images/fourofour.png");
 const GoogleLogo = require("../assets/images/google-logo.png");
+const Russas = require("../assets/images/russas.png");
+const Colombia = require("../assets/images/colombia.png");
+const Hyrdo = require("../assets/images/hyrdoelectric.png");
+const Quebec = require("../assets/images/quebec.png");
+
+
+
 
 export {
   Earth,
@@ -24,4 +31,8 @@ export {
   Pamona,
   fourofour,
   GoogleLogo,
+  Russas,
+  Colombia,
+  Hyrdo,
+  Quebec,
 };
