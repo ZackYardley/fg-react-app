@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Button,
 } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";

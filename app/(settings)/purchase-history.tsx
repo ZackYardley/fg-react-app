@@ -6,7 +6,6 @@ import { fetchRecentInvoices } from "@/api/subscriptions";
 import { Payment, Invoice } from "@/types";
 import { BackButton, Loading, PageHeader } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
-import { ActivityIndicator } from "react-native-paper";
 
 interface PurchaseItem {
   type: "payment" | "invoice";
