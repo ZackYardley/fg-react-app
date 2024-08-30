@@ -21,7 +21,7 @@ const CarbonFootprintSection = ({
   return (
     <View style={styles.footprintContainer}>
       <TouchableOpacity
-        onPress={() => router.navigate("/user-breakdown")}
+        onPress={() => router.navigate("/breakdown")}
         style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}
       >
         <Text style={styles.boxTitle}>Your Carbon Footprint</Text>

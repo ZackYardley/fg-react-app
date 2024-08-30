@@ -1,13 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  useWindowDimensions,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Pressable, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
@@ -199,6 +191,7 @@ const HomeScreen = () => {
               names={["You", "Average American"]}
               values={[totalEmissions - totalOffset, 21]}
               colors={["#44945F", "#A9A9A9"]}
+              width={width - 128}
             />
           </View>
 
