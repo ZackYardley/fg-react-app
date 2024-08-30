@@ -12,8 +12,9 @@ const fourofour = require("../assets/images/fourofour.png");
 const GoogleLogo = require("../assets/images/google-logo.png");
 const Russas = require("../assets/images/russas.png");
 const Colombia = require("../assets/images/colombia.png");
-const Hyrdo = require("../assets/images/hyrdoelectric.png");
 const Quebec = require("../assets/images/quebec.png");
+const Hydro = require("../assets/images/hydro.png");
+
 
 
 
@@ -33,6 +34,6 @@ export {
   GoogleLogo,
   Russas,
   Colombia,
-  Hyrdo,
   Quebec,
+  Hydro,
 };

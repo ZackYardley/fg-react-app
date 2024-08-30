@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet, Image, Dimensions } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
@@ -7,6 +7,29 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdow
 import { getRandomFact } from "@/constants/facts";
 import { TARGET_EMISSIONS } from "@/constants";
 import { CarbonFootprint } from "@/components/home";
+import { Russas, Colombia, Quebec, Hydro } from "@/constants/Images";
+
+const windowWidth = Dimensions.get('window').width;
+
+type EmissionGroup = 'Transportation' | 'Diet' | 'Energy';
+
+interface Emissions {
+  transportationEmissions: number;
+  dietEmissions: number;
+  energyEmissions: number;
+}
+
+function getHighestEmissionGroup(emissions: Emissions): EmissionGroup {
+  const { transportationEmissions, dietEmissions, energyEmissions } = emissions;
+
+  if (transportationEmissions >= dietEmissions && transportationEmissions >= energyEmissions) {
+    return 'Transportation';
+  } else if (dietEmissions >= transportationEmissions && dietEmissions >= energyEmissions) {
+    return 'Diet';
+  } else {
+    return 'Energy';
+  }
+}
 
 const HomeScreen = () => {
   const { width } = useWindowDimensions();
@@ -17,6 +40,7 @@ const HomeScreen = () => {
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
   const [fact, setFact] = useState<string>(getRandomFact());
+  const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>('transportation');
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -31,7 +55,15 @@ const HomeScreen = () => {
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
+
+        const emissions: Emissions = {
+          transportationEmissions: data.surveyEmissions.transportationEmissions || 0,
+          dietEmissions: data.surveyEmissions.dietEmissions || 0,
+          energyEmissions: data.surveyEmissions.energyEmissions || 0
+        };
+        setHighestEmissionGroup(getHighestEmissionGroup(emissions));
       }
+      
     };
 
     loadData();
@@ -44,6 +76,7 @@ const HomeScreen = () => {
     months.push(dayjs().subtract(i, "month").format("YYYY-MM"));
   }
   months.reverse();
+
 
   return (
     <ScrollView style={styles.container}>
@@ -203,7 +236,46 @@ const HomeScreen = () => {
             </Text>
             <EarthBreakdown emissions={totalEmissions - totalOffset} />
           </View>
+
+
         </View>
+
+          {/* Tips */}
+        <View style={styles.fastFact}>
+          <Text style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</Text>
+          <Text style={styles.fastFactText}>Your highest emissions source: {highestEmissionGroup}</Text>
+          <Text style={styles.fastFactText}>Tip 1</Text>
+          <Text style={styles.fastFactText}>Tip 2</Text>
+          <Text style={styles.fastFactText}>Tip 3</Text>
+        </View>
+          
+          {/* Credits */}
+        <TouchableOpacity style={styles.creditBox} onPress={() => router.push("/carbon-credit")}>
+          <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
+          <Text style={styles.subtitleText}>From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!</Text>
+
+
+                    <View style={styles.creditsContainer}>
+                      <View style={styles.creditRow}>
+                        <Image source={Russas} style={styles.creditIcon} />
+                        <Image source={Colombia} style={styles.creditIcon} />
+                      </View>
+                      <View style={styles.creditRow}>
+                      <Text style={styles.creditName}>The Russas Project</Text>
+                      <Text style={styles.creditName}>Colombian Reforestation</Text>
+                      </View>
+
+                      <View style={styles.creditRow}>
+                        <Image source={Quebec} style={styles.creditIcon} />
+                        <Image source={Hydro} style={styles.creditIcon} />
+                      </View>
+                      <View style={styles.creditRow}>
+                      <Text style={styles.creditName}>Canadian Energy & Waste</Text>
+                      <Text style={styles.creditName}>Pamona Hydroelectric</Text>
+                      </View>
+                    </View>
+        </TouchableOpacity>
+          
       </View>
     </ScrollView>
   );
@@ -244,6 +316,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   fastFactText: {
+    fontSize: 18,
+    textAlign: "center",
+  },
+  subtitleText: {
     fontSize: 18,
     textAlign: "center",
   },
@@ -327,7 +403,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   leadersContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     backgroundColor: "#eeeeee",
     padding: 24,
@@ -444,5 +520,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
     textAlign: "center",
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  creditIcon: {
+    width: 200,
+    height: 125,
+  },
+  creditRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  creditsContainer: {
+    width: '100%',
+  },
+  creditBox: {
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 12,
+    marginTop: 12,
+    backgroundColor: "#e5e7eb",
+  },
+  creditName: {
+    fontSize: 13,
+    fontWeight: "bold",
+    marginBottom: 16,
+    alignItems: "center",
   },
 });
