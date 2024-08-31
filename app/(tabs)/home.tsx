@@ -185,7 +185,27 @@ const HomeScreen = () => {
             </Pressable>
           </View>
         </View>
+        
+        
+        {/* Prizes */}
+        <View style={styles.chartsSection}>
+          <View style={styles.chartBox}>
+            <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
+                <TouchableOpacity
+                style={styles.prizeBox}
+                onPress={() => {
+                  router.push("/journey");
+                }}
+              >
+                <Text style={styles.netZeroText}>3</Text>
+                <Text style={styles.subtitleText}>Months Net-Zero</Text>
+              </TouchableOpacity>
 
+          
+
+
+            </View>
+          </View>
         {/* Charts */}
         <View style={styles.chartsSection}>
           {/* Your Breakdown Pie Chart */}
@@ -322,6 +342,11 @@ const styles = StyleSheet.create({
   subtitleText: {
     fontSize: 18,
     textAlign: "center",
+  },
+  netZeroText: {
+    fontSize: 36,
+    textAlign: "center",
+    fontWeight: "bold",
   },
   emissionsGraph: {
     backgroundColor: "#eeeeee",
@@ -514,13 +539,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  netZeroText: {
-    marginTop: 12,
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-    textAlign: "center",
-  },
+  
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -550,5 +569,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
     alignItems: "center",
+  },
+  prizeBox: {
+    backgroundColor: "#d4edda",
+    borderRadius: 16,
+    width: "40%",
+    padding: 16,
+    // ADD BUTTON IS GREEN OR RED IF NET ZERO
   },
 });

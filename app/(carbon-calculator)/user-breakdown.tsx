@@ -202,11 +202,7 @@ const userbreakdown = () => {
                   justifyContent: "center",
                 }}
               >
-                <BarChartBreakdown
-                  names={["You", "Average American"]}
-                  values={[totalEmissions, 21]}
-                  colors={["#44945F", "#A9A9A9"]}
-                />
+        
               </View>
             </View>
 
