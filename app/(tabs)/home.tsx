@@ -206,6 +206,8 @@ const HomeScreen = () => {
 
             </View>
           </View>
+          
+          </View>
         {/* Charts */}
         <View style={styles.chartsSection}>
           {/* Your Breakdown Pie Chart */}
@@ -296,7 +298,6 @@ const HomeScreen = () => {
                     </View>
         </TouchableOpacity>
           
-      </View>
     </ScrollView>
   );
 };

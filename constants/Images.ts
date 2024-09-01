@@ -14,6 +14,17 @@ const Russas = require("../assets/images/russas.png");
 const Colombia = require("../assets/images/colombia.png");
 const Quebec = require("../assets/images/quebec.png");
 const Hydro = require("../assets/images/hydro.png");
+const Sticker = require("../assets/images/sticker.png");
+const Tote = require("../assets/images/tote.png");
+const Shirt = require("../assets/images/shirt.png");
+const WaterBottle = require("../assets/images/waterbottle.png");
+const CuttingBoard = require("../assets/images/cuttingboard.png");
+const Crewneck = require("../assets/images/crewneck.png");
+
+
+
+
+
 
 
 
@@ -36,4 +47,10 @@ export {
   Colombia,
   Quebec,
   Hydro,
+  Sticker,
+  Tote,
+  Shirt,
+  WaterBottle,
+  CuttingBoard,
+  Crewneck,
 };
