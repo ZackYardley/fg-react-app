@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, Pressable, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet, Image, Dimensions } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -7,7 +7,9 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdow
 import { getRandomFact } from "@/constants/facts";
 import { TARGET_EMISSIONS } from "@/constants";
 import { CarbonFootprint } from "@/components/home";
-import { Russas, Colombia, Quebec, Hydro } from "@/constants/Images";
+import { Russas, Colombia, Quebec, Hydro, Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck  } from "@/constants/Images";
+import Carousel from 'react-native-reanimated-carousel';
+
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -40,7 +42,7 @@ const HomeScreen = () => {
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
   const [fact, setFact] = useState<string>(getRandomFact());
-  const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>('transportation');
+  const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>('Transportation');
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -76,6 +78,25 @@ const HomeScreen = () => {
     months.push(dayjs().subtract(i, "month").format("YYYY-MM"));
   }
   months.reverse();
+
+  const carouselRef = useRef(null);
+  const { width: screenWidth } = useWindowDimensions();
+
+  const carouselData = [
+    { title: "1 Month Net-Zero", image: Sticker },
+    { title: "3 Months Net-Zero", image: Tote },
+    { title: "6 Months Net-Zero", image: Shirt },
+    { title: "1 Months Net-Zero", image: WaterBottle },
+    { title: "18 Months Net-Zero", image: CuttingBoard },
+    { title: "24 Months Net-Zero", image: Crewneck },
+  ];
+
+  const renderCarouselItem = ({ item }) => (
+    <View style={styles.carouselItem}>
+      <Image source={item.image} style={styles.carouselImage} />
+      <Text style={styles.carouselText}>{item.title}</Text>
+    </View>
+  );  
 
 
   return (
@@ -140,9 +161,9 @@ const HomeScreen = () => {
           </View>
 
           {monthlyEmissions <= totalOffset ? (
-            <Text style={styles.netZeroText}>You are net zero this month!</Text>
+            <Text style={styles.netZeroText}>You are net zero this month! 😊</Text>
           ) : (
-            <Text style={styles.netZeroText}>You are not net zero this month!</Text>
+            <Text style={styles.netZeroText}>You are not net zero this month! 😔</Text>
           )}
 
           <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
@@ -155,12 +176,12 @@ const HomeScreen = () => {
           <Text style={styles.sectionTitle}>Forevergreen Community</Text>
           <View style={styles.communityStatsContainer}>
             <View style={styles.communityStatBox}>
-              <Text style={styles.statLargeText}>10,000</Text>
+              <Text style={styles.statLargeText}>1,344</Text>
               <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
             </View>
             <View style={styles.communityStatBox}>
-              <Text style={styles.statLargeText}>10,000</Text>
-              <Text style={styles.statMediumText}>Tons CO2 Gone</Text>
+              <Text style={styles.statLargeText}>600</Text>
+              <Text style={styles.statMediumText}>Tons CO2 Offset</Text>
             </View>
           </View>
         </View>
@@ -185,29 +206,41 @@ const HomeScreen = () => {
             </Pressable>
           </View>
         </View>
-        
-        
+
         {/* Prizes */}
-        <View style={styles.chartsSection}>
-          <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
-                <TouchableOpacity
-                style={styles.prizeBox}
-                onPress={() => {
-                  router.push("/journey");
-                }}
-              >
-                <Text style={styles.netZeroText}>3</Text>
-                <Text style={styles.subtitleText}>Months Net-Zero</Text>
-              </TouchableOpacity>
-
-          
-
-
-            </View>
+      <View style={styles.chartsSection}>
+        <View style={styles.chartBox}>
+          <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
+          <View style={styles.prizeSection}>
+            <TouchableOpacity
+              style={styles.prizeBox}
+              onPress={() => {
+                router.push("/journey");
+              }}
+            >
+              <Text style={styles.monthNetZeroText}>3</Text>
+              <Text style={styles.subtitleText}>Months Net-Zero</Text>
+            </TouchableOpacity>
+            <View style={styles.prizeSection}>
+                <Carousel
+                  ref={carouselRef}
+                  loop
+                  width={screenWidth * 0.3}
+                  height={screenWidth * 0.3}
+                  autoPlay={true}
+                  data={carouselData}
+                  scrollAnimationDuration={1000}
+                  renderItem={renderCarouselItem}
+                />
+              </View>
           </View>
-          
-          </View>
+        </View>
+      </View>
+
+        
+        
+        
+
         {/* Charts */}
         <View style={styles.chartsSection}>
           {/* Your Breakdown Pie Chart */}
@@ -265,10 +298,10 @@ const HomeScreen = () => {
           {/* Tips */}
         <View style={styles.fastFact}>
           <Text style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</Text>
-          <Text style={styles.fastFactText}>Your highest emissions source: {highestEmissionGroup}</Text>
-          <Text style={styles.fastFactText}>Tip 1</Text>
-          <Text style={styles.fastFactText}>Tip 2</Text>
-          <Text style={styles.fastFactText}>Tip 3</Text>
+          <Text style={styles.highestEmissionsText}>Your highest emissions source: {highestEmissionGroup}</Text>
+          <Text style={styles.fastFactText}>Turn off your lights!</Text>
+          <Text style={styles.fastFactText}>Carpool to work!</Text>
+          <Text style={styles.fastFactText}>Try meatless Monday!</Text>
         </View>
           
           {/* Credits */}
@@ -297,7 +330,7 @@ const HomeScreen = () => {
                       </View>
                     </View>
         </TouchableOpacity>
-          
+        </View>
     </ScrollView>
   );
 };
@@ -345,6 +378,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   netZeroText: {
+    marginTop: 16,
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  monthNetZeroText: {
     fontSize: 36,
     textAlign: "center",
     fontWeight: "bold",
@@ -508,7 +547,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#eeeeee",
   },
   carbonFootprintTitle: {
     fontSize: 20,
@@ -525,6 +564,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#b91c1c",
+  },
+  highestEmissionsText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#b91c1c",
+    textAlign: "center",
+    marginBottom: 16,
   },
   offsetText: {
     fontSize: 24,
@@ -563,7 +609,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#eeeeee",
   },
   creditName: {
     fontSize: 13,
@@ -577,5 +623,30 @@ const styles = StyleSheet.create({
     width: "40%",
     padding: 16,
     // ADD BUTTON IS GREEN OR RED IF NET ZERO
+  },
+  prizeSection: {
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    alignItems: 'center',
+  },
+  carouselItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+
+  },
+  carouselImage: {
+    width: '80%',
+    height: '80%',
+    resizeMode: 'contain',
+  },
+  carouselText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
