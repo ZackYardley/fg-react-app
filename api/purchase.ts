@@ -1,74 +1,73 @@
-import { getFirestore, doc, runTransaction, collection, getDoc, addDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { TransactionItem } from "@/types";
-import { fetchEmissionsData, saveEmissionsData } from "./emissions";
 
-const purchaseCarbonCredits = async (
-  userId: string,
-  items: TransactionItem[],
-  paymentIntentId: string
-): Promise<{ success: boolean; error?: string }> => {
-  const db = getFirestore();
-  const userRef = doc(db, "users", userId);
+// const purchaseCarbonCredits = async (
+//   userId: string,
+//   items: TransactionItem[],
+//   paymentIntentId: string
+// ): Promise<{ success: boolean; error?: string }> => {
+//   const db = getFirestore();
+//   const userRef = doc(db, "users", userId);
 
-  try {
-    let newTotalOffset = 0;
+//   try {
+//     let newTotalOffset = 0;
 
-    // Use a transaction to ensure data consistency
-    await runTransaction(db, async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-      if (!userDoc.exists()) {
-        throw new Error("User document does not exist!");
-      }
+//     // Use a transaction to ensure data consistency
+//     await runTransaction(db, async (transaction) => {
+//       const userDoc = await transaction.get(userRef);
+//       if (!userDoc.exists()) {
+//         throw new Error("User document does not exist!");
+//       }
 
-      // Update user's carbon credits
-      const existingCredits = userDoc.data().carbonCredits || [];
-      const updatedCredits = items.map((item) => {
-        const existingCredit = existingCredits.find((credit: TransactionItem) => credit.id === item.id);
-        newTotalOffset += item.quantity; // Accumulate total offset
-        if (existingCredit) {
-          // If the credit already exists, update the quantity
-          return { id: item.id, quantity: existingCredit.quantity + item.quantity };
-        } else {
-          // If it's a new credit, add it to the array
-          return item;
-        }
-      });
+//       // Update user's carbon credits
+//       const existingCredits = userDoc.data().carbonCredits || [];
+//       const updatedCredits = items.map((item) => {
+//         const existingCredit = existingCredits.find((credit: TransactionItem) => credit.id === item.id);
+//         newTotalOffset += item.quantity; // Accumulate total offset
+//         if (existingCredit) {
+//           // If the credit already exists, update the quantity
+//           return { id: item.id, quantity: existingCredit.quantity + item.quantity };
+//         } else {
+//           // If it's a new credit, add it to the array
+//           return item;
+//         }
+//       });
 
-      // Merge the updated credits with the existing ones
-      const finalCredits = existingCredits
-        .filter((credit: TransactionItem) => !updatedCredits.some((uc) => uc.id === credit.id))
-        .concat(updatedCredits);
+//       // Merge the updated credits with the existing ones
+//       const finalCredits = existingCredits
+//         .filter((credit: TransactionItem) => !updatedCredits.some((uc) => uc.id === credit.id))
+//         .concat(updatedCredits);
 
-      transaction.update(userRef, { carbonCredits: finalCredits });
-    });
+//       transaction.update(userRef, { carbonCredits: finalCredits });
+//     });
 
-    const paymentRef = doc(db, "users", userId, "payments", paymentIntentId);
+//     const paymentRef = doc(db, "users", userId, "payments", paymentIntentId);
 
-    // Prepare simplified cart items for metadata
-    const simplifiedItems = items.map((item) => ({
-      id: item.id,
-      name: item.name,
-      productType: "carbon_credit",
-      quantity: item.quantity,
-      price: item.price,
-    }));
+//     // Prepare simplified cart items for metadata
+//     const simplifiedItems = items.map((item) => ({
+//       id: item.id,
+//       name: item.name,
+//       productType: "carbon_credit",
+//       quantity: item.quantity,
+//       price: item.price,
+//     }));
 
-    const updateData = { metadata: { items: simplifiedItems } };
-    await updateDoc(paymentRef, updateData);
+//     const updateData = { metadata: { items: simplifiedItems } };
+//     await updateDoc(paymentRef, updateData);
 
-    const emissionsData = await fetchEmissionsData();
-    const oldTotalOffset = emissionsData?.totalOffset || 0;
-    saveEmissionsData({ totalOffset: oldTotalOffset + newTotalOffset });
+//     const emissionsData = await fetchEmissionsData();
+//     const oldTotalOffset = emissionsData?.totalOffset || 0;
+//     saveEmissionsData({ totalOffset: oldTotalOffset + newTotalOffset });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Error in purchaseCarbonCredits:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "An unknown error occurred",
-    };
-  }
-};
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error in purchaseCarbonCredits:", error);
+//     return {
+//       success: false,
+//       error: error instanceof Error ? error.message : "An unknown error occurred",
+//     };
+//   }
+// };
 
 const fetchOneTimePaymentSheetParams = async (
   amount: number,
@@ -208,9 +207,35 @@ const fetchSetupPaymentSheetParams = async (
   }
 };
 
+const requestCarbonCredits = async (
+  userId: string,
+  items: TransactionItem[],
+  paymentIntentId: string
+): Promise<{ success: boolean; error?: string }> => {
+  const db = getFirestore();
+  const requestsRef = collection(db, "users", userId, "requests");
+
+  try {
+    await addDoc(requestsRef, {
+      type: "carbonCredits",
+      items: items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+      })),
+      paymentIntentId: paymentIntentId,
+      status: "pending",
+      createdAt: serverTimestamp(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return { success: false, error: "Failed to fetch user data." };
+  }
+};
+
 export {
-  purchaseCarbonCredits,
   fetchOneTimePaymentSheetParams,
   fetchSubscriptionPaymentSheetParams,
   fetchSetupPaymentSheetParams,
+  requestCarbonCredits,
 };

@@ -173,6 +173,7 @@ export default function EnergyCalculator() {
         totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
         monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions) / 12,
       });
+      // The use of params here is wrong. There is no emissions document parameter for the logEvent method
       await analytics().logEvent("energy_emission_calculated", {
         emissionsDocument: {
           surveyData: surveyData,
