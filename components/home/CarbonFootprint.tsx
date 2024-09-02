@@ -24,12 +24,12 @@ const CarbonFootprintSection = ({
         onPress={() => router.navigate("/user-breakdown")}
         style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}
       >
-        <Text style={styles.boxTitle}>Your Carbon Footprint</Text>
+        <Text style={styles.boxTitle}>Your Monthly Emissions</Text>
         <Text style={styles.footprintText}>
           {monthlyEmissions.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>
         </Text>
-        <Text style={styles.offsetTitle}>Your Carbon Offsets</Text>
+        <Text style={styles.offsetTitle}>Your Monthly Offsets</Text>
         <Text style={styles.footprintText}>
           {totalOffset.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>

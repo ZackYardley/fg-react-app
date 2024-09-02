@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Dimensions, Image, TouchableOpacity, Modal } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { PageHeader, BackButton } from '@/components/common';
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
+import { fetchEmissionsData } from "@/api/emissions"; // Assume this function exists to fetch user data
+
+
 
 const prizeImages = [
   Sticker,
@@ -22,6 +25,9 @@ const prizeNames = [
   "Crewneck Sweater",
 ];
 
+const prizeMonths = [1, 3, 6, 12, 18, 24];
+
+
 const prizeDescriptions = [
   "Welcome to the club! Enjoy this cool sticker to rep your new net-zero status 😎",
   "You have been net zero for 3 months! Go get some groceries in a reusable new tote 🛍️",
@@ -31,7 +37,18 @@ const prizeDescriptions = [
   "You made it two whole years, you are a true part of the Forevergreen Family!",
 ];
 
+const lockedPrizeDescriptions = [
+  "Reach one month net zero and get an awesomw sticker!",
+  "If you are net zero for 3 months, you will get this sweet new tote! 🛍️",
+  "After 6 whole months of net-zero! You will get a new eco-friendly shirt! 👕",
+  "After a full year of no emissions, you can ditch single use plastic bottles with a reusable water bottle!  🚰",
+  "After 18 months you will get a sustainably harvested teak cutting board!",
+  "After a full two years, you are a true part of the Forevergreen Family and will get a crewneck sweater!",
+];
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
+
+
 
 const Popup: React.FC<{ visible: boolean; onClose: () => void; title: string; image: any; description: string }> = ({ visible, onClose, title, image, description }) => (
   <Modal
@@ -57,17 +74,46 @@ const Popup: React.FC<{ visible: boolean; onClose: () => void; title: string; im
   </Modal>
 );
 
-const LearnScreen: React.FC = () => {
+const Journey: React.FC = () => {
   const [selectedPrize, setSelectedPrize] = useState<number | null>(null);
-  const progress = 0.5; // You can adjust this value based on your logic
   const cardHeight = 100;
   const cardGap = 16;
   const totalHeight = (6 * cardHeight + 5 * cardGap) + 30;
+  const [netZeroMonths, setNetZeroMonths] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+      const loadData = async () => {
+        const data = await fetchEmissionsData();
+        if (data !== null) {
+          const netZero = data.totalOffset >= data.monthlyEmissions;
+          if (netZero && data.monthlyEmissions > 0) {
+            const months = Math.floor(data.totalOffset - data.monthlyEmissions);
+            const cappedMonths = Math.min(24, Math.max(0, months));
+            setNetZeroMonths(cappedMonths);
+            setProgress(cappedMonths / 24); // 24 months is the maximum
+          } else {
+            setNetZeroMonths(0);
+            setProgress(0);
+          }
+        }
+      };
+
+      loadData();
+    }, []);
+
+    const getPrizeDescription = (index: number) => {
+      if (netZeroMonths >= prizeMonths[index]) {
+        return prizeDescriptions[index];
+      } else {
+        return `${lockedPrizeDescriptions[index]} You're currently at ${netZeroMonths} months.`;
+      }
+    };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <PageHeader title="Forever" titleAlt="green" subtitle="Sustainability Journey" description="Each month you are net-zero!" />
+        <PageHeader title="Forever" titleAlt="green" subtitle="Sustainability Journey" description="Build a sustainable future by living net-zero" />
         <BackButton />
        
         <View style={styles.mainContent}>
@@ -91,10 +137,10 @@ const LearnScreen: React.FC = () => {
                 style={styles.prizeRow}
                 onPress={() => setSelectedPrize(index)}
               >
-                <View style={styles.card}>
+                <View style={netZeroMonths >= prizeMonths[index] ? styles.card : styles.grayCard}>
                   <Image source={image} style={styles.cardImage} />
                 </View>
-                <Text style={styles.boxText}>{index + 1}</Text>
+                <Text style={styles.boxText}>{prizeMonths[index]}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -106,7 +152,7 @@ const LearnScreen: React.FC = () => {
           onClose={() => setSelectedPrize(null)}
           title={prizeNames[selectedPrize]}
           image={prizeImages[selectedPrize]}
-          description={prizeDescriptions[selectedPrize]}
+          description={getPrizeDescription(selectedPrize)}
         />
       )}
     </SafeAreaView>
@@ -154,9 +200,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    paddingRight: 16, // Add some padding to the right for the text
   },
   card: {
     backgroundColor: "#409858",
+    padding: 12,
+    borderRadius: 16,
+    height: 100,
+    width: 100,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  grayCard: {
+    backgroundColor: "#A0A0A0",
     padding: 12,
     borderRadius: 16,
     height: 100,
@@ -171,9 +228,16 @@ const styles = StyleSheet.create({
     height: 76,
     width: 76,
   },
+  
   boxText: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  netZeroMonthsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 8,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
@@ -221,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LearnScreen;
+export default Journey;

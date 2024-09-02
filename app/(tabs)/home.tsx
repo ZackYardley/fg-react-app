@@ -65,6 +65,8 @@ const HomeScreen = () => {
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
   const [fact, setFact] = useState<string>(getRandomFact());
   const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
+  const [isNetZero, setIsNetZero] = useState(false);
+  const [netZeroMonths, setNetZeroMonths] = useState(0);
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -80,12 +82,22 @@ const HomeScreen = () => {
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
 
+        const netZero = data.totalOffset >= data.monthlyEmissions;
+        setIsNetZero(netZero);
+
         const emissions: Emissions = {
           transportationEmissions: data.surveyEmissions.transportationEmissions || 0,
           dietEmissions: data.surveyEmissions.dietEmissions || 0,
           energyEmissions: data.surveyEmissions.energyEmissions || 0,
         };
         setHighestEmissionGroup(getHighestEmissionGroup(emissions));
+
+        if (netZero && data.monthlyEmissions > 0) {
+          const months = Math.floor(data.totalOffset - data.monthlyEmissions);
+          setNetZeroMonths(Math.min(24, Math.max(0, months)));
+        } else {
+          setNetZeroMonths(0);
+        }
       }
     };
 
@@ -118,6 +130,8 @@ const HomeScreen = () => {
       <Text style={styles.carouselText}>{item.title}</Text>
     </View>
   );
+
+  const displayNetZeroMonths = netZeroMonths === 24 ? "24+" : netZeroMonths.toString();
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -159,7 +173,7 @@ const HomeScreen = () => {
 
           {/* Emissions vs Offset */}
           <View style={styles.carbonFootprint}>
-            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint...</Text>
+            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint</Text>
             <View style={styles.carbonFootprintContent}>
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Emissions</Text>
@@ -177,11 +191,11 @@ const HomeScreen = () => {
               </View>
             </View>
 
-            {monthlyEmissions <= totalOffset ? (
-              <Text style={styles.netZeroText}>You are net zero this month! 😊</Text>
-            ) : (
-              <Text style={styles.netZeroText}>You are not net zero this month! 😔</Text>
-            )}
+            <Text style={styles.netZeroText}>
+              {isNetZero 
+                ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? 's' : ''}! 😊`
+                : "You are not net-zero this month! 😔"}
+            </Text>
 
             <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
               <Text style={styles.offsetButtonText}>Offset Now!</Text>
@@ -230,20 +244,18 @@ const HomeScreen = () => {
               <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
               <View style={styles.prizeSection}>
                 <TouchableOpacity
-                  style={styles.prizeBox}
-                  onPress={() => {
-                    router.push("/journey");
-                  }}
+                  style={[styles.prizeBox, isNetZero ? styles.prizeBox : {}]}
+                  onPress={() => router.push("/journey")}
                 >
-                  <Text style={styles.monthNetZeroText}>3</Text>
+                  <Text style={styles.monthNetZeroText}>{displayNetZeroMonths}</Text>
                   <Text style={styles.subtitleText}>Months Net-Zero</Text>
                 </TouchableOpacity>
                 <View style={styles.prizeSection}>
                   <Carousel
                     ref={carouselRef}
                     loop
-                    width={screenWidth * 0.3}
-                    height={screenWidth * 0.3}
+                    width={screenWidth * 0.4}
+                    height={screenWidth * 0.4}
                     autoPlay={true}
                     data={carouselData}
                     scrollAnimationDuration={1000}
