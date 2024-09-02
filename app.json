@@ -20,7 +20,8 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "buildNumber": "2"
+      "buildNumber": "2",
+      "associatedDomains": ["applinks:fg-react-app.web.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,21 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.fgdevteam.fgreactapp",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "*.fg-react-app.web.app",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

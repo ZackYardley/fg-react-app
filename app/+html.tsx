@@ -12,6 +12,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="apple-itunes-app" content="app-id=6578432563" />
 
         {/*
           Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.

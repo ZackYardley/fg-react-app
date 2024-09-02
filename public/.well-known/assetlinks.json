@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.fgdevteam.fgreactapp",
+      "sha256_cert_fingerprints": [
+        "8E:B4:82:DD:6A:A1:12:FC:6E:3E:2B:9C:9D:35:40:0D:91:0B:E4:50:3C:C9:A9:76:4E:D3:26:C0:BF:FA:38:31"
+      ]
+    }
+  }
+]
