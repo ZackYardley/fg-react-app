@@ -1,0 +1,27 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "KT9Z34QZ46.com.fgdevteam.fgreactapp"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes"
+          }
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "KT9Z34QZ46.com.fgdevteam.fgreactapp"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "KT9Z34QZ46.com.fgdevteam.fgreactapp"
+    ]
+  }
+}
