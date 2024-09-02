@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.fgdevteam.fgreactapp",
       "entitlements": {
         "aps-environment": "production"
-      }
+      },
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {
