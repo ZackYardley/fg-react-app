@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     es6: true,
     node: true,
@@ -15,6 +16,7 @@ module.exports = {
     "prefer-arrow-callback": "error",
     "linebreak-style": 0,
     "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    "max-len": ["error", {"code": 120}],
   },
   overrides: [
     {

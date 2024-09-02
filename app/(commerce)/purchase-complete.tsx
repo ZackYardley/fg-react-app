@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import dayjs from "dayjs";
-import { Loading, PageHeader, NotFoundComponent } from "@/components/common";
 import { getPaymentById } from "@/api/payments";
 import { fetchInvoiceById, fetchSubscriptionByInvoice } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription, fetchSpecificCarbonCreditProduct } from "@/api/products";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Pamona } from "@/constants/Images";
-import { CarbonCreditSubscription, Subscription, Payment, CarbonCredit } from "@/types";
-import { formatPrice } from "@/utils";
 import { fetchEmissionsData } from "@/api/emissions";
+import { Loading, PageHeader, NotFoundComponent } from "@/components/common";
+import { Pamona } from "@/constants/Images";
+import { CarbonCreditSubscription, Subscription, Payment, CarbonCredit, TransactionItem } from "@/types";
+import { formatPrice } from "@/utils";
+import { fetchCreditRequestByPaymentId } from "@/api/purchase";
 
 interface CreditWithQuantity extends CarbonCredit {
   quantity: number;
@@ -85,20 +86,25 @@ const PurchaseCompleteScreen = () => {
   };
 
   const fetchOneTimePurchaseData = async (fetchedPayment: Payment) => {
-    const carbonCredits = fetchedPayment.metadata.items;
-    if (carbonCredits) {
-      const fetchedCredits = await Promise.all(
-        carbonCredits.map(async (credit) => {
-          const creditData = await fetchSpecificCarbonCreditProduct(credit.id);
-          if (!creditData) {
-            throw new Error(`Carbon credit with ID ${credit.id} does not exist`);
-          }
-          return { ...creditData, quantity: credit.quantity };
-        })
-      );
-      setCredits(fetchedCredits);
-      setTotalCO2Offset(carbonCredits.reduce((total, item) => total + item.quantity, 0));
+    const creditRequest = await fetchCreditRequestByPaymentId(fetchedPayment.id);
+    if (!creditRequest) {
+      throw new Error("Credit request not found");
     }
+
+    const creditsWithDetails = await Promise.all(
+      creditRequest.items.map(async (item: TransactionItem) => {
+        const creditDetails = await fetchSpecificCarbonCreditProduct(item.id);
+        return {
+          ...creditDetails,
+          quantity: item.quantity,
+          price: item.price,
+        };
+      })
+    );
+
+    setCredits(creditsWithDetails);
+    setTotalCO2Offset(creditsWithDetails.reduce((total, item) => total + item.quantity, 0));
+    setPrice(fetchedPayment.amount);
   };
 
   if (loading) {
@@ -155,9 +161,9 @@ const PurchaseCompleteScreen = () => {
 
   const renderOneTimePurchaseContent = () => (
     <>
-      <View style={{ display: "flex", flexDirection: "row", gap: 32 }}>
+      <View style={{ display: "flex", flexDirection: "row", rowGap: 12, columnGap: 32, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 }}>
         {credits.map((credit, index) => (
-          <View key={index} style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
+          <View key={index} style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center", maxWidth: "47%" }}>
             <LinearGradient
               colors={[credit.stripe_metadata_color_0, credit.stripe_metadata_color_1, credit.stripe_metadata_color_2]}
               start={{ x: 0.5, y: 0 }}
@@ -187,7 +193,7 @@ const PurchaseCompleteScreen = () => {
           title="Thank you for your "
           titleAlt={productType === "subscription" ? "subscription!" : "purchase!"}
         />
-        <View style={{ padding: 16 }}>
+        <View style={{ paddingHorizontal: 16 }}>
           <LinearGradient
             style={styles.card}
             colors={["#EFEFEF", "#E5F5F6"]}

@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Dimensions, StyleSheet, useWindowDimensions } from "react-native";
 import { fetchEmissionsData } from "@/api/emissions";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import ConfettiCannon from "react-native-confetti-cannon";
 import { TARGET_EMISSIONS } from "@/constants";
 import { router } from "expo-router";
 import dayjs from "dayjs";
-import { BackButton } from "@/components/common";
+import { PageHeader, BackButton } from "@/components/common";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+
 
 const userbreakdown = () => {
+  const { width } = useWindowDimensions();
   const [totalEmissions, setTotalEmissions] = useState(0);
   const [monthlyEmissions, setMonthlyEmissions] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0);
@@ -19,6 +22,7 @@ const userbreakdown = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
   const [userName, setUserName] = useState("");
+
 
   const auth = getAuth();
 
@@ -71,21 +75,18 @@ const userbreakdown = () => {
  months.reverse();
   
   return (
-    <ScrollView style={styles.container}>
+    
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      
+      <ScrollView style={styles.container}>
       
         
       <View style={styles.emissions}>
-
-        <View style={styles.header}>
-        <BackButton />
-
-          <Text style={styles.titleText}>
-            Forever<Text style={styles.greenText}>green</Text>
-          </Text>
-          <Text style={styles.welcomeUser}>
-              Welcome, {userName}
+        <PageHeader title="Forever" titleAlt="green" subtitle="Your Breakdown"/>
+        <Text style={styles.welcomeUser}>
+              Welcome, {userName}! Here is your carbon footprint breakdown.
             </Text>
-        </View>
+        <BackButton />
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Annual Footprint</Text>
@@ -182,32 +183,15 @@ const userbreakdown = () => {
             </View>
 
             {/* Average American */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>You vs the Average American</Text>
-              <View style={styles.legendContainer}>
-                {[
-                  { name: "You", color: "#44945F" },
-                  { name: "Average American", color: "#A9A9A9" },
-                ].map((item, index) => (
-                  <View key={index} style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                    <Text>{item.name}</Text>
-                  </View>
-                ))}
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <BarChartBreakdown
-                  names={["You", "Average American"]}
-                  values={[totalEmissions, 21]}
-                  colors={["#44945F", "#A9A9A9"]}
-                />
-              </View>
+            <View style={styles.chartBox}>
+              <Text style={styles.chartTitle}>You vs the Average American</Text>
+              <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
+              <BarChartBreakdown
+                names={["You", "Average American"]}
+                values={[totalEmissions - totalOffset, 21]}
+                colors={["#44945F", "#A9A9A9"]}
+                width={width - 128}
+              />
             </View>
 
 
@@ -227,12 +211,9 @@ const userbreakdown = () => {
 
               <TouchableOpacity
                 onPress={() => {
-                  if (isAnonymous) {
-                    router.push("/signup");
-                  } else {
                     router.push("/offset-now");
                   }
-                }}
+                }
                 style={styles.ctaButton}
               >
                 <Text style={styles.ctaButtonText}>Learn More</Text>
@@ -243,20 +224,20 @@ const userbreakdown = () => {
 
               <TouchableOpacity
                 onPress={() => {
-                  if (isAnonymous) {
-                    router.push("/signup");
-                  } else {
-                    router.replace("/tree-planting");
-                  }
+                    router.replace("/carbon-credit");
                 }}
                 style={styles.ctaButton}
               >
                 <Text style={styles.ctaButtonText}>Start the Pledge today!</Text>
               </TouchableOpacity>
             </View>
-
+        
       </View>
     </ScrollView>
+  </SafeAreaView>
+
+    
+    
   );
 };
 
@@ -270,17 +251,13 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
   },
-  header: {
-    alignItems: "center",
-    marginTop: 32,
-  },
   titleText: {
     fontSize: 48,
     fontWeight: "bold",
   },
   welcomeUser: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 16,
+    alignSelf: "center",
   },
   greenText: {
     color: "#409858",
@@ -460,5 +437,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 16,
+  },
+  //Average American
+  chartBox: {
+    backgroundColor: "#eeeeee",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  chartTitle: {
+    fontSize: 24,
+    marginBottom: 16,
+  },
+  chartSubtitle: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  chartText: {
+    fontSize: 18,
+    marginBottom: 16,
   },
 });

@@ -3,7 +3,14 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import statesData from "@/constants/states.json";
-import { Header, NumberInput, NextButton, QuestionSlider, RadioButtonGroup } from "@/components/carbon-calculator";
+import {
+  Header,
+  NumberInput,
+  NextButton,
+  QuestionSlider,
+  RadioButtonGroup,
+  PlatformPicker,
+} from "@/components/carbon-calculator";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { StateData, SurveyData, SurveyEmissions } from "@/types";
 import analytics from "@react-native-firebase/analytics";
@@ -36,6 +43,11 @@ export default function EnergyCalculator() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
+  const stateItems = statesData.map((state) => ({
+    label: `${state.name} (${state.abbreviation})`,
+    value: state.name,
+  }));
 
   useEffect(() => {
     const loadData = async () => {
@@ -159,16 +171,15 @@ export default function EnergyCalculator() {
         surveyData: { ...surveyData },
         surveyEmissions: { ...surveyEmissions },
         totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
-        monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions)/12,
-
+        monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions) / 12,
       });
+      // The use of params here is wrong. There is no emissions document parameter for the logEvent method
       await analytics().logEvent("energy_emission_calculated", {
         emissionsDocument: {
           surveyData: surveyData,
           surveyEmissions: surveyEmissions,
           totalEmissions: (surveyEmissions.energyEmissions || 0) + transportationEmissions + dietEmissions,
-          monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions)/12,
-
+          monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions) / 12,
         },
       });
     } catch (error) {
@@ -190,7 +201,7 @@ export default function EnergyCalculator() {
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
-          <Picker
+          {/* <Picker
             selectedValue={surveyData.state}
             onValueChange={handleStateChange}
             style={styles.picker}
@@ -203,7 +214,10 @@ export default function EnergyCalculator() {
                 value={state.name}
               />
             ))}
-          </Picker>
+          </Picker> */}
+          {surveyData.state && stateItems && (
+            <PlatformPicker selectedValue={surveyData.state} onValueChange={handleStateChange} items={stateItems} />
+          )}
 
           <NumberInput
             question="How much was your electric bill last month? ⚡"

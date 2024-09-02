@@ -68,8 +68,12 @@ export default function TransportationCalculator() {
       let carEmissions = 0;
       let publicTransportEmissions = 0;
 
-      if (surveyData.longFlights && surveyData.shortFlights) {
-        flightEmissions = surveyData.longFlights * 1.35 + surveyData.shortFlights * 0.9;
+      if (surveyData.longFlights) {
+        flightEmissions += surveyData.longFlights * 1.35;
+      }
+
+      if (surveyData.shortFlights) {
+        flightEmissions += surveyData.shortFlights * 0.9;
       }
 
       if (surveyData.carType && surveyData.milesPerWeek) {
@@ -150,8 +154,8 @@ export default function TransportationCalculator() {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <SafeAreaView>
+      <SafeAreaView>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>
             <Header progress={progress} title="Transportation" />
             <Text>
@@ -267,8 +271,8 @@ export default function TransportationCalculator() {
             </View>
           </View>
           <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
-        </SafeAreaView>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }

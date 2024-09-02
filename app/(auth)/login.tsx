@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { onLogin, onGoogleLogin } from "@/api/auth";
-import { TreeLogo } from "@/constants/Images";
 import { TitleWithLogo, GreenButton, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
 
 export default function LoginScreen() {
@@ -12,9 +11,10 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <SafeAreaView style={styles.safeAreaView}>
+    <SafeAreaView style={styles.safeAreaView}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <StatusBar barStyle="dark-content" />
           <TitleWithLogo title="Log" titleAlt="in" />
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
@@ -63,9 +63,9 @@ export default function LoginScreen() {
               </Link>
             </View>
           </View>
-        </SafeAreaView>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -75,12 +75,10 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+    marginHorizontal: 20,
   },
-  test: {},
   safeAreaView: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 12,
     backgroundColor: "white",
   },
   header: {

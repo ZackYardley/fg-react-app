@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CreditItem from "@/components/carbon-credit/CreditItem";
-import ProjectCard from "@/components/carbon-credit/ProjectCard";
+import { router } from "expo-router";
+import { fetchEmissionsData } from "@/api/emissions";
 import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/products";
 import { subscribeToCart } from "@/api/cart";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
-import { fetchEmissionsData } from "@/api/emissions";
 import { PageHeader } from "@/components/common";
+import CreditItem from "@/components/carbon-credit/CreditItem";
+import ProjectCard from "@/components/carbon-credit/ProjectCard";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
-import { CarbonCredit, CartItem } from "@/types";
 import { formatPrice } from "@/utils";
-import { router } from "expo-router";
+import { CarbonCredit, CartItem } from "@/types";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
@@ -70,18 +70,19 @@ export default function CarbonCreditScreen() {
 
   const numItems = cartItems ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
 
-  const renderCreditItem = ({ item }: { item: CarbonCredit }) =>
-    loading ? (
-      <CreditItem name={null} price={null} image={null} colors={["#eee", "#ddd", "#ccc"]} onPress={() => {}} />
-    ) : (
-      <CreditItem
-        name={item.name}
-        price={item.prices[0].unit_amount}
-        image={item.images[0]}
-        colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
-        onPress={() => setSelectedProject(item)}
-      />
-    );
+  const renderCreditItem = ({ item }: { item: CarbonCredit }) => (
+    <CreditItem
+      name={item.name}
+      price={item.prices[0].unit_amount}
+      image={item.images[0]}
+      colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
+      onPress={() => setSelectedProject(item)}
+    />
+  );
+
+  const renderSkeletonItem = () => (
+    <CreditItem name={null} price={null} image={null} colors={["#eee", "#ddd", "#ccc"]} onPress={() => {}} />
+  );
 
   const renderHeader = () => (
     <>
@@ -92,7 +93,13 @@ export default function CarbonCreditScreen() {
 
   const renderFooter = () => (
     <>
-      <View style={styles.projectContainer}>{selectedProject && <ProjectCard project={selectedProject} />}</View>
+      <View style={styles.projectContainer}>
+        {loading ? (
+          <View style={[styles.skeletonCard, { height: 200 }]} />
+        ) : (
+          selectedProject && <ProjectCard project={selectedProject} />
+        )}
+      </View>
       <View style={styles.footer}>
         <Text style={styles.footerTitle}>Carbon Credit Subscription</Text>
         <Text style={styles.footerText}>
@@ -105,30 +112,49 @@ export default function CarbonCreditScreen() {
             {loading
               ? "Loading..."
               : isSubscribed
-              ? "Manage Subscription"
-              : subscriptionPrice
-              ? `${formatPrice(subscriptionPrice)}/Month`
-              : "Subscription Unavailable"}
+                ? "Manage Subscription"
+                : subscriptionPrice
+                  ? `${formatPrice(subscriptionPrice)}/Month`
+                  : "Subscription Unavailable"}
           </Text>
         </TouchableOpacity>
       </View>
     </>
   );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ flexGrow: 1 }}>
+  const renderContent = () => {
+    if (loading) {
+      return (
         <FlatList
           ListHeaderComponent={renderHeader}
-          data={credits}
-          renderItem={renderCreditItem}
-          keyExtractor={(item) => item.name}
+          data={[...Array(6)]} // Render 6 skeleton items
+          renderItem={renderSkeletonItem}
+          keyExtractor={(_, index) => `skeleton-${index}`}
           numColumns={3}
           columnWrapperStyle={styles.columnWrapper}
           style={styles.flatList}
           ListFooterComponent={renderFooter}
         />
-      </View>
+      );
+    }
+
+    return (
+      <FlatList
+        ListHeaderComponent={renderHeader}
+        data={credits}
+        renderItem={renderCreditItem}
+        keyExtractor={(item) => item.name}
+        numColumns={3}
+        columnWrapperStyle={styles.columnWrapper}
+        style={styles.flatList}
+        ListFooterComponent={renderFooter}
+      />
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={{ flexGrow: 1 }}>{renderContent()}</View>
     </SafeAreaView>
   );
 }
@@ -165,6 +191,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginHorizontal: "auto",
     borderRadius: 9999,
+    marginTop: 16,
   },
   buttonText: {
     fontWeight: "bold",
@@ -180,5 +207,9 @@ const styles = StyleSheet.create({
   },
   flatList: {
     paddingHorizontal: 0,
+  },
+  skeletonCard: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
   },
 });

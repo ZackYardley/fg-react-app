@@ -6,6 +6,7 @@ import TransportQuestion from "./TransportQuestion";
 import NextButton from "./NextButton";
 import CalculatingScreen from "./Calculating";
 import QuestionSliderColor from "./QuestionSliderColor";
+import PlatformPicker from "./PlatformPicker";
 
 export {
   Header,
@@ -16,4 +17,5 @@ export {
   TransportQuestion,
   NextButton,
   CalculatingScreen,
+  PlatformPicker,
 };

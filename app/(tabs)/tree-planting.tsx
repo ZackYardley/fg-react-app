@@ -1,16 +1,10 @@
 import { router, useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import {
-  ScrollView,
-  Text,
-  Pressable,
-  View,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { ScrollView, Text, Pressable, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Map, CostaRica, Brazil, Penn } from "@/constants/Images";
 import { Overlay, Button, Icon } from "@rneui/themed";
+import { PageHeader } from "@/components/common";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TreePlantingScreen() {
   const [visible, setVisible] = useState(false);
@@ -33,110 +27,78 @@ export default function TreePlantingScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Overlay isVisible={visible} onBackdropPress={handleWaitlistNo}>
-        <View style={styles.overlayContent}>
-          <Text style={styles.overlayText}>Coming Soon... Waitlist?</Text>
-          <View style={styles.overlayButtonsContainer}>
-            <TouchableOpacity
-              style={styles.overlayButton}
-              onPress={handleWaitlistYes}
-              >
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <ScrollView style={styles.container}>
+        <Overlay isVisible={visible} onBackdropPress={handleWaitlistNo}>
+          <View style={styles.overlayContent}>
+            <Text style={styles.overlayText}>Coming Soon... Waitlist?</Text>
+            <View style={styles.overlayButtonsContainer}>
+              <TouchableOpacity style={styles.overlayButton} onPress={handleWaitlistYes}>
                 <Text style={styles.overlayButtonText}>Yes</Text>
               </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.overlayNoButton}
-              onPress={handleWaitlistNo}
-              >
+              <TouchableOpacity style={styles.overlayNoButton} onPress={handleWaitlistNo}>
                 <Text style={styles.overlayNoButtonText}>Home</Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Overlay>
+
+        <PageHeader subtitle="Tree Planting" description="Subscribe today to plant a tree monthly!" />
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.button} onPress={() => router.push("/plant-a-tree")}>
+            <Text style={styles.buttonEmoji}>🌱</Text>
+            <Text style={styles.buttonText}>Plant a new tree!</Text>
+          </Pressable>
+          <Pressable style={styles.button}>
+            <Text style={styles.buttonEmoji}>🌳</Text>
+            <Text style={styles.buttonText}>View my Forest!</Text>
+          </Pressable>
+        </View>
+        <View style={styles.mapContainer}>
+          <Image source={Map} style={styles.mapImage} resizeMode="contain" />
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Text style={styles.statTitle}>You have planted:</Text>
+            <Text style={styles.statText}>12 trees</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statTitle}>Your trees have sequestered:</Text>
+            <Text style={styles.statText}>576 pounds of CO2</Text>
           </View>
         </View>
-      </Overlay>
-      
-      <View style={styles.headerContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>
-            Forever<Text style={styles.headerTitleGreen}>green</Text>
-          </Text>
-          <Text style={styles.headerSubtitle}>Tree Planting</Text>
-          <Text style={styles.headerText}>
-            Subscribe today to plant a tree monthly!
-          </Text>
-        </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={styles.button}
-          onPress={() => router.push("/plant-a-tree")}
-        >
-          <Text style={styles.buttonEmoji}>🌱</Text>
-          <Text style={styles.buttonText}>Plant a new tree!</Text>
-        </Pressable>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonEmoji}>🌳</Text>
-          <Text style={styles.buttonText}>View my Forest!</Text>
-        </Pressable>
-      </View>
-      <View style={styles.mapContainer}>
-        <Image source={Map} style={styles.mapImage} resizeMode="contain" />
-      </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>You have planted:</Text>
-          <Text style={styles.statText}>12 trees</Text>
+        <View style={styles.projectsContainer}>
+          <Text style={styles.projectsTitle}>Check out our reforestation projects!</Text>
+          <View style={styles.projectsButtonContainer}>
+            <Pressable style={styles.projectButton}>
+              <Image source={CostaRica} style={styles.projectImage} resizeMode="contain" />
+              <Text style={styles.projectText}>Costa Rica</Text>
+            </Pressable>
+            <Pressable style={styles.projectButton}>
+              <Image source={Brazil} style={styles.projectImage} resizeMode="contain" />
+              <Text style={styles.projectText}>Brazil</Text>
+            </Pressable>
+            <Pressable style={styles.projectButton}>
+              <Image source={Penn} style={styles.projectImage} resizeMode="contain" />
+              <Text style={styles.projectText}>Pennsylvania</Text>
+            </Pressable>
+          </View>
         </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>Your trees have sequestered:</Text>
-          <Text style={styles.statText}>576 pounds of CO2</Text>
-        </View>
-      </View>
-
-      <View style={styles.projectsContainer}>
-        <Text style={styles.projectsTitle}>
-          Check out our reforestation projects!
-        </Text>
-        <View style={styles.projectsButtonContainer}>
-          <Pressable style={styles.projectButton}>
-            <Image
-              source={CostaRica}
-              style={styles.projectImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.projectText}>Costa Rica</Text>
-          </Pressable>
-          <Pressable style={styles.projectButton}>
-            <Image
-              source={Brazil}
-              style={styles.projectImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.projectText}>Brazil</Text>
-          </Pressable>
-          <Pressable style={styles.projectButton}>
-            <Image
-              source={Penn}
-              style={styles.projectImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.projectText}>Pennsylvania</Text>
+        <View style={styles.subscriptionContainer}>
+          <Text style={styles.subscriptionTitle}>Tree Planting Subscription</Text>
+          <Text style={styles.subscriptionText}>
+            The Forevergreen tree planting subscription includes 1 tree planted on our reforestation projects. We will
+            populate your forest with all the relevant data and credit the carbon sequestered to you. Build a forest and
+            a sustainable future with a consistent effort.
+          </Text>
+          <Pressable style={styles.subscriptionButton}>
+            <Text style={styles.subscriptionButtonText}>$10 Month</Text>
           </Pressable>
         </View>
-      </View>
-      <View style={styles.subscriptionContainer}>
-        <Text style={styles.subscriptionTitle}>Tree Planting Subscription</Text>
-        <Text style={styles.subscriptionText}>
-          The Forevergreen tree planting subscription includes 1 tree planted on
-          our reforestation projects. We will populate your forest with all the
-          relevant data and credit the carbon sequestered to you. Build a forest
-          and a sustainable future with a consistent effort.
-        </Text>
-        <Pressable style={styles.subscriptionButton}>
-          <Text style={styles.subscriptionButtonText}>$10 Month</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -145,35 +107,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  headerContainer: {
-    paddingTop: 24,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 32,
-    marginBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 40,
-    fontWeight: "bold",
-  },
-  headerTitleGreen: {
-    color: "#409858",
-  },
-  headerSubtitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  headerText: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 8,
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 24,
+    marginVertical: 24,
   },
   button: {
     backgroundColor: "#eeeeee",

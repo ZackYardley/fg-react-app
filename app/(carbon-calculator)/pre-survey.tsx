@@ -1,53 +1,47 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PreSurveyScreen = () => {
   const { fromIndex } = useLocalSearchParams<{ fromIndex: string }>();
-  
+
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.circleBottom} />
       <View style={styles.circleTop} />
-
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          Forever<Text style={styles.titleHighlight}>green</Text>
-        </Text>
-      </View>
-
-      <View style={styles.contentContainer}>
-        <Text style={styles.contentTitle}>Welcome!</Text>
-        {fromIndex ? (
-          <Text style={styles.contentText}>
-            It looks like it's been a while since we last checked your
-            emissions. Let's start with a few questions to update your carbon
-            footprint calculation.
+      <ScrollView style={{ flexGrow: 1 }}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>
+            Forever<Text style={styles.titleHighlight}>green</Text>
           </Text>
-        ) : (
-          <Text style={styles.contentText}>
-            Before we begin, we'll ask you a few quick questions about your
-            transportation, diet, and energy use to help calculate your carbon
-            footprint. Completing this survey will give you personalized tips to
-            reduce your impact on the environment.
-          </Text>
-        )}
+        </View>
 
-        <TouchableOpacity
-          onPress={() => router.navigate("/transportation")}
-          style={styles.button}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Begin Survey</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={styles.contentContainer}>
+          <Text style={styles.contentTitle}>Welcome!</Text>
+          {fromIndex ? (
+            <Text style={styles.contentText}>
+              It looks like it's been a while since we last checked your emissions. Let's start with a few questions to
+              update your carbon footprint calculation.
+            </Text>
+          ) : (
+            <Text style={styles.contentText}>
+              Before we begin, we'll ask you a few quick questions about your transportation, diet, and energy use to
+              help calculate your carbon footprint. Completing this survey will give you personalized tips to reduce
+              your impact on the environment.
+            </Text>
+          )}
+
+          <TouchableOpacity
+            onPress={() => router.navigate("/transportation")}
+            style={styles.button}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.buttonText}>Begin Survey</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -65,8 +59,8 @@ const styles = StyleSheet.create({
     height: 300,
     backgroundColor: "#409858",
     borderRadius: 150,
-    bottom: -300,
-    left: -150,
+    bottom: "-10%",
+    left: "-10%",
   },
   circleTop: {
     position: "absolute",
@@ -74,8 +68,8 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: "#409858",
     borderRadius: 100,
-    top: -100,
-    right: -50,
+    top: "-10%",
+    right: "-10%",
   },
   titleContainer: {
     flexDirection: "row",

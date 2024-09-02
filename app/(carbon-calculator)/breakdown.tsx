@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -42,7 +42,7 @@ const Breakdown = () => {
     }
   }, [dataLoaded]);
 
-  const screenWidth = Dimensions.get("window").width;
+  const width = useWindowDimensions().width;
 
   useEffect(() => {
     const auth = getAuth();
@@ -72,23 +72,23 @@ const Breakdown = () => {
           <View style={styles.contentContainer}>
             {/* Carbon Footprint */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Your Carbon Footprint</Text>
+              <Text style={[styles.cardTitle, { textAlign: "center" }]}>Your Carbon Footprint</Text>
               <Text>Your total emissions are:</Text>
               <Text style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</Text>
               <Text>Your total monthly emissions are:</Text>
-              <Text style={styles.greenText}>{(monthlyEmissions).toFixed(2)} tons co2/month</Text>
+              <Text style={styles.greenText}>{monthlyEmissions.toFixed(2)} tons co2/month</Text>
             </View>
 
             {/* Emission Breakdown */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Your Emission Breakdown</Text>
+              <Text style={[styles.cardTitle, { textAlign: "center" }]}>Your Emission Breakdown</Text>
               <View style={{ alignItems: "center", marginBottom: 16 }}>
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
                   values={[transportationEmissions, dietEmissions, energyEmissions]}
                   colors={["#44945F", "#AEDCA7", "#66A570"]}
                   height={220}
-                  width={screenWidth}
+                  width={width}
                 />
               </View>
               <View style={styles.legendContainer}>
@@ -107,7 +107,7 @@ const Breakdown = () => {
 
             {/* Average American */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>You vs the Average American</Text>
+              <Text style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</Text>
               <View style={styles.legendContainer}>
                 {[
                   { name: "You", color: "#44945F" },
@@ -130,6 +130,7 @@ const Breakdown = () => {
                   names={["You", "Average American"]}
                   values={[totalEmissions, 21]}
                   colors={["#44945F", "#A9A9A9"]}
+                  width={width - 104}
                 />
               </View>
             </View>
@@ -199,7 +200,7 @@ const Breakdown = () => {
       <View style={styles.confettiContainer} pointerEvents="none">
         <ConfettiCannon
           count={200}
-          origin={{ x: screenWidth / 2, y: 0 }}
+          origin={{ x: width / 2, y: 0 }}
           autoStart={false}
           ref={explosionRef}
           fadeOut
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   container: {
-    padding: 24,
+    padding: 20,
   },
   header: {
     flexDirection: "row",

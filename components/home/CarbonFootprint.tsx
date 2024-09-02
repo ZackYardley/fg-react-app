@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -10,6 +10,7 @@ const CarbonFootprintSection = ({
   totalOffset: number;
 }) => {
   const netImpact = monthlyEmissions - totalOffset;
+  const isPositiveImpact = netImpact <= 0;
 
   const TextButton = ({ label, style }: { label: string; style: object }) => (
     <View style={[styles.textButton, style]}>
@@ -19,13 +20,16 @@ const CarbonFootprintSection = ({
 
   return (
     <View style={styles.footprintContainer}>
-      <TouchableOpacity onPress={() => router.navigate("/breakdown")} style={styles.footprintBox}>
-        <Text style={styles.boxTitle}>Your Carbon Footprint</Text>
+      <TouchableOpacity
+        onPress={() => router.navigate("/user-breakdown")}
+        style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}
+      >
+        <Text style={styles.boxTitle}>Your Monthly Emissions</Text>
         <Text style={styles.footprintText}>
           {monthlyEmissions.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>
         </Text>
-        <Text style={styles.offsetTitle}>Your Carbon Offsets</Text>
+        <Text style={styles.offsetTitle}>Your Monthly Offsets</Text>
         <Text style={styles.footprintText}>
           {totalOffset.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>
@@ -35,6 +39,7 @@ const CarbonFootprintSection = ({
           {netImpact.toFixed(1)}
           <Text style={styles.footprintUnit}> Tons of CO2</Text>
         </Text>
+        <Text style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
         <Text style={styles.boxTitle}>Calculate your impact</Text>
@@ -156,6 +161,17 @@ const styles = StyleSheet.create({
   textButtonLabel: {
     color: "white",
     fontSize: 16,
+  },
+  positiveImpact: {
+    backgroundColor: "#d4edda", // Light green for positive impact
+  },
+  negativeImpact: {
+    backgroundColor: "#f8d7da", // Light red for negative impact
+  },
+  netZeroCheck: {
+    fontSize: 12,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

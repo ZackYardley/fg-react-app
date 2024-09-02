@@ -60,12 +60,12 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
   const datasets: Dataset[] = [
     { 
       data: emissionsData, 
-      color: (opacity = 1) => `rgba(31, 120, 180, ${opacity})`,
+      color: (opacity = 1) => `rgba(220, 53, 69, ${opacity})`,
       label: "Emissions this month"
     },
     { 
       data: offsetData, 
-      color: (opacity = 1) => `rgba(180, 103, 31, ${opacity})`,
+      color: (opacity = 1) => `rgba(64, 152, 88, ${opacity})`,
       label: "Offsets this month"
     },
   ];

@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 interface StateData {
   name: string;
   abbreviation: string;
@@ -10,54 +12,54 @@ interface StateData {
 
 interface SurveyData {
   // Transportation Data
-  longFlights: number;
-  shortFlights: number;
-  carType: string;
-  milesPerWeek: string;
-  useTrain: string;
-  trainFrequency: string;
-  useBus: string;
-  busFrequency: string;
-  walkBike: string;
-  walkBikeFrequency: string;
+  longFlights?: number;
+  shortFlights?: number;
+  carType?: string;
+  milesPerWeek?: string;
+  useTrain?: string;
+  trainFrequency?: string;
+  useBus?: string;
+  busFrequency?: string;
+  walkBike?: string;
+  walkBikeFrequency?: string;
 
   // Diet Data
-  diet: string;
+  diet?: string;
 
   // Energy Data
-  state: string;
-  electricBill: string;
-  waterBill: string;
-  propaneBill: string;
-  gasBill: string;
-  useWoodStove: string;
-  peopleInHome: number;
+  state?: string;
+  electricBill?: string;
+  waterBill?: string;
+  propaneBill?: string;
+  gasBill?: string;
+  useWoodStove?: string;
+  peopleInHome?: number;
 }
 
 interface SurveyEmissions {
   // Transportation Emissions
-  flightEmissions: number;
-  carEmissions: number;
-  publicTransportEmissions: number;
-  transportationEmissions: number;
+  flightEmissions?: number;
+  carEmissions?: number;
+  publicTransportEmissions?: number;
+  transportationEmissions?: number;
 
   // Diet Emissions
-  dietEmissions: number;
+  dietEmissions?: number;
 
   // Energy Emissions
-  electricEmissions: number;
-  waterEmissions: number;
-  otherEnergyEmissions: number;
-  energyEmissions: number;
+  electricEmissions?: number;
+  waterEmissions?: number;
+  otherEnergyEmissions?: number;
+  energyEmissions?: number;
 }
 
 interface EmissionsDocument {
-  surveyData: Partial<SurveyData>;
-  surveyEmissions: Partial<SurveyEmissions>;
+  surveyData: SurveyData;
+  surveyEmissions: SurveyEmissions;
   totalEmissions: number;
   monthlyEmissions: number;
   totalOffset: number;
-  lastUpdated: any;
+  lastUpdated: Timestamp;
 }
 
 export { StateData, SurveyEmissions, SurveyData, EmissionsDocument };

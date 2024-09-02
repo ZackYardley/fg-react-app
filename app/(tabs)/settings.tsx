@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { Href, useRouter } from "expo-router";
@@ -34,7 +34,6 @@ export default function ProfileScreen() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
-
 
   const router = useRouter();
   const auth = getAuth();
@@ -74,9 +73,9 @@ export default function ProfileScreen() {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        setTotalEmissions(data.totalEmissions);
-        setMonthlyEmissions(data.monthlyEmissions);
-        setTotalOffset(data.totalOffset);
+        setTotalEmissions(data.totalEmissions || 0);
+        setMonthlyEmissions(data.monthlyEmissions || 0);
+        setTotalOffset(data.totalOffset || 0);
       }
     };
 
@@ -190,7 +189,8 @@ export default function ProfileScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
@@ -242,17 +242,17 @@ export default function ProfileScreen() {
                 </Text>
               </View>
             </View>
-            
+
             {monthlyEmissions <= totalOffset ? (
-                <Text style={styles.netZeroText}>You are net zero this month!</Text>
-              ) : (
-                <Text style={styles.netZeroText}>You are not net zero this month!</Text>
-              )}
+              <Text style={styles.netZeroText}>You are net zero this month!</Text>
+            ) : (
+              <Text style={styles.netZeroText}>You are not net zero this month!</Text>
+            )}
 
             <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
               <Text style={styles.offsetButtonText}>Offset Now!</Text>
             </TouchableOpacity>
-        </View>
+          </View>
 
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutButtonText}>Logout</Text>
@@ -323,7 +323,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   profileContainer: {
     paddingHorizontal: 20,
@@ -432,15 +431,15 @@ const styles = StyleSheet.create({
     borderRadius: 999, // Slightly rounded corners
     paddingHorizontal: 28,
     paddingVertical: 12,
-    width: '50%',  // Set a specific width, adjust as needed
-    alignSelf: 'center',
+    width: "50%", // Set a specific width, adjust as needed
+    alignSelf: "center",
     marginTop: 10, // Add some space above the button
   },
   offsetButtonText: {
     color: "white",
     fontSize: 18,
     fontWeight: "600",
-    textAlign: 'center', // Ensure text is centered
+    textAlign: "center", // Ensure text is centered
   },
   logoutButton: {
     padding: 12,
@@ -529,18 +528,18 @@ const styles = StyleSheet.create({
   },
   section: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   netZeroText: {
     marginTop: 12,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
-    textAlign: 'center', 
+    textAlign: "center",
   },
 });

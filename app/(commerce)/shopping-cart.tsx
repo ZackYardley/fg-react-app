@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
@@ -7,8 +7,8 @@ import { getAuth } from "firebase/auth";
 import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
 import { TransactionItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
-import { PageHeader, BackButton, Loading } from "@/components/common";
-import { purchaseCarbonCredits, fetchOneTimePaymentSheetParams } from "@/api/purchase";
+import { PageHeader, BackButton } from "@/components/common";
+import { fetchOneTimePaymentSheetParams, requestCarbonCredits } from "@/api/purchase";
 import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
@@ -135,7 +135,7 @@ export default function ShoppingCartScreen() {
   const handleSuccessfulPurchase = async (paymentIntentId: string) => {
     try {
       setIsProcessingPayment(true);
-      const result = await purchaseCarbonCredits(auth.currentUser?.uid || "", credits, paymentIntentId);
+      const result = await requestCarbonCredits(auth.currentUser?.uid || "", credits, paymentIntentId);
 
       if (result.success) {
         await clearCart();
@@ -144,7 +144,7 @@ export default function ShoppingCartScreen() {
         Alert.alert("Purchase Successful", "Your carbon credits have been added to your account.");
         router.replace({
           pathname: "/purchase-complete",
-          params: { productType: "Carbon Credit", paymentIntentId: paymentIntentId },
+          params: { paymentIntentId: paymentIntentId },
         });
       } else {
         throw new Error("Purchase failed");
@@ -285,6 +285,7 @@ export default function ShoppingCartScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
       <View>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Button,
+  Image,
+  Dimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -16,6 +17,43 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdow
 import { getRandomFact } from "@/constants/facts";
 import { TARGET_EMISSIONS } from "@/constants";
 import { CarbonFootprint } from "@/components/home";
+import {
+  Russas,
+  Colombia,
+  Quebec,
+  Hydro,
+  Sticker,
+  Tote,
+  Shirt,
+  WaterBottle,
+  CuttingBoard,
+  Crewneck,
+} from "@/constants/Images";
+import Carousel from "react-native-reanimated-carousel";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { PageHeader } from "@/components/common";
+
+const windowWidth = Dimensions.get("window").width;
+
+type EmissionGroup = "Transportation" | "Diet" | "Energy";
+
+interface Emissions {
+  transportationEmissions: number;
+  dietEmissions: number;
+  energyEmissions: number;
+}
+
+function getHighestEmissionGroup(emissions: Emissions): EmissionGroup {
+  const { transportationEmissions, dietEmissions, energyEmissions } = emissions;
+
+  if (transportationEmissions >= dietEmissions && transportationEmissions >= energyEmissions) {
+    return "Transportation";
+  } else if (dietEmissions >= transportationEmissions && dietEmissions >= energyEmissions) {
+    return "Diet";
+  } else {
+    return "Energy";
+  }
+}
 
 const HomeScreen = () => {
   const { width } = useWindowDimensions();
@@ -26,6 +64,9 @@ const HomeScreen = () => {
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
   const [fact, setFact] = useState<string>(getRandomFact());
+  const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
+  const [isNetZero, setIsNetZero] = useState(false);
+  const [netZeroMonths, setNetZeroMonths] = useState(0);
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -40,6 +81,23 @@ const HomeScreen = () => {
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
+
+        const netZero = data.totalOffset >= data.monthlyEmissions;
+        setIsNetZero(netZero);
+
+        const emissions: Emissions = {
+          transportationEmissions: data.surveyEmissions.transportationEmissions || 0,
+          dietEmissions: data.surveyEmissions.dietEmissions || 0,
+          energyEmissions: data.surveyEmissions.energyEmissions || 0,
+        };
+        setHighestEmissionGroup(getHighestEmissionGroup(emissions));
+
+        if (netZero && data.monthlyEmissions > 0) {
+          const months = Math.floor(data.totalOffset - data.monthlyEmissions);
+          setNetZeroMonths(Math.min(24, Math.max(0, months)));
+        } else {
+          setNetZeroMonths(0);
+        }
       }
     };
 
@@ -54,166 +112,251 @@ const HomeScreen = () => {
   }
   months.reverse();
 
+  const carouselRef = useRef(null);
+  const { width: screenWidth } = useWindowDimensions();
+
+  const carouselData = [
+    { title: "1 Month Net-Zero", image: Sticker },
+    { title: "3 Months Net-Zero", image: Tote },
+    { title: "6 Months Net-Zero", image: Shirt },
+    { title: "1 Months Net-Zero", image: WaterBottle },
+    { title: "18 Months Net-Zero", image: CuttingBoard },
+    { title: "24 Months Net-Zero", image: Crewneck },
+  ];
+
+  const renderCarouselItem = ({ item }: any) => (
+    <View style={styles.carouselItem}>
+      <Image source={item.image} style={styles.carouselImage} />
+      <Text style={styles.carouselText}>{item.title}</Text>
+    </View>
+  );
+
+  const displayNetZeroMonths = netZeroMonths === 24 ? "24+" : netZeroMonths.toString();
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerText}>
-            Forever<Text style={styles.headerGreen}>green</Text>
-          </Text>
-        </View>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <ScrollView style={styles.container}>
+        <View style={styles.content}>
+          {/* Header */}
+          <PageHeader />
 
-        {/* Fast Fact */}
-        <View style={styles.fastFact}>
-          <Text style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</Text>
-          <Text style={styles.fastFactText}>{fact}</Text>
-          <TouchableOpacity
-            style={styles.factButton}
-            onPress={handleNewFact} // Call the function directly
-          >
-            <Text style={styles.offsetButtonText}>See New Fact</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Carbon Footprint and Calculator */}
-        <CarbonFootprint monthlyEmissions={monthlyEmissions} totalOffset={totalOffset} />
-
-        {/* Monthly Graph of Emissions */}
-        <View style={styles.emissionsGraph}>
-          <Text style={styles.sectionTitle}>Your net-zero journey</Text>
-          <View style={styles.graphContainer}>
-            <LineChartBreakdown />
-          </View>
-          <TouchableOpacity
-            style={styles.offsetButton}
-            onPress={() => {
-              router.push("/offset-now");
-            }}
-          >
-            <Text style={styles.offsetButtonText}>Offset Now!</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Emissions vs Offset */}
-        <View style={styles.carbonFootprint}>
-          <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint...</Text>
-          <View style={styles.carbonFootprintContent}>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Emissions</Text>
-              <Text style={styles.emissionText}>
-                {monthlyEmissions.toFixed(2)}
-                <Text style={styles.emissionUnit}> tons of CO₂</Text>
-              </Text>
-            </View>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Offsets</Text>
-              <Text style={styles.offsetText}>
-                {totalOffset.toFixed(2)}
-                <Text style={styles.emissionUnit}> tons of CO₂</Text>
-              </Text>
-            </View>
+          {/* Fast Fact */}
+          <View style={styles.fastFact}>
+            <Text style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</Text>
+            <Text style={styles.fastFactText}>{fact}</Text>
+            <TouchableOpacity
+              style={styles.factButton}
+              onPress={handleNewFact} // Call the function directly
+            >
+              <Text style={styles.offsetButtonText}>See New Fact</Text>
+            </TouchableOpacity>
           </View>
 
-          {monthlyEmissions <= totalOffset ? (
-            <Text style={styles.netZeroText}>You are net zero this month!</Text>
-          ) : (
-            <Text style={styles.netZeroText}>You are not net zero this month!</Text>
-          )}
+          {/* Carbon Footprint and Calculator */}
+          <CarbonFootprint monthlyEmissions={monthlyEmissions} totalOffset={totalOffset} />
 
-          <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
-            <Text style={styles.offsetButtonText}>Offset Now!</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Community */}
-        <View style={styles.communitySection}>
-          <Text style={styles.sectionTitle}>Forevergreen Community</Text>
-          <View style={styles.communityStatsContainer}>
-            <View style={styles.communityStatBox}>
-              <Text style={styles.statLargeText}>10,000</Text>
-              <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
+          {/* Monthly Graph of Emissions */}
+          <View style={styles.emissionsGraph}>
+            <Text style={styles.sectionTitle}>Your net-zero journey</Text>
+            <View style={styles.graphContainer}>
+              <LineChartBreakdown />
             </View>
-            <View style={styles.communityStatBox}>
-              <Text style={styles.statLargeText}>10,000</Text>
-              <Text style={styles.statMediumText}>Tons CO2 Gone</Text>
+            <TouchableOpacity
+              style={styles.offsetButton}
+              onPress={() => {
+                router.push("/offset-now");
+              }}
+            >
+              <Text style={styles.offsetButtonText}>Offset Now!</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Emissions vs Offset */}
+          <View style={styles.carbonFootprint}>
+            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint</Text>
+            <View style={styles.carbonFootprintContent}>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Emissions</Text>
+                <Text style={styles.emissionText}>
+                  {monthlyEmissions.toFixed(2)}
+                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
+                </Text>
+              </View>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Offsets</Text>
+                <Text style={styles.offsetText}>
+                  {totalOffset.toFixed(2)}
+                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.netZeroText}>
+              {isNetZero 
+                ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? 's' : ''}! 😊`
+                : "You are not net-zero this month! 😔"}
+            </Text>
+
+            <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
+              <Text style={styles.offsetButtonText}>Offset Now!</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Community */}
+          <View style={styles.communitySection}>
+            <Text style={styles.sectionTitle}>Forevergreen Community</Text>
+            <View style={styles.communityStatsContainer}>
+              <View style={styles.communityStatBox}>
+                <Text style={styles.statLargeText}>1,344</Text>
+                <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
+              </View>
+              <View style={styles.communityStatBox}>
+                <Text style={styles.statLargeText}>600</Text>
+                <Text style={styles.statMediumText}>Tons CO2 Offset</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Forevergreen Community Leaders/Referral */}
-        <View style={styles.leadersSection}>
-          <Text style={styles.sectionTitle}>Community Leaders</Text>
-          <View style={styles.leadersContainer}>
-            <View>
-              <Text style={styles.leaderText}>
-                <Text style={styles.boldText}>1.</Text> jpear - 10 Referrals
-              </Text>
-              <Text style={styles.leaderText}>
-                <Text style={styles.boldText}>2.</Text> joegjoe - 9 Referrals
-              </Text>
-              <Text style={styles.leaderText}>
-                <Text style={styles.boldText}>3.</Text> zyardley - 8 Referrals
-              </Text>
+          {/* Forevergreen Community Leaders/Referral */}
+          <View style={styles.leadersSection}>
+            <Text style={styles.sectionTitle}>Community Leaders</Text>
+            <View style={styles.leadersContainer}>
+              <View>
+                <Text style={styles.leaderText}>
+                  <Text style={styles.boldText}>1.</Text> jpear - 10 Referrals
+                </Text>
+                <Text style={styles.leaderText}>
+                  <Text style={styles.boldText}>2.</Text> joegjoe - 9 Referrals
+                </Text>
+                <Text style={styles.leaderText}>
+                  <Text style={styles.boldText}>3.</Text> zyardley - 8 Referrals
+                </Text>
+              </View>
+              <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
+                <Text style={styles.referButtonText}>Refer a friend!</Text>
+              </Pressable>
             </View>
-            <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
-              <Text style={styles.referButtonText}>Refer a friend!</Text>
-            </Pressable>
           </View>
-        </View>
 
-        {/* Charts */}
-        <View style={styles.chartsSection}>
-          {/* Your Breakdown Pie Chart */}
-          <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>Your Breakdown</Text>
-            <View style={styles.pieChartContainer}>
-              <PieChartBreakdown
-                names={["Transportation", "Diet", "Energy"]}
-                values={[transportationEmissions, dietEmissions, energyEmissions]}
-                colors={["#44945F", "#AEDCA7", "#66A570"]}
-                width={Math.round(width / 3)}
-                height={100}
-              />
-              <View style={styles.legendContainer}>
-                <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
-                  <Text>Transportation</Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]} />
-                  <Text>Diet</Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: "#66A570" }]} />
-                  <Text>Energy</Text>
+          {/* Prizes */}
+          <View style={styles.chartsSection}>
+            <View style={styles.chartBox}>
+              <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
+              <View style={styles.prizeSection}>
+                <TouchableOpacity
+                  style={[styles.prizeBox, isNetZero ? styles.prizeBox : {}]}
+                  onPress={() => router.push("/journey")}
+                >
+                  <Text style={styles.monthNetZeroText}>{displayNetZeroMonths}</Text>
+                  <Text style={styles.subtitleText}>Months Net-Zero</Text>
+                </TouchableOpacity>
+                <View style={styles.prizeSection}>
+                  <Carousel
+                    ref={carouselRef}
+                    loop
+                    width={screenWidth * 0.4}
+                    height={screenWidth * 0.4}
+                    autoPlay={true}
+                    data={carouselData}
+                    scrollAnimationDuration={1000}
+                    renderItem={renderCarouselItem}
+                  />
                 </View>
               </View>
             </View>
           </View>
 
-          {/* You vs the Average American */}
-          <View style={styles.chartBox}>
-            <Text style={styles.chartTitle}>You vs the Average American</Text>
-            <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
-            <BarChartBreakdown
-              names={["You", "Average American"]}
-              values={[totalEmissions - totalOffset, 21]}
-              colors={["#44945F", "#A9A9A9"]}
-            />
+          {/* Charts */}
+          <View style={styles.chartsSection}>
+            {/* Your Breakdown Pie Chart */}
+            <View style={styles.chartBox}>
+              <Text style={styles.chartTitle}>Your Breakdown</Text>
+              <View style={styles.pieChartContainer}>
+                <PieChartBreakdown
+                  names={["Transportation", "Diet", "Energy"]}
+                  values={[transportationEmissions, dietEmissions, energyEmissions]}
+                  colors={["#44945F", "#AEDCA7", "#66A570"]}
+                  width={Math.round(width / 3)}
+                  height={100}
+                />
+                <View style={styles.legendContainer}>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
+                    <Text>Transportation</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]} />
+                    <Text>Diet</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: "#66A570" }]} />
+                    <Text>Energy</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* You vs the Average American */}
+            <View style={styles.chartBox}>
+              <Text style={styles.chartTitle}>You vs the Average American</Text>
+              <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
+              <BarChartBreakdown
+                names={["You", "Average American"]}
+                values={[totalEmissions - totalOffset, 21]}
+                colors={["#44945F", "#A9A9A9"]}
+                width={width - 128}
+              />
+            </View>
+
+            {/* If everyone lived like you */}
+            <View style={styles.chartBox}>
+              <Text style={styles.chartText}>
+                If everyone lived like you we'd need {((totalEmissions - totalOffset) / TARGET_EMISSIONS).toFixed(2)}{" "}
+                Earths
+              </Text>
+              <EarthBreakdown emissions={totalEmissions - totalOffset} />
+            </View>
           </View>
 
-          {/* If everyone lived like you */}
-          <View style={styles.chartBox}>
-            <Text style={styles.chartText}>
-              If everyone lived like you we'd need {((totalEmissions - totalOffset) / TARGET_EMISSIONS).toFixed(2)}{" "}
-              Earths
-            </Text>
-            <EarthBreakdown emissions={totalEmissions - totalOffset} />
+          {/* Tips */}
+          <View style={styles.fastFact}>
+            <Text style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</Text>
+            <Text style={styles.highestEmissionsText}>Your highest emissions source: {highestEmissionGroup}</Text>
+            <Text style={styles.fastFactText}>Turn off your lights!</Text>
+            <Text style={styles.fastFactText}>Carpool to work!</Text>
+            <Text style={styles.fastFactText}>Try meatless Monday!</Text>
           </View>
+
+          {/* Credits */}
+          <TouchableOpacity style={styles.creditBox} onPress={() => router.push("/carbon-credit")}>
+            <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
+            <Text style={styles.subtitleText}>
+              From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
+            </Text>
+
+            <View style={styles.creditsContainer}>
+              <View style={styles.creditRow}>
+                <Image source={Russas} style={styles.creditIcon} />
+                <Image source={Colombia} style={styles.creditIcon} />
+              </View>
+              <View style={styles.creditRow}>
+                <Text style={styles.creditName}>The Russas Project</Text>
+                <Text style={styles.creditName}>Colombian Reforestation</Text>
+              </View>
+
+              <View style={styles.creditRow}>
+                <Image source={Quebec} style={styles.creditIcon} />
+                <Image source={Hydro} style={styles.creditIcon} />
+              </View>
+              <View style={styles.creditRow}>
+                <Text style={styles.creditName}>Canadian Energy & Waste</Text>
+                <Text style={styles.creditName}>Pamona Hydroelectric</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -225,7 +368,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   content: {
-    padding: 24,
+    paddingHorizontal: 24,
   },
   header: {
     alignItems: "center",
@@ -255,89 +398,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-  footprintContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  footprintTitle: {
-    fontSize: 22,
+  subtitleText: {
+    fontSize: 18,
     textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 12,
   },
-  emissionsTitle: {
+  netZeroText: {
+    marginTop: 16,
     fontSize: 16,
     textAlign: "center",
-    fontWeight: "light",
-    marginBottom: 6,
+    fontWeight: "bold",
   },
-  footprintText: {
-    fontSize: 32,
+  monthNetZeroText: {
+    fontSize: 36,
     textAlign: "center",
     fontWeight: "bold",
-    marginBottom: 0,
   },
-  footprintUnit: {
-    fontSize: 12,
-    marginLeft: 16,
-    textAlign: "right",
-  },
-  footprintBox: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 16,
-    width: "47%",
-    height: 288,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 12,
-  },
-  dataRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginTop: 5,
-  },
-  divider: {
-    borderTopWidth: 2,
-    borderColor: "black",
-    marginVertical: 15,
-  },
-  calculatorBox: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 16,
-    width: "47%",
-    height: 288,
-    padding: 16,
-  },
-  carbonBoxTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  carbonBoxMediumText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  boxTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  boxLargeText: {
-    fontSize: 56,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  boxMediumText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-
   emissionsGraph: {
     backgroundColor: "#eeeeee",
     marginBottom: 24,
@@ -418,7 +493,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   leadersContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     backgroundColor: "#eeeeee",
     padding: 24,
@@ -497,17 +572,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: "#eeeeee",
   },
   carbonFootprintTitle: {
     fontSize: 20,
     textAlign: "center",
-    marginBottom: 12,
-    fontWeight: "700",
-  },
-  offsetTitle: {
-    fontSize: 20,
-    textAlign: "right",
     marginBottom: 12,
     fontWeight: "700",
   },
@@ -520,6 +589,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#b91c1c",
+  },
+  highestEmissionsText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#b91c1c",
+    textAlign: "center",
+    marginBottom: 16,
   },
   offsetText: {
     fontSize: 24,
@@ -535,11 +611,66 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  netZeroText: {
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  creditIcon: {
+    width: 200,
+    height: 125,
+  },
+  creditRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 10,
+  },
+  creditsContainer: {
+    width: "100%",
+  },
+  creditBox: {
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 12,
     marginTop: 12,
-    fontSize: 18,
+    backgroundColor: "#eeeeee",
+  },
+  creditName: {
+    fontSize: 13,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  prizeBox: {
+    backgroundColor: "#d4edda",
+    borderRadius: 16,
+    width: "40%",
+    padding: 16,
+    // ADD BUTTON IS GREEN OR RED IF NET ZERO
+  },
+  prizeSection: {
+    flex: 2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    alignItems: "center",
+  },
+  carouselItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
+  },
+  carouselImage: {
+    width: "80%",
+    height: "80%",
+    resizeMode: "contain",
+  },
+  carouselText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: "bold",
     textAlign: "center",
   },
 });
