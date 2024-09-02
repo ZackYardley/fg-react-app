@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Dimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -32,8 +31,6 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PageHeader } from "@/components/common";
-
-const windowWidth = Dimensions.get("window").width;
 
 type EmissionGroup = "Transportation" | "Diet" | "Energy";
 
@@ -192,8 +189,8 @@ const HomeScreen = () => {
             </View>
 
             <Text style={styles.netZeroText}>
-              {isNetZero 
-                ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? 's' : ''}! 😊`
+              {isNetZero
+                ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? "s" : ""}! 😊`
                 : "You are not net-zero this month! 😔"}
             </Text>
 
@@ -310,10 +307,7 @@ const HomeScreen = () => {
 
             {/* If everyone lived like you */}
             <View style={styles.chartBox}>
-              <Text style={styles.chartText}>
-                If everyone lived like you we'd need {((totalEmissions - totalOffset) / TARGET_EMISSIONS).toFixed(2)}{" "}
-                Earths
-              </Text>
+              <Text style={styles.chartTitle}>Earth Breakdown</Text>
               <EarthBreakdown emissions={totalEmissions - totalOffset} />
             </View>
           </View>

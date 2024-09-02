@@ -7,7 +7,7 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown } from "@/componen
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
-import { TARGET_EMISSIONS } from "@/constants";
+import { AVERAGE_AMERICAN_EMISSIONS, TARGET_EMISSIONS } from "@/constants";
 
 const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
@@ -128,7 +128,7 @@ const Breakdown = () => {
               >
                 <BarChartBreakdown
                   names={["You", "Average American"]}
-                  values={[totalEmissions, 21]}
+                  values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
                   colors={["#44945F", "#A9A9A9"]}
                   width={width - 104}
                 />
@@ -138,9 +138,6 @@ const Breakdown = () => {
             {/* Earth Breakdown */}
             <View style={styles.card}>
               <Text style={styles.earthBreakdownTitle}>Earth Breakdown</Text>
-              <Text style={styles.earthBreakdownText}>
-                If everyone lived like you we would need {(totalEmissions / TARGET_EMISSIONS).toFixed(2)} Earths!
-              </Text>
               <EarthBreakdown emissions={totalEmissions || 0} />
             </View>
 
