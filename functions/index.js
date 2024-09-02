@@ -76,6 +76,9 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
           return null;
         }
 
+        const paymentDoc = paymentSnapshot.docs[0];
+        const paymentRef = paymentDoc.ref;
+
         const carbonCreditsRef = db.collection("users")
             .doc(userId)
             .collection("purchased")
@@ -93,6 +96,8 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
         const stripeProducts = await Promise.all(
             request.items.map((item) => stripe.products.retrieve(item.id)),
         );
+
+        const simplifiedItems = [];
 
         await db.runTransaction(async (transaction) => {
           // Perform all reads
@@ -126,6 +131,14 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
 
             totalPurchasedCredits += item.quantity;
 
+            simplifiedItems.push({
+              id: item.id,
+              name: product.name,
+              productType: "carbon_credit",
+              quantity: item.quantity,
+              price: item.price, // Assuming price is available in the request item
+            });
+
             const newQuantity = parseInt(product.metadata.quantity) - item.quantity;
             if (newQuantity < 0) {
               throw new Error(`Insufficient inventory for product ${item.id}`);
@@ -148,6 +161,11 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
               totalOffset: totalPurchasedCredits,
             });
           }
+
+          // Update payment document with metadata
+          transaction.update(paymentRef, {
+            metadata: {items: simplifiedItems},
+          });
         });
 
         // Update Stripe products outside the transaction

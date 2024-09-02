@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { Href, useRouter } from "expo-router";
@@ -189,7 +189,8 @@ export default function ProfileScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+      <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
@@ -322,7 +323,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   profileContainer: {
     paddingHorizontal: 20,

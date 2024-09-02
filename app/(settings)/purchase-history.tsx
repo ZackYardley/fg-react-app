@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getRecentPayments } from "@/api/payments";
 import { fetchRecentInvoices } from "@/api/subscriptions";
@@ -94,6 +94,7 @@ const PurchaseHistoryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <View style={{ flexGrow: 1 }}>
         <PageHeader subtitle="Purchase History" />
         <BackButton />

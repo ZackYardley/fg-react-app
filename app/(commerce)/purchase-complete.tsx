@@ -161,9 +161,9 @@ const PurchaseCompleteScreen = () => {
 
   const renderOneTimePurchaseContent = () => (
     <>
-      <View style={{ display: "flex", flexDirection: "row", gap: 32 }}>
+      <View style={{ display: "flex", flexDirection: "row", rowGap: 12, columnGap: 32, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 }}>
         {credits.map((credit, index) => (
-          <View key={index} style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
+          <View key={index} style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center", maxWidth: "47%" }}>
             <LinearGradient
               colors={[credit.stripe_metadata_color_0, credit.stripe_metadata_color_1, credit.stripe_metadata_color_2]}
               start={{ x: 0.5, y: 0 }}

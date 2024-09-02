@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
@@ -285,6 +285,7 @@ export default function ShoppingCartScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
       <View>

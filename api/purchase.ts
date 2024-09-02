@@ -56,10 +56,6 @@ import { getAuth } from "firebase/auth";
 //     const updateData = { metadata: { items: simplifiedItems } };
 //     await updateDoc(paymentRef, updateData);
 
-//     const emissionsData = await fetchEmissionsData();
-//     const oldTotalOffset = emissionsData?.totalOffset || 0;
-//     saveEmissionsData({ totalOffset: oldTotalOffset + newTotalOffset });
-
 //     return { success: true };
 //   } catch (error) {
 //     console.error("Error in purchaseCarbonCredits:", error);
@@ -217,7 +213,7 @@ const requestCarbonCredits = async (
   const requestsRef = collection(db, "users", userId, "requests");
 
   try {
-    await addDoc(requestsRef, {
+    const docData = {
       type: "carbonCredits",
       items: items.map((item) => ({
         id: item.id,
@@ -226,14 +222,23 @@ const requestCarbonCredits = async (
         quantity: item.quantity,
         price: item.price,
       })),
-      paymentIntentId: paymentIntentId,
+      paymentIntentId,
       status: "pending",
       createdAt: serverTimestamp(),
-    });
+    };
+
+    // Check for any undefined values
+    for (const [key, value] of Object.entries(docData)) {
+      if (value === undefined) {
+        throw new Error(`Undefined value for field: ${key}`);
+      }
+    }
+
+    await addDoc(requestsRef, docData);
     return { success: true };
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return { success: false, error: "Failed to fetch user data." };
+  } catch (error: any) {
+    console.error("Error adding carbon credits request:", error);
+    return { success: false, error: error.message || "Failed to add carbon credits request." };
   }
 };
 
