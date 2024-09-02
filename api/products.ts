@@ -83,7 +83,7 @@ const fetchSpecificCarbonCreditProduct = async (productId: string): Promise<Carb
 };
 
 const fetchCarbonCreditSubscription = async (
-  userEmissions: number
+  userEmissions?: number
 ): Promise<{ product: CarbonCreditSubscription; recommendedPrice: Price } | null> => {
   const db = getFirestore();
   const productsCollection = collection(db, "products");
@@ -106,6 +106,11 @@ const fetchCarbonCreditSubscription = async (
     const productDoc = querySnapshot.docs[0];
     const productData = productDoc.data() as Omit<CarbonCreditSubscription, "id" | "prices">;
     const product: CarbonCreditSubscription = { ...productData, id: productDoc.id, prices: [] };
+
+    // If user emissions are not provided, return the product with the lowest price
+    if (!userEmissions) {
+      return { product, recommendedPrice: product.prices[0] };
+    }
 
     // Fetch prices for this product
     const pricesCollection = collection(db, "products", product.id, "prices");

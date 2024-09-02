@@ -1,5 +1,6 @@
-import { getFirestore, collection, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, getDoc, addDoc, serverTimestamp, query, getDocs, where } from "firebase/firestore";
 import { TransactionItem } from "@/types";
+import { getAuth } from "firebase/auth";
 
 // const purchaseCarbonCredits = async (
 //   userId: string,
@@ -220,7 +221,10 @@ const requestCarbonCredits = async (
       type: "carbonCredits",
       items: items.map((item) => ({
         id: item.id,
+        name: item.name,
+        productType: item.productType,
         quantity: item.quantity,
+        price: item.price,
       })),
       paymentIntentId: paymentIntentId,
       status: "pending",
@@ -233,9 +237,38 @@ const requestCarbonCredits = async (
   }
 };
 
+const fetchCreditRequestByPaymentId = async (paymentIntentId: string) => {
+  const db = getFirestore();
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+  if (!userId) {
+    throw new Error("User is not authenticated");
+  }
+
+  const requestsRef = collection(db, "users", userId, "requests");
+
+  const q = query(requestsRef, where("paymentIntentId", "==", paymentIntentId));
+
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0];
+    const data = doc.data();
+    return {
+      id: doc.id,
+      tyoe: data.type,
+      items: data.items,
+      paymentIntentId: data.paymentIntentId,
+      status: data.status,
+      createdAt: data.createdAt,
+    };
+  }
+};
+
 export {
   fetchOneTimePaymentSheetParams,
   fetchSubscriptionPaymentSheetParams,
   fetchSetupPaymentSheetParams,
   requestCarbonCredits,
+  fetchCreditRequestByPaymentId,
 };
