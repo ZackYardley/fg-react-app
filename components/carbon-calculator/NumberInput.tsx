@@ -9,6 +9,7 @@ const NumberInput = ({
   unit,
   label,
   error,
+  disabled,
 }: {
   question: string;
   value: string;
@@ -16,6 +17,7 @@ const NumberInput = ({
   unit?: string;
   label?: string;
   error?: string;
+  disabled?: boolean;
 }) => {
   const inputRef = useRef<any>(null);
 
@@ -24,8 +26,8 @@ const NumberInput = ({
       <Text style={styles.question}>{question}</Text>
       <TextInput
         ref={inputRef}
-        placeholder="Your Answer"
-        value={value}
+        placeholder={disabled ? "Loading..." : "Your Answer"}
+        value={disabled ? "Loading" : value}
         onChangeText={onChange}
         keyboardType="numeric"
         mode="outlined"
@@ -33,16 +35,9 @@ const NumberInput = ({
         outlineColor="#D9D9D9"
         style={styles.input}
         textColor="#000"
-        right={
-          label ? (
-            <TextInput.Affix text={label} textStyle={styles.affixText} />
-          ) : null
-        }
-        left={
-          unit ? (
-            <TextInput.Affix text={unit} textStyle={styles.affixText} />
-          ) : null
-        }
+        right={label ? <TextInput.Affix text={label} textStyle={styles.affixText} /> : null}
+        left={unit ? <TextInput.Affix text={unit} textStyle={styles.affixText} /> : null}
+        disabled={disabled}
       />
       <HelperText type="error" visible={!!error}>
         {error}

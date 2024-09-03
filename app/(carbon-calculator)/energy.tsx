@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Pressable, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
+import * as Location from "expo-location";
+import analytics from "@react-native-firebase/analytics";
 import statesData from "@/constants/states.json";
+import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import {
   Header,
   NumberInput,
@@ -11,15 +14,11 @@ import {
   RadioButtonGroup,
   PlatformPicker,
 } from "@/components/carbon-calculator";
-import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
-import { StateData, SurveyData, SurveyEmissions } from "@/types";
-import analytics from "@react-native-firebase/analytics";
-import { router } from "expo-router";
 import { Loading } from "@/components/common";
+import { StateData, SurveyData, SurveyEmissions } from "@/types";
 
 export default function EnergyCalculator() {
-  // Todo: Use geolocation services to determine which state to choose
-  const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
+  const [surveyData, setSurveyData] = useState<SurveyData>({
     state: "",
     electricBill: "",
     waterBill: "",
@@ -29,7 +28,7 @@ export default function EnergyCalculator() {
     peopleInHome: 1,
   });
 
-  const [surveyEmissions, setSurveyEmissions] = useState<Partial<SurveyEmissions>>({
+  const [surveyEmissions, setSurveyEmissions] = useState<SurveyEmissions>({
     electricEmissions: 0,
     waterEmissions: 0,
     otherEnergyEmissions: 0,
@@ -43,6 +42,7 @@ export default function EnergyCalculator() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const stateItems = statesData.map((state) => ({
     label: `${state.name} (${state.abbreviation})`,
@@ -55,7 +55,16 @@ export default function EnergyCalculator() {
       try {
         const data = await fetchEmissionsData();
         if (data && data.surveyData && data.surveyEmissions) {
-          setSurveyData(data.surveyData);
+          setSurveyData({
+            ...surveyData,
+            state: data.surveyData.state,
+            electricBill: data.surveyData.electricBill,
+            waterBill: data.surveyData.waterBill,
+            propaneBill: data.surveyData.propaneBill,
+            gasBill: data.surveyData.gasBill,
+            useWoodStove: data.surveyData.useWoodStove || "No",
+            peopleInHome: data.surveyData.peopleInHome || 1,
+          });
           setSurveyEmissions(data.surveyEmissions);
           setDietEmissions(data.surveyEmissions.dietEmissions || 0);
           setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
@@ -64,11 +73,9 @@ export default function EnergyCalculator() {
             if (selectedState) {
               setStateData(selectedState as StateData);
             }
-          } else {
-            const randomState = statesData[Math.floor(Math.random() * statesData.length)];
-            handleStateChange(randomState.name);
           }
         } else {
+          // console.log("No data available");
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -78,7 +85,6 @@ export default function EnergyCalculator() {
     };
 
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -132,12 +138,12 @@ export default function EnergyCalculator() {
   useEffect(() => {
     const validateForm = () => {
       const isValid =
-        surveyData.state !== "" &&
-        surveyData.electricBill !== "" &&
-        surveyData.waterBill !== "" &&
-        surveyData.propaneBill !== "" &&
-        surveyData.gasBill !== "" &&
-        surveyData.useWoodStove !== "" &&
+        surveyData.state !== undefined &&
+        surveyData.electricBill !== undefined &&
+        surveyData.waterBill !== undefined &&
+        surveyData.propaneBill !== undefined &&
+        surveyData.gasBill !== undefined &&
+        surveyData.useWoodStove !== undefined &&
         surveyData.peopleInHome !== undefined;
       setIsFormValid(isValid);
     };
@@ -162,6 +168,41 @@ export default function EnergyCalculator() {
         gasBill: selectedState.averageMonthlyGasBill.toFixed(2),
       });
       setStateData(selectedState as StateData);
+    }
+  };
+
+  const handleUseCurrentLocation = async () => {
+    if (isProcessing) {
+      return;
+    }
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      // console.log("Location permission not granted");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      let location = await Location.getCurrentPositionAsync({});
+      const address = await Location.reverseGeocodeAsync(location.coords);
+      let state = statesData.find(
+        (s) =>
+          s.name.toLowerCase() === address[0].region?.toLowerCase() ||
+          s.abbreviation.toLowerCase() === address[0].region?.toLowerCase()
+      );
+
+      if (!state) {
+        // console.log("State not found in statesData, using random state");
+        state = statesData[Math.floor(Math.random() * statesData.length)];
+      }
+
+      if (state) {
+        handleStateChange(state.name);
+      }
+    } catch (error) {
+      console.error("Error getting location:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -194,30 +235,30 @@ export default function EnergyCalculator() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <StatusBar barStyle="dark-content" />
         <View style={styles.contentContainer}>
           <Header progress={progress} title="Energy" />
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
-          {/* <Picker
-            selectedValue={surveyData.state}
-            onValueChange={handleStateChange}
-            style={styles.picker}
-            itemStyle={styles.pickerItem}
-          >
-            {statesData.map((state) => (
-              <Picker.Item
-                key={state.abbreviation}
-                label={`${state.name} (${state.abbreviation})`}
-                value={state.name}
-              />
-            ))}
-          </Picker> */}
-          {surveyData.state && stateItems && (
-            <PlatformPicker selectedValue={surveyData.state} onValueChange={handleStateChange} items={stateItems} />
+          {stateItems && (
+            <PlatformPicker
+              selectedValue={surveyData.state}
+              onValueChange={handleStateChange}
+              items={stateItems}
+              disabled={isProcessing}
+            />
           )}
+
+          <Pressable
+            style={[styles.locationButton, isProcessing && styles.locationButtonLoading]}
+            onPress={handleUseCurrentLocation}
+            disabled={isProcessing}
+          >
+            <Text style={styles.locationButtonText}>{isProcessing ? "Loading..." : "Use my current location"}</Text>
+          </Pressable>
 
           <NumberInput
             question="How much was your electric bill last month? ⚡"
@@ -227,6 +268,7 @@ export default function EnergyCalculator() {
             }}
             unit="$"
             label="per month"
+            disabled={isProcessing}
           />
 
           <NumberInput
@@ -237,6 +279,7 @@ export default function EnergyCalculator() {
             }}
             unit="$"
             label="per month"
+            disabled={isProcessing}
           />
 
           <NumberInput
@@ -247,6 +290,7 @@ export default function EnergyCalculator() {
             }}
             unit="$"
             label="per month"
+            disabled={isProcessing}
           />
 
           <NumberInput
@@ -257,6 +301,7 @@ export default function EnergyCalculator() {
             }}
             unit="$"
             label="per month"
+            disabled={isProcessing}
           />
 
           <RadioButtonGroup
@@ -283,15 +328,15 @@ export default function EnergyCalculator() {
             <View style={styles.emissionsContent}>
               <View style={styles.emissionRow}>
                 <Text>Electric Emissions:</Text>
-                <Text>{(surveyEmissions.electricEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.electricEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Water:</Text>
-                <Text>{(surveyEmissions.waterEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.waterEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Other Energy:</Text>
-                <Text>{(surveyEmissions.otherEnergyEmissions! / surveyData.peopleInHome!).toFixed(2)}</Text>
+                <Text>{(surveyEmissions.otherEnergyEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
               </View>
               <View style={styles.emissionRow}>
                 <Text>Transportation + Diet:</Text>
@@ -308,9 +353,9 @@ export default function EnergyCalculator() {
           </View>
         </View>
 
-        <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
-      </SafeAreaView>
-    </ScrollView>
+        <NextButton isFormValid={isFormValid && !isProcessing} onPress={() => handleNextButton()} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -326,18 +371,21 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 18,
   },
-  picker: {
-    marginTop: 8,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 8,
-    height: 80, // Set the height to a smaller value to ensure it's just one line
-    width: "100%", // Set width to fit the container or adjust as needed
+  locationButton: {
+    backgroundColor: "#409858",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 50,
+    marginTop: 10,
+    alignItems: "center",
   },
-  pickerItem: {
-    fontSize: 16, // Adjust the font size as needed
-    height: 80, // This should match the height of the picker
+  locationButtonLoading: {
+    backgroundColor: "#ccc",
+  },
+  locationButtonText: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
   },
   emissionsContainer: {
     marginTop: 32,
