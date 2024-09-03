@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, Image, ScrollView, Platform } from "react-native";
+import { View, Text, StatusBar, Image, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
 import { StyleSheet } from "react-native";
@@ -21,36 +21,36 @@ export default function GetStartedScreen() {
 
   if (Platform.OS === "web") {
     return (
-      <ScrollView style={styles.webContainer}>
-        <Text style={styles.webTitle}>
-          Forever<Text style={{ color: "#409858" }}>green</Text>
-        </Text>
-        <Text style={styles.webMessage}>Open our app to continue or download it if you haven't installed it yet.</Text>
-        <View style={styles.webButtonContainer}>
-          <GreenButton
-            title="Open App"
-            onPress={handleOpenApp}
-            style={styles.webButton}
-            textStyle={styles.webButtonText}
-          />
-          <Text style={styles.orText}>or</Text>
-          <Text style={styles.downloadText}>Download from:</Text>
-          <View style={styles.storeButtonsContainer}>
+      <View style={styles.webContainer}>
+        <View style={styles.webContent}>
+          <Text style={styles.webTitle}>
+            Forever<Text style={styles.webTitleGreen}>green</Text>
+          </Text>
+          <View style={styles.centeredContent}>
             <GreenButton
-              title="App Store"
-              onPress={() => Linking.openURL(appStoreUrl)}
-              style={styles.storeButton}
-              textStyle={styles.storeButtonText}
+              title="Open App"
+              onPress={handleOpenApp}
+              style={styles.webButton}
+              textStyle={styles.webButtonText}
             />
-            <GreenButton
-              title="Google Play"
-              onPress={() => Linking.openURL(playStoreUrl)}
-              style={styles.storeButton}
-              textStyle={styles.storeButtonText}
-            />
+            <Text style={styles.orText}>or</Text>
+            <View style={styles.storeButtonsContainer}>
+              <TouchableOpacity onPress={() => Linking.openURL(appStoreUrl)}>
+                <Image
+                  source={require('../../assets/images/app-store.png')}
+                  style={styles.storeButton}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Linking.openURL(playStoreUrl)}>
+                <Image
+                  source={require('../../assets/images/google-play.png')}
+                  style={styles.storeButton}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 
@@ -140,59 +140,67 @@ const styles = StyleSheet.create({
   },
   webContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#f0f4f0", // Light green background
+  },
+  webContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 20,
   },
   webTitle: {
-    fontSize: 48,
+    fontSize: 64,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 40,
+    color: "#333",
   },
-  webMessage: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 30,
+  webTitleGreen: {
+    color: "#409858",
   },
-  webButtonContainer: {
-    alignItems: "center",
+  centeredContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    maxWidth: 600,
+    width: '100%',
+    marginBottom: 100,
   },
   webButton: {
     backgroundColor: "#409858",
-    borderRadius: 9999,
-    padding: 16,
-    paddingHorizontal: 32,
-    marginBottom: 20,
+    borderRadius: 50,
+    paddingHorizontal: 40,
+    borderWidth: 0,
+    borderColor: "#000",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   webButtonText: {
     color: "#fff",
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: "bold",
   },
   orText: {
-    fontSize: 16,
-    marginVertical: 10,
-  },
-  downloadText: {
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 28,
+    marginVertical: 20,
+    fontWeight: "bold",
+    color: "#666",
   },
   storeButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
   },
   storeButton: {
-    backgroundColor: "#409858",
-    borderRadius: 9999,
-    padding: 12,
-    paddingHorizontal: 24,
-    marginHorizontal: 5,
-  },
-  storeButtonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "bold",
+    width: 250,
+    height: 70,
+    marginHorizontal: 10,
+    resizeMode: "contain",
   },
 });
