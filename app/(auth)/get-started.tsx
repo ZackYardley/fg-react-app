@@ -8,8 +8,8 @@ import { GreenButton } from "@/components/auth";
 
 export default function GetStartedScreen() {
   const appUrl = "com.fgdevteam.fgreactapp://";
-  const appStoreUrl = "https://apps.apple.com/app/your-app-id"; // Replace with your actual App Store URL
-  const playStoreUrl = "https://play.google.com/store/apps/details?id=com.fgdevteam.fgreactapp"; // Replace with your actual Play Store URL
+  const appStoreUrl = "https://apps.apple.com/app/6578432563";
+  const playStoreUrl = "https://play.google.com/store/apps/details?id=com.fgdevteam.fgreactapp";
 
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
