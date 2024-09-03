@@ -52,14 +52,15 @@ const sendWelcomeEmail = async (email: string, name: string): Promise<void> => {
 
 // Function to send account deletion email
 const sendAccountDeletionEmail = async (email: string, name: string): Promise<void> => {
-  const subject = "Account Deleted - We're Sorry to See You Go";
-  const text = `Hello ${name},\n\nWe're sorry to see you go. Your account has been successfully deleted.\n\nIf you change your mind, you're always welcome back.\n\nBest regards,\nThe App Team`;
+  const subject = `Sorry to See You Go, ${name} 🌱`;
+  const text = `Hi ${name},\n\nWe noticed that you've recently deleted your Forevergreen account. We're sorry to see you leave our community of eco-conscious individuals working towards a more sustainable future. 🌍\n\nIf there’s anything we could have done better or if you have any feedback, we’d love to hear from you. Your insights can help us improve and make the world a little greener together.\n\nIf you ever change your mind, know that you’re always welcome back. Your contributions have already made a difference, and we hope you’ll continue your sustainability journey with us in the future.\n\nUntil then, stay green and take care! 🌱\n\nBest regards,\n\nThe Forevergreen Team`;
   const html = `
-    <h2>Account Deleted</h2>
-    <p>Hello ${name},</p>
-    <p>We're sorry to see you go. Your account has been successfully deleted.</p>
-    <p>If you change your mind, you're always welcome back.</p>
-    <p>Best regards,<br>The App Team</p>
+    <p>Hi ${name},</p>
+    <p>We noticed that you've recently deleted your Forevergreen account. We're sorry to see you leave our community of eco-conscious individuals working towards a more sustainable future. 🌍</p>
+    <p>If there’s anything we could have done better or if you have any feedback, we’d love to hear from you. Your insights can help us improve and make the world a little greener together.</p>
+    <p>If you ever change your mind, know that you’re always welcome back. Your contributions have already made a difference, and we hope you’ll continue your sustainability journey with us in the future.</p>
+    <p>Until then, stay green and take care! 🌱</p>
+    <p>Best regards,<br>The Forevergreen Team</p>
   `;
 
   await sendEmail([email], subject, text, html);
