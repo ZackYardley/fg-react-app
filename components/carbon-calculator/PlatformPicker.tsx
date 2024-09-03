@@ -6,17 +6,23 @@ interface PickerProps {
   selectedValue: string | undefined;
   onValueChange: (value: string) => void;
   items: { label: string; value: string }[];
+  disabled?: boolean;
 }
 
-const IOSPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
+const IOSPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProps) => {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   const selectedItem = items.find((item) => item.value === selectedValue);
 
   return (
     <View>
-      <Pressable style={styles.iosPickerTrigger} onPress={() => setIsPickerVisible(true)}>
-        <Text style={styles.iosPickerTriggerText}>{selectedItem ? selectedItem.label : "Select a state"}</Text>
+      <Pressable
+        style={[styles.iosPickerTrigger, disabled && styles.disabledTrigger]}
+        onPress={() => !disabled && setIsPickerVisible(true)}
+      >
+        <Text style={[styles.iosPickerTriggerText, disabled && styles.disabledText]}>
+          {selectedItem ? selectedItem.label : "Select a state"}
+        </Text>
       </Pressable>
       <Modal visible={isPickerVisible} animationType="slide" transparent={true}>
         <View style={styles.iosModalContainer}>
@@ -28,8 +34,10 @@ const IOSPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
               selectedValue={selectedValue}
               onValueChange={(itemValue) => {
                 onValueChange(itemValue);
+                setIsPickerVisible(false);
               }}
               itemStyle={styles.iosPickerItem}
+              enabled={!disabled}
             >
               {items.map((item) => (
                 <Picker.Item key={item.value} label={item.label} value={item.value} />
@@ -42,7 +50,7 @@ const IOSPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
   );
 };
 
-const AndroidPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
+const AndroidPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProps) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const renderItem = ({ item }: { item: { label: string; value: string } }) => (
@@ -59,8 +67,11 @@ const AndroidPicker = ({ selectedValue, onValueChange, items }: PickerProps) => 
 
   return (
     <View>
-      <Pressable style={styles.androidPickerTrigger} onPress={() => setModalVisible(true)}>
-        <Text style={styles.androidPickerTriggerText}>
+      <Pressable
+        style={[styles.androidPickerTrigger, disabled && styles.disabledTrigger]}
+        onPress={() => !disabled && setModalVisible(true)}
+      >
+        <Text style={[styles.androidPickerTriggerText, disabled && styles.disabledText]}>
           {selectedValue ? items.find((item) => item.value === selectedValue)?.label : "Select a state"}
         </Text>
       </Pressable>
@@ -171,6 +182,13 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: "white",
     fontSize: 16,
+  },
+  disabledTrigger: {
+    backgroundColor: "#F3F4F6",
+    borderColor: "#E5E7EB",
+  },
+  disabledText: {
+    color: "#9CA3AF",
   },
 });
 

@@ -235,7 +235,12 @@ export default function EnergyCalculator() {
 
           <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
           {stateItems && (
-            <PlatformPicker selectedValue={surveyData.state} onValueChange={handleStateChange} items={stateItems} />
+            <PlatformPicker
+              selectedValue={surveyData.state}
+              onValueChange={handleStateChange}
+              items={stateItems}
+              disabled={isProcessing}
+            />
           )}
 
           <Pressable
