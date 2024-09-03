@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Pressable, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Location from "expo-location";
@@ -55,7 +55,16 @@ export default function EnergyCalculator() {
       try {
         const data = await fetchEmissionsData();
         if (data && data.surveyData && data.surveyEmissions) {
-          setSurveyData(data.surveyData);
+          setSurveyData({
+            ...surveyData,
+            state: data.surveyData.state,
+            electricBill: data.surveyData.electricBill,
+            waterBill: data.surveyData.waterBill,
+            propaneBill: data.surveyData.propaneBill,
+            gasBill: data.surveyData.gasBill,
+            useWoodStove: data.surveyData.useWoodStove || "No",
+            peopleInHome: data.surveyData.peopleInHome || 1,
+          });
           setSurveyEmissions(data.surveyEmissions);
           setDietEmissions(data.surveyEmissions.dietEmissions || 0);
           setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
@@ -66,7 +75,7 @@ export default function EnergyCalculator() {
             }
           }
         } else {
-          console.log("No data available");
+          // console.log("No data available");
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -129,16 +138,15 @@ export default function EnergyCalculator() {
   useEffect(() => {
     const validateForm = () => {
       const isValid =
-        surveyData.state !== "" &&
-        surveyData.electricBill !== "" &&
-        surveyData.waterBill !== "" &&
-        surveyData.propaneBill !== "" &&
-        surveyData.gasBill !== "" &&
-        surveyData.useWoodStove !== "" &&
+        surveyData.state !== undefined &&
+        surveyData.electricBill !== undefined &&
+        surveyData.waterBill !== undefined &&
+        surveyData.propaneBill !== undefined &&
+        surveyData.gasBill !== undefined &&
+        surveyData.useWoodStove !== undefined &&
         surveyData.peopleInHome !== undefined;
       setIsFormValid(isValid);
     };
-    console.log("surveyData", surveyData);
     validateForm();
   }, [surveyData]);
 
@@ -169,7 +177,7 @@ export default function EnergyCalculator() {
     }
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      console.log("Location permission not granted");
+      // console.log("Location permission not granted");
       return;
     }
 
@@ -184,7 +192,7 @@ export default function EnergyCalculator() {
       );
 
       if (!state) {
-        console.log("State not found in statesData, using random state");
+        // console.log("State not found in statesData, using random state");
         state = statesData[Math.floor(Math.random() * statesData.length)];
       }
 
@@ -227,8 +235,9 @@ export default function EnergyCalculator() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <StatusBar barStyle="dark-content" />
         <View style={styles.contentContainer}>
           <Header progress={progress} title="Energy" />
           <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
@@ -344,9 +353,9 @@ export default function EnergyCalculator() {
           </View>
         </View>
 
-        <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
-      </SafeAreaView>
-    </ScrollView>
+        <NextButton isFormValid={isFormValid && !isProcessing} onPress={() => handleNextButton()} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

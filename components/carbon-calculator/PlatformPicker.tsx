@@ -34,7 +34,6 @@ const IOSPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProp
               selectedValue={selectedValue}
               onValueChange={(itemValue) => {
                 onValueChange(itemValue);
-                setIsPickerVisible(false);
               }}
               itemStyle={styles.iosPickerItem}
               enabled={!disabled}
