@@ -66,6 +66,12 @@
           }
         }
       ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Forevergreen to use your location."
+        }
+      ],
       "@react-native-google-signin/google-signin",
       "@react-native-firebase/app",
       [

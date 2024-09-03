@@ -1,30 +1,52 @@
-import React from "react";
-import { Platform, View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from "react-native";
+import { useState } from "react";
+import { Platform, View, Text, Modal, FlatList, StyleSheet, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
 interface PickerProps {
-  selectedValue: string;
+  selectedValue: string | undefined;
   onValueChange: (value: string) => void;
   items: { label: string; value: string }[];
 }
 
 const IOSPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
+  const [isPickerVisible, setIsPickerVisible] = useState(false);
+
+  const selectedItem = items.find((item) => item.value === selectedValue);
+
   return (
-    <View style={styles.iosPicker}>
-      <Picker selectedValue={selectedValue} onValueChange={onValueChange} itemStyle={styles.iosPickerItem}>
-        {items.map((item) => (
-          <Picker.Item key={item.value} label={item.label} value={item.value} />
-        ))}
-      </Picker>
+    <View>
+      <Pressable style={styles.iosPickerTrigger} onPress={() => setIsPickerVisible(true)}>
+        <Text style={styles.iosPickerTriggerText}>{selectedItem ? selectedItem.label : "Select a state"}</Text>
+      </Pressable>
+      <Modal visible={isPickerVisible} animationType="slide" transparent={true}>
+        <View style={styles.iosModalContainer}>
+          <View style={styles.iosModalContent}>
+            <Pressable style={styles.iosDoneButton} onPress={() => setIsPickerVisible(false)}>
+              <Text style={styles.iosDoneButtonText}>Done</Text>
+            </Pressable>
+            <Picker
+              selectedValue={selectedValue}
+              onValueChange={(itemValue) => {
+                onValueChange(itemValue);
+              }}
+              itemStyle={styles.iosPickerItem}
+            >
+              {items.map((item) => (
+                <Picker.Item key={item.value} label={item.label} value={item.value} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const AndroidPicker = ({ selectedValue, onValueChange, items }: PickerProps) => {
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const renderItem = ({ item }: { item: { label: string; value: string } }) => (
-    <TouchableOpacity
+    <Pressable
       style={styles.item}
       onPress={() => {
         onValueChange(item.value);
@@ -32,16 +54,16 @@ const AndroidPicker = ({ selectedValue, onValueChange, items }: PickerProps) => 
       }}
     >
       <Text style={[styles.itemText, item.value === selectedValue && styles.selectedItemText]}>{item.label}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
     <View>
-      <TouchableOpacity style={styles.androidPickerTrigger} onPress={() => setModalVisible(true)}>
+      <Pressable style={styles.androidPickerTrigger} onPress={() => setModalVisible(true)}>
         <Text style={styles.androidPickerTriggerText}>
           {selectedValue ? items.find((item) => item.value === selectedValue)?.label : "Select a state"}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
       <Modal
         animationType="slide"
         transparent={true}
@@ -51,9 +73,9 @@ const AndroidPicker = ({ selectedValue, onValueChange, items }: PickerProps) => 
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <FlatList data={items} renderItem={renderItem} keyExtractor={(item) => item.value} />
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+            <Pressable style={styles.closeButton} onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </Modal>
@@ -68,12 +90,37 @@ const PlatformPicker = Platform.select({
 });
 
 const styles = StyleSheet.create({
-  iosPicker: {
-    marginTop: 8,
+  iosPickerTrigger: {
     backgroundColor: "white",
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+  },
+  iosPickerTriggerText: {
+    fontSize: 16,
+  },
+  iosModalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  iosModalContent: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 20,
+  },
+  iosDoneButton: {
+    alignSelf: "flex-end",
+    padding: 10,
+    marginRight: 10,
+  },
+  iosDoneButtonText: {
+    color: "#007AFF",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   iosPickerItem: {
     fontSize: 16,

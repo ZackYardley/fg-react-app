@@ -8,10 +8,10 @@ import { router } from "expo-router";
 import { Loading } from "@/components/common";
 
 export default function DietCalculator() {
-  const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
+  const [surveyData, setSurveyData] = useState<SurveyData>({
     diet: "",
   });
-  const [surveyEmissions, setSurveyEmissions] = useState<Partial<SurveyEmissions>>({
+  const [surveyEmissions, setSurveyEmissions] = useState<SurveyEmissions>({
     dietEmissions: 0,
   });
   const [transportationEmissions, setTransportationEmissions] = useState(0);

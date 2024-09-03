@@ -9,7 +9,7 @@ import { Loading } from "@/components/common";
 import { router } from "expo-router";
 
 export default function TransportationCalculator() {
-  const [surveyData, setSurveyData] = useState<Partial<SurveyData>>({
+  const [surveyData, setSurveyData] = useState<SurveyData>({
     longFlights: 0,
     shortFlights: 0,
     carType: "Gas - ⛽️",
@@ -21,7 +21,7 @@ export default function TransportationCalculator() {
     walkBike: "No",
     walkBikeFrequency: "",
   });
-  const [surveyEmissions, setSurveyEmissions] = useState<Partial<SurveyEmissions>>({
+  const [surveyEmissions, setSurveyEmissions] = useState<SurveyEmissions>({
     flightEmissions: 0,
     carEmissions: 0,
     publicTransportEmissions: 0,
