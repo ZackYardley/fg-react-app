@@ -55,8 +55,8 @@ export default function ForevergreenBlogsPage() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
-        <BackButton />
         <PageHeader subtitle="Blogs" />
+        <BackButton />
         <View>
           {POSTS.map((item: DataType, index: string) => (
             <Link key={index} href={item.href as Href}>

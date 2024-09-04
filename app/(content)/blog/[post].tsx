@@ -56,8 +56,8 @@ export default function BlogPostPage() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.scrollViewContent} contentInsetAdjustmentBehavior="automatic">
-        <BackButton />
         <PageHeader subtitle="Blogs" />
+        <BackButton />
         <View style={styles.header}>
           <Text style={styles.title}>{info.title}</Text>
           <Text style={styles.subtitle}>{info.subtitle}</Text>
