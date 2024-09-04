@@ -35,7 +35,7 @@ export default function RootLayout() {
 
   const { handleURLCallback } = useStripe();
 
-  /* const handleDeepLink = useCallback(
+  const handleDeepLink = useCallback(
     async (url: string) => {
       if (url) {
         const stripeHandled = await handleURLCallback(url);
@@ -50,9 +50,8 @@ export default function RootLayout() {
     },
     [handleURLCallback]
   );
-  */
 
-  /* useEffect(() => {
+  useEffect(() => {
     const getUrlAsync = async () => {
       const initialUrl = await Linking.getInitialURL();
       handleDeepLink(initialUrl || "");
@@ -68,7 +67,6 @@ export default function RootLayout() {
       deepLinkListener.remove();
     };
   }, [handleDeepLink]);
-  */
 
   if (!loaded) {
     return null;
