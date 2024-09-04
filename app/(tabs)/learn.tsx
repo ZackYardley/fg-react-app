@@ -6,6 +6,7 @@ import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Link } from "expo-router";
 
 const LearnScreen = () => {
   const [loading, setLoading] = useState(true);
@@ -84,9 +85,11 @@ const LearnScreen = () => {
             <Text style={styles.cardText}>
               We have tons of blogs about hot climate topics that are easy to read and educational!
             </Text>
-            <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/blog")}>
-              <Text style={styles.buttonText}>Read Now</Text>
-            </Pressable>
+            <Link href="/blog">
+              <View style={styles.button}>
+                <Text style={styles.buttonText}>Read Now</Text>
+              </View>
+            </Link>
           </View>
 
           <View style={styles.card}>

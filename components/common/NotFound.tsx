@@ -8,7 +8,7 @@ const NotFoundComponent = () => {
       <Text style={styles.errorCode}>404</Text>
       <Text style={styles.errorMessage}>Page Not Found</Text>
       <Image source={fourofour} style={styles.image} />
-      <TouchableOpacity onPress={() => router.replace("/")} style={styles.button}>
+      <TouchableOpacity onPress={() => router.replace("/blog")} style={styles.button}>
         <Text style={styles.buttonText}>Back Home</Text>
       </TouchableOpacity>
     </View>
