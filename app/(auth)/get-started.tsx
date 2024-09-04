@@ -5,12 +5,13 @@ import { StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GreenButton } from "@/components/auth";
+import { useState } from "react";
 
 export default function GetStartedScreen() {
   const appUrl = "com.fgdevteam.fgreactapp://";
   const appStoreUrl = "https://apps.apple.com/app/6578432563";
   const playStoreUrl = "https://play.google.com/store/apps/details?id=com.fgdevteam.fgreactapp";
-
+  
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = appUrl;
@@ -21,12 +22,23 @@ export default function GetStartedScreen() {
 
   if (Platform.OS === "web") {
     return (
-      <View style={styles.webContainer}>
+      <ScrollView style={styles.webContainer}>
         <View style={styles.webContent}>
           <Text style={styles.webTitle}>
             Forever<Text style={styles.webTitleGreen}>green</Text>
           </Text>
           <View style={styles.centeredContent}>
+            <Text style={styles.description}>
+              Forevergreen is your all-in-one tool for understanding and managing your carbon footprint. Designed for eco-conscious individuals, our app provides everything you need to take control of your environmental impact.
+            </Text> 
+              <View style={styles.featuresList}>
+                <Text style={styles.featuresTitle}>Key Features</Text>
+                <Text style={styles.feature}>• Carbon Footprint Calculator</Text>
+                <Text style={styles.feature}>• Track Your Progress</Text>
+                <Text style={styles.feature}>• Offset Your Emissions</Text>
+                <Text style={styles.feature}>• Personalized Insights</Text>
+                <Text style={styles.feature}>• Join a Community</Text>
+              </View>
             <GreenButton
               title="Open App"
               onPress={handleOpenApp}
@@ -48,9 +60,12 @@ export default function GetStartedScreen() {
                 />
               </TouchableOpacity>
             </View>
+            <Text style={styles.callToAction}>
+              Download Forevergreen today and take the first step towards a greener future!
+            </Text> 
           </View>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -140,7 +155,7 @@ const styles = StyleSheet.create({
   },
   webContainer: {
     flex: 1,
-    backgroundColor: "#f0f4f0", // Light green background
+    backgroundColor: "#f0f4f0",
   },
   webContent: {
     flex: 1,
@@ -164,9 +179,37 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    maxWidth: 600,
+    maxWidth: 800,
     width: '100%',
     marginBottom: 100,
+  },
+  description: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 28,
+  },
+  featuresList: {
+    alignSelf: 'stretch',
+    marginBottom: 20,
+    alignItems: 'center'
+  },
+  featuresTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#409858',
+    textDecorationLine: 'underline',
+  },
+  feature: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  callToAction: {
+    fontSize: 20,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: 20,
   },
   webButton: {
     backgroundColor: "#409858",
