@@ -1,5 +1,5 @@
 import { useRootNavigationState, Redirect, router } from "expo-router";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect, useRef } from "react";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
@@ -7,6 +7,7 @@ import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
 import { Loading } from "@/components/common";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Initialize debugMode with useState
 export default function Index() {
@@ -61,49 +62,51 @@ export default function Index() {
 
   if (debugMode) {
     return (
-      <View style={styles.container}>
-        <View style={styles.confettiContainer} pointerEvents="none">
-          <ConfettiCannon
-            count={200}
-            origin={{ x: 0, y: 0 }}
-            autoStart={false}
-            ref={explosionRef}
-            fadeOut
-            fallSpeed={3000}
-            explosionSpeed={1}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setDebugMode(false)} // Update debugMode state
-        >
-          <View style={styles.buttonContent}>
-            <View style={styles.buttonLabel}>
-              <Icon name="user" size={24} color="#FFF" />
-              <Text style={styles.buttonText}>Regular App Flow</Text>
-            </View>
-            <Icon name="arrow-right" size={24} color="#FFF" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <ScrollView style={styles.container}>
+          <View style={styles.confettiContainer} pointerEvents="none">
+            <ConfettiCannon
+              count={200}
+              origin={{ x: 0, y: 0 }}
+              autoStart={false}
+              ref={explosionRef}
+              fadeOut
+              fallSpeed={3000}
+              explosionSpeed={1}
+            />
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/_sitemap")}>
-          <View style={styles.buttonContent}>
-            <View style={styles.buttonLabel}>
-              <Icon name="map" size={24} color="#FFF" />
-              <Text style={styles.buttonText}>Sitemap</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setDebugMode(false)} // Update debugMode state
+          >
+            <View style={styles.buttonContent}>
+              <View style={styles.buttonLabel}>
+                <Icon name="user" size={24} color="#FFF" />
+                <Text style={styles.buttonText}>Regular App Flow</Text>
+              </View>
+              <Icon name="arrow-right" size={24} color="#FFF" />
             </View>
-            <Icon name="arrow-right" size={24} color="#FFF" />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => explosionRef.current?.start()}>
-          <View style={styles.buttonContent}>
-            <View style={styles.buttonLabel}>
-              <Icon name="smile-o" size={24} color="#FFF" />
-              <Text style={styles.buttonText}>Test Button!</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => router.push("/_sitemap")}>
+            <View style={styles.buttonContent}>
+              <View style={styles.buttonLabel}>
+                <Icon name="map" size={24} color="#FFF" />
+                <Text style={styles.buttonText}>Sitemap</Text>
+              </View>
+              <Icon name="arrow-right" size={24} color="#FFF" />
             </View>
-            <Icon name="arrow-right" size={24} color="#FFF" />
-          </View>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => explosionRef.current?.start()}>
+            <View style={styles.buttonContent}>
+              <View style={styles.buttonLabel}>
+                <Icon name="smile-o" size={24} color="#FFF" />
+                <Text style={styles.buttonText}>Test Button!</Text>
+              </View>
+              <Icon name="arrow-right" size={24} color="#FFF" />
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
     );
   } else {
     if (!user) {

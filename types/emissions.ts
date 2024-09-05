@@ -68,4 +68,6 @@ interface CommunityEmissionsData {
   last_updated: Date;
 }
 
-export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData };
+type EmissionGroup = "Transportation" | "Diet" | "Energy";
+
+export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData, EmissionGroup };

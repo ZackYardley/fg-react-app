@@ -153,8 +153,8 @@ export default function TransportationCalculator() {
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>
             <Header progress={progress} title="Transportation" />
@@ -272,8 +272,8 @@ export default function TransportationCalculator() {
           </View>
           <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
         </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

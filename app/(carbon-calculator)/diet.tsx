@@ -81,8 +81,8 @@ export default function DietCalculator() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.contentContainer}>
           {/* Header */}
           <Header progress={progress} title="Diet" />
@@ -121,8 +121,8 @@ export default function DietCalculator() {
 
         {/* Next Button */}
         <NextButton isFormValid={isFormValid} onPress={handleNextButton} />
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

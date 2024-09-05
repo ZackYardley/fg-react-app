@@ -1,29 +1,33 @@
-import { useState, useEffect, useRef } from "react";
-import { View, Text, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+import { useState, useEffect } from "react";
+import { View, Text, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";
-import { fetchCarbonCreditProducts } from "@/api/products";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
-import { CarbonFootprint, Community, CommunityLeaders, FastFact } from "@/components/home";
+import {
+  CarbonFootprint,
+  Community,
+  CommunityLeaders,
+  EmissionsOffset,
+  FastFact,
+  Prizes,
+  Credits,
+  Tips,
+} from "@/components/home";
 import { PageHeader } from "@/components/common";
-import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
-import { CarbonCredit } from "@/types";
+import { EmissionGroup, EmissionsDocument } from "@/types";
 
-type EmissionGroup = "Transportation" | "Diet" | "Energy";
-
-interface Emissions {
-  transportationEmissions: number;
-  dietEmissions: number;
-  energyEmissions: number;
-}
-
-function getHighestEmissionGroup(emissions: Emissions): EmissionGroup {
-  const { transportationEmissions, dietEmissions, energyEmissions } = emissions;
+function getHighestEmissionGroup(emissions: EmissionsDocument): EmissionGroup {
+  if (
+    !emissions.surveyEmissions ||
+    !emissions.surveyEmissions.transportationEmissions ||
+    !emissions.surveyEmissions.dietEmissions ||
+    !emissions.surveyEmissions.energyEmissions
+  ) {
+    return "Transportation";
+  }
+  const { transportationEmissions, dietEmissions, energyEmissions } = emissions.surveyEmissions;
 
   if (transportationEmissions >= dietEmissions && transportationEmissions >= energyEmissions) {
     return "Transportation";
@@ -42,10 +46,9 @@ const HomeScreen = () => {
   const [transportationEmissions, setTransportationEmissions] = useState(0.0);
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
-  const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
+  const [highestEmissionGroup, setHighestEmissionGroup] = useState<string>();
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
-  const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -60,13 +63,7 @@ const HomeScreen = () => {
 
         const netZero = data.totalOffset >= data.monthlyEmissions;
         setIsNetZero(netZero);
-
-        const emissions: Emissions = {
-          transportationEmissions: data.surveyEmissions.transportationEmissions || 0,
-          dietEmissions: data.surveyEmissions.dietEmissions || 0,
-          energyEmissions: data.surveyEmissions.energyEmissions || 0,
-        };
-        setHighestEmissionGroup(getHighestEmissionGroup(emissions));
+        setHighestEmissionGroup(getHighestEmissionGroup(data));
 
         if (netZero && data.monthlyEmissions > 0) {
           const months = Math.floor(data.totalOffset - data.monthlyEmissions);
@@ -74,14 +71,6 @@ const HomeScreen = () => {
         } else {
           setNetZeroMonths(0);
         }
-      }
-
-      // Fetch carbon credit products
-      try {
-        const credits = await fetchCarbonCreditProducts();
-        setCarbonCredits(credits.slice(0, 4)); // Get the first 4 credits for display
-      } catch (error) {
-        console.error("Error fetching carbon credits:", error);
       }
     };
 
@@ -96,46 +85,7 @@ const HomeScreen = () => {
   }
   months.reverse();
 
-  const carouselRef = useRef(null);
-  const { width: screenWidth } = useWindowDimensions();
-
-  const carouselData = [
-    { title: "1 Month Net-Zero", image: Sticker },
-    { title: "3 Months Net-Zero", image: Tote },
-    { title: "6 Months Net-Zero", image: Shirt },
-    { title: "1 Months Net-Zero", image: WaterBottle },
-    { title: "18 Months Net-Zero", image: CuttingBoard },
-    { title: "24 Months Net-Zero", image: Crewneck },
-  ];
-
-  const renderCarouselItem = ({ item }: any) => (
-    <View style={styles.carouselItem}>
-      <Image source={item.image} style={styles.carouselImage} />
-      <Text style={styles.carouselText}>{item.title}</Text>
-    </View>
-  );
-
   const displayNetZeroMonths = netZeroMonths === 24 ? "24+" : netZeroMonths.toString();
-
-  const renderCreditItem = (credit: CarbonCredit, index: number) => (
-    <View key={index} style={styles.creditItem}>
-      <LinearGradient
-        colors={[credit.stripe_metadata_color_0, credit.stripe_metadata_color_1, credit.stripe_metadata_color_2]}
-        style={{
-          width: 120,
-          height: 120,
-          borderRadius: 20,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-      >
-        <Image source={{ uri: credit.images[0] }} style={styles.creditIcon} />
-      </LinearGradient>
-      <Text style={styles.creditName}>{credit.name}</Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -143,89 +93,21 @@ const HomeScreen = () => {
       <ScrollView style={styles.container}>
         <View style={styles.content}>
           <PageHeader />
-
           <FastFact />
-
           <CarbonFootprint monthlyEmissions={monthlyEmissions} totalOffset={totalOffset} />
+          <LineChartBreakdown />
 
-          {/* Monthly Graph of Emissions */}
-          <View style={styles.emissionsGraph}>
-            <Text style={styles.sectionTitle}>Your net-zero journey</Text>
-            <View style={styles.graphContainer}>
-              <LineChartBreakdown />
-            </View>
-            <TouchableOpacity
-              style={styles.offsetButton}
-              onPress={() => {
-                router.push("/offset-now");
-              }}
-            >
-              <Text style={styles.offsetButtonText}>Offset Now!</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Emissions vs Offset */}
-          <View style={styles.carbonFootprint}>
-            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint</Text>
-            <View style={styles.carbonFootprintContent}>
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Emissions</Text>
-                <Text style={styles.emissionText}>
-                  {monthlyEmissions.toFixed(2)}
-                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
-                </Text>
-              </View>
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Offsets</Text>
-                <Text style={styles.offsetText}>
-                  {totalOffset.toFixed(2)}
-                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
-                </Text>
-              </View>
-            </View>
-
-            <Text style={styles.netZeroText}>
-              {isNetZero
-                ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? "s" : ""}! 😊`
-                : "You are not net-zero this month! 😔"}
-            </Text>
-
-            <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
-              <Text style={styles.offsetButtonText}>Offset Now!</Text>
-            </TouchableOpacity>
-          </View>
+          <EmissionsOffset
+            monthlyEmissions={monthlyEmissions}
+            totalOffset={totalOffset}
+            isNetZero={isNetZero}
+            displayNetZeroMonths={displayNetZeroMonths}
+            netZeroMonths={netZeroMonths}
+          />
 
           <Community />
-
           <CommunityLeaders />
-
-          {/* Prizes */}
-          <View style={styles.chartsSection}>
-            <View style={styles.chartBox}>
-              <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
-              <View style={styles.prizeSection}>
-                <TouchableOpacity
-                  style={[styles.prizeBox, isNetZero ? styles.prizeBox : {}]}
-                  onPress={() => router.push("/journey")}
-                >
-                  <Text style={styles.monthNetZeroText}>{displayNetZeroMonths}</Text>
-                  <Text style={styles.subtitleText}>Months Net-Zero</Text>
-                </TouchableOpacity>
-                <View style={styles.prizeSection}>
-                  <Carousel
-                    ref={carouselRef}
-                    loop
-                    width={screenWidth * 0.4}
-                    height={screenWidth * 0.4}
-                    autoPlay={true}
-                    data={carouselData}
-                    scrollAnimationDuration={1000}
-                    renderItem={renderCarouselItem}
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
+          <Prizes isNetZero={isNetZero} displayNetZeroMonths={displayNetZeroMonths} />
 
           {/* Charts */}
           <View style={styles.chartsSection}>
@@ -276,32 +158,8 @@ const HomeScreen = () => {
             </View>
           </View>
 
-          {/* Tips */}
-          {/* <View style={styles.fastFact}>
-            <Text style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</Text>
-            <Text style={styles.highestEmissionsText}>Your highest emissions source: {highestEmissionGroup}</Text>
-            <Text style={styles.fastFactText}>Turn off your lights!</Text>
-            <Text style={styles.fastFactText}>Carpool to work!</Text>
-            <Text style={styles.fastFactText}>Try meatless Monday!</Text>
-          </View> */}
-
-          {/* Credits */}
-          <TouchableOpacity style={styles.creditBox} onPress={() => router.navigate("/carbon-credit")}>
-            <View style={{ padding: 24 }}>
-              <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
-              <Text style={styles.subtitleText}>
-                From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
-              </Text>
-            </View>
-
-            <View style={styles.creditsContainer}>
-              {carbonCredits.length > 0 ? (
-                carbonCredits.map((credit, index) => renderCreditItem(credit, index))
-              ) : (
-                <Text>Loading carbon credits...</Text>
-              )}
-            </View>
-          </TouchableOpacity>
+          {highestEmissionGroup && <Tips highestEmissionGroup={highestEmissionGroup} />}
+          <Credits />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -318,46 +176,6 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
   },
-  subtitleText: {
-    fontSize: 18,
-    textAlign: "center",
-  },
-  netZeroText: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  monthNetZeroText: {
-    fontSize: 36,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  emissionsGraph: {
-    backgroundColor: "#eeeeee",
-    marginBottom: 24,
-    padding: 24,
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  graphContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  offsetButton: {
-    marginTop: 10,
-    backgroundColor: "#409858",
-    borderRadius: 50,
-    alignItems: "center",
-    alignSelf: "center",
-    justifyContent: "center",
-    height: 40,
-    width: 150,
-    paddingVertical: 4,
-    paddingHorizontal: 16,
-  },
   factButton: {
     justifyContent: "center", // Center the text vertically
     alignItems: "center",
@@ -369,18 +187,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 16,
     marginHorizontal: "auto",
-  },
-  offsetButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  sectionTitle: {
-    fontSize: 24,
-    marginBottom: 16,
-    fontWeight: "bold",
-    textAlign: "center",
   },
   chartsSection: {
     backgroundColor: "#eeeeee",
@@ -426,106 +232,5 @@ const styles = StyleSheet.create({
     height: 16,
     width: 16,
     marginRight: 8,
-  },
-  carbonFootprint: {
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    marginTop: 12,
-    backgroundColor: "#eeeeee",
-  },
-  carbonFootprintTitle: {
-    fontSize: 20,
-    textAlign: "center",
-    marginBottom: 12,
-    fontWeight: "700",
-  },
-  carbonFootprintContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  emissionText: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#b91c1c",
-  },
-  highestEmissionsText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#b91c1c",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  offsetText: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "green",
-  },
-  emissionUnit: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "black",
-  },
-  section: {
-    flex: 1,
-    alignItems: "center",
-  },
-  creditItem: {
-    maxWidth: 120,
-  },
-  creditIcon: {
-    width: 86,
-    height: 92,
-  },
-  creditsContainer: {
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-evenly",
-    gap: 16,
-  },
-  creditBox: {
-    borderRadius: 8,
-    marginBottom: 12,
-    marginTop: 12,
-    backgroundColor: "#eeeeee",
-  },
-  creditName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  prizeBox: {
-    backgroundColor: "#d4edda",
-    borderRadius: 16,
-    width: "40%",
-    padding: 16,
-    // ADD BUTTON IS GREEN OR RED IF NET ZERO
-  },
-  prizeSection: {
-    flex: 2,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 16,
-    alignItems: "center",
-  },
-  carouselItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 8,
-  },
-  carouselImage: {
-    width: "80%",
-    height: "80%",
-    resizeMode: "contain",
-  },
-  carouselText: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
   },
 });
