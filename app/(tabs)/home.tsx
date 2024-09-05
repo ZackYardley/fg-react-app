@@ -20,18 +20,10 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdow
 import { getRandomFact } from "@/constants/facts";
 import { CarbonFootprint } from "@/components/home";
 import { PageHeader } from "@/components/common";
-import {
-  Russas,
-  Colombia,
-  Quebec,
-  Hydro,
-  Sticker,
-  Tote,
-  Shirt,
-  WaterBottle,
-  CuttingBoard,
-  Crewneck,
-} from "@/constants/Images";
+import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
+import { fetchCarbonCreditProducts } from "@/api/products";
+import { CarbonCredit } from "@/types";
+import { LinearGradient } from "expo-linear-gradient";
 
 type EmissionGroup = "Transportation" | "Diet" | "Energy";
 
@@ -66,6 +58,7 @@ const HomeScreen = () => {
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
   const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
+  const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -106,6 +99,14 @@ const HomeScreen = () => {
       } catch (error) {
         console.error("Error fetching top referrers:", error);
       }
+
+      // Fetch carbon credit products
+      try {
+        const credits = await fetchCarbonCreditProducts();
+        setCarbonCredits(credits.slice(0, 4)); // Get the first 4 credits for display
+      } catch (error) {
+        console.error("Error fetching carbon credits:", error);
+      }
     };
 
     loadData();
@@ -139,6 +140,26 @@ const HomeScreen = () => {
   );
 
   const displayNetZeroMonths = netZeroMonths === 24 ? "24+" : netZeroMonths.toString();
+
+  const renderCreditItem = (credit: CarbonCredit, index: number) => (
+    <View key={index} style={styles.creditItem}>
+      <LinearGradient
+        colors={[credit.stripe_metadata_color_0, credit.stripe_metadata_color_1, credit.stripe_metadata_color_2]}
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: 20,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      >
+        <Image source={{ uri: credit.images[0] }} style={styles.creditIcon} />
+      </LinearGradient>
+      <Text style={styles.creditName}>{credit.name}</Text>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -330,30 +351,20 @@ const HomeScreen = () => {
           </View>
 
           {/* Credits */}
-          <TouchableOpacity style={styles.creditBox} onPress={() => router.push("/carbon-credit")}>
-            <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
-            <Text style={styles.subtitleText}>
-              From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
-            </Text>
+          <TouchableOpacity style={styles.creditBox} onPress={() => router.navigate("/carbon-credit")}>
+            <View style={{ padding: 24 }}>
+              <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
+              <Text style={styles.subtitleText}>
+                From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
+              </Text>
+            </View>
 
             <View style={styles.creditsContainer}>
-              <View style={styles.creditRow}>
-                <Image source={Russas} style={styles.creditIcon} />
-                <Image source={Colombia} style={styles.creditIcon} />
-              </View>
-              <View style={styles.creditRow}>
-                <Text style={styles.creditName}>The Russas Project</Text>
-                <Text style={styles.creditName}>Colombian Reforestation</Text>
-              </View>
-
-              <View style={styles.creditRow}>
-                <Image source={Quebec} style={styles.creditIcon} />
-                <Image source={Hydro} style={styles.creditIcon} />
-              </View>
-              <View style={styles.creditRow}>
-                <Text style={styles.creditName}>Canadian Energy & Waste</Text>
-                <Text style={styles.creditName}>Pamona Hydroelectric</Text>
-              </View>
+              {carbonCredits.length > 0 ? (
+                carbonCredits.map((credit, index) => renderCreditItem(credit, index))
+              ) : (
+                <Text>Loading carbon credits...</Text>
+              )}
             </View>
           </TouchableOpacity>
         </View>
@@ -601,30 +612,31 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  creditIcon: {
-    width: 200,
-    height: 125,
+  creditItem: {
+    maxWidth: 120,
   },
-  creditRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 10,
+  creditIcon: {
+    width: 86,
+    height: 92,
   },
   creditsContainer: {
-    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-evenly",
+    gap: 16,
   },
   creditBox: {
-    padding: 8,
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
     backgroundColor: "#eeeeee",
   },
   creditName: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 16,
-    alignItems: "center",
+    textAlign: "center",
   },
   prizeBox: {
     backgroundColor: "#d4edda",
