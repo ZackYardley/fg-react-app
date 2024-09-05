@@ -7,6 +7,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { BackButton, PageHeader } from "@/components/common";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 
 export default function ProfileSettings() {
   const auth = getAuth();
@@ -63,6 +64,7 @@ export default function ProfileSettings() {
           photoURL: profileImage,
         });
         Alert.alert("Success", "Profile updated successfully!");
+        router.back();
       } catch (error) {
         console.error("Error updating profile: ", error);
         Alert.alert("Error", "Failed to update profile. Please try again.");
