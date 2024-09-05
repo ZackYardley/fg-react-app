@@ -62,4 +62,10 @@ interface EmissionsDocument {
   lastUpdated: Timestamp;
 }
 
-export { StateData, SurveyEmissions, SurveyData, EmissionsDocument };
+interface CommunityEmissionsData {
+  emissions_calculated: number;
+  emissions_offset: number;
+  last_updated: Date;
+}
+
+export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData };

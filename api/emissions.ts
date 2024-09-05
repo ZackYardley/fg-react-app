@@ -1,7 +1,7 @@
-import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, runTransaction } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import dayjs from "dayjs";
-import { EmissionsDocument } from "@/types";
+import { EmissionsDocument, CommunityEmissionsData } from "@/types";
 
 const saveEmissionsData = async (data: Partial<EmissionsDocument>): Promise<void> => {
   const auth = getAuth();
@@ -48,102 +48,57 @@ const fetchEmissionsData = async (month?: string, userId?: string) => {
   }
 };
 
-// const calculateEmissions = (data: EmissionsData) => {
-//   const { energyData, transportationData, dietData, totalData } = data;
-//   // Transportation Caclculation
-//   let transportationEmissions = 0.0;
-//   if (transportationData) {
-//     const { longFlights, shortFlights, carType, milesPerWeek, trainFrequency, busFrequency } = transportationData;
+const saveCommunityEmissionsData = async (amount: number): Promise<void> => {
+  const db = getFirestore();
+  const communityDocRef = doc(db, "community", "emissions_stats");
 
-//     const flightEmissions = (longFlights || 0) * 1.35 + (shortFlights || 0) * 0.9;
+  try {
+    await runTransaction(db, async (transaction) => {
+      const communityDoc = await transaction.get(communityDocRef);
 
-//     const carEmissionRates: { [key: string]: number } = {
-//       Gas: 300,
-//       Hybrid: 250,
-//       Electric: 200,
-//     };
+      if (!communityDoc.exists()) {
+        transaction.set(communityDocRef, {
+          emissions_calculated: amount,
+          last_updated: serverTimestamp(),
+        });
+      } else {
+        const currentEmissions = communityDoc.data().emissions_calculated || 0;
+        transaction.update(communityDocRef, {
+          emissions_calculated: currentEmissions + amount,
+          last_updated: serverTimestamp(),
+        });
+      }
+    });
 
-//     const carEmissions =
-//       carType && milesPerWeek && carType in carEmissionRates
-//         ? (carEmissionRates[carType] * parseFloat(milesPerWeek) * 52) / 1000000
-//         : 0;
+    console.log("Community emissions data updated successfully");
+  } catch (error) {
+    console.error("Error updating community emissions data:", error);
+    throw error;
+  }
+};
 
-//     const publicTransportEmissions =
-//       parseFloat(trainFrequency || "0") * 0.002912 * 52 + parseFloat(busFrequency || "0") * 0.005824 * 52;
+const fetchCommunityEmissionsData = async (): Promise<CommunityEmissionsData | null> => {
+  const db = getFirestore();
+  const communityDocRef = doc(db, "community", "emissions_stats");
 
-//     transportationEmissions = flightEmissions + carEmissions + publicTransportEmissions;
+  try {
+    const communityDoc = await getDoc(communityDocRef);
 
-//     // Set the calculated emissions back into transportationData
-//     transportationData.flightEmissions = flightEmissions;
-//     transportationData.carEmissions = carEmissions;
-//     transportationData.publicTransportEmissions = publicTransportEmissions;
-//     transportationData.transportationEmissions = transportationEmissions;
-//   }
-//   totalData.transportationEmissions = transportationEmissions;
+    if (communityDoc.exists()) {
+      const data = communityDoc.data();
+      return {
+        emissions_calculated: data.emissions_calculated || 0,
+        emissions_offset: data.emissions_offset || 0,
+        last_updated: data.last_updated ? data.last_updated.toDate() : new Date(),
+      };
+    } else {
+      console.log("No community emissions data found");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching community emissions data:", error);
+    throw error;
+  }
+};
 
-//   // Diet Calculation
-//   let dietEmissions = 0.0;
-
-//   if (dietData?.diet) {
-//     switch (dietData.diet) {
-//       case "Meat Lover":
-//         dietEmissions = 3.3;
-//         break;
-//       case "Average":
-//         dietEmissions = 2.5;
-//         break;
-//       case "No Beef Or Lamb":
-//         dietEmissions = 1.9;
-//         break;
-//       case "Vegetarian":
-//         dietEmissions = 1.7;
-//         break;
-//       case "Vegan":
-//         dietEmissions = 1.5;
-//         break;
-//       default:
-//         dietEmissions = 0.0;
-//     }
-//   }
-
-//   totalData.dietEmissions = dietEmissions;
-
-//   // Energy Calculation
-//   let energyEmissions = 0.0;
-//   let statesData: StateData[] = require("../constants/states.json");
-//   if (energyData) {
-//     const { state, electricBill, waterBill, propaneBill, gasBill, peopleInHome } = energyData;
-
-//     if (state && electricBill && waterBill && propaneBill && gasBill && peopleInHome) {
-//       const stateData = statesData.find((s) => s.name === state);
-
-//       if (stateData) {
-//         const electricityEmissions =
-//           (stateData.stateEGridValue / 2000) *
-//           1000 *
-//           10500 *
-//           (parseFloat(electricBill) / stateData.averageMonthlyElectricityBill);
-//         const waterEmissions = (parseFloat(waterBill) / stateData.averageMonthlyWaterBill) * 0.0052;
-//         const propaneEmissions = (parseFloat(propaneBill) / stateData.averageMonthlyPropaneBill) * 0.24;
-//         const gasEmissions = (parseFloat(gasBill) / stateData.averageMonthlyGasBill) * 2.12;
-
-//         energyEmissions = (electricityEmissions + waterEmissions + propaneEmissions + gasEmissions) / peopleInHome;
-
-//         // Update energyData with calculated emissions
-//         energyData.electricEmissions = electricityEmissions;
-//         energyData.waterEmissions = waterEmissions;
-//         energyData.otherEnergyEmissions = propaneEmissions + gasEmissions;
-//         energyData.energyEmissions = energyEmissions;
-//       }
-//     }
-//   }
-
-//   totalData.energyEmissions = energyEmissions;
-//   totalData.totalEmissions = totalData.transportationEmissions + totalData.dietEmissions + totalData.energyEmissions;
-
-//   return totalData;
-// };
-
-// export { calculateEmissions };
-
-export { saveEmissionsData, fetchEmissionsData };
+export { saveEmissionsData, fetchEmissionsData, saveCommunityEmissionsData, fetchCommunityEmissionsData };

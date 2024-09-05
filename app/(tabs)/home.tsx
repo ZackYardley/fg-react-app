@@ -1,14 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  useWindowDimensions,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { View, Text, useWindowDimensions, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -16,11 +7,9 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";
-import { getTopReferrers } from "@/api/referral";
 import { fetchCarbonCreditProducts } from "@/api/products";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
-import { getRandomFact } from "@/constants/facts";
-import { CarbonFootprint, FastFact } from "@/components/home";
+import { CarbonFootprint, Community, CommunityLeaders, FastFact } from "@/components/home";
 import { PageHeader } from "@/components/common";
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
 import { CarbonCredit } from "@/types";
@@ -56,7 +45,6 @@ const HomeScreen = () => {
   const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
-  const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
 
   useEffect(() => {
@@ -86,14 +74,6 @@ const HomeScreen = () => {
         } else {
           setNetZeroMonths(0);
         }
-      }
-
-      // Fetch top referrers
-      try {
-        const referrersData = await getTopReferrers();
-        setTopReferrers(referrersData);
-      } catch (error) {
-        console.error("Error fetching top referrers:", error);
       }
 
       // Fetch carbon credit products
@@ -215,38 +195,9 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Community */}
-          <View style={styles.communitySection}>
-            <Text style={styles.sectionTitle}>Forevergreen Community</Text>
-            <View style={styles.communityStatsContainer}>
-              <View style={styles.communityStatBox}>
-                <Text style={styles.statLargeText}>1,344</Text>
-                <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
-              </View>
-              <View style={styles.communityStatBox}>
-                <Text style={styles.statLargeText}>600</Text>
-                <Text style={styles.statMediumText}>Tons CO2 Offset</Text>
-              </View>
-            </View>
-          </View>
+          <Community />
 
-          {/* Forevergreen Community Leaders/Referral */}
-          <View style={styles.leadersSection}>
-            <Text style={styles.sectionTitle}>Community Leaders</Text>
-            <View style={styles.leadersContainer}>
-              <View>
-                {topReferrers.map((referrer, index) => (
-                  <Text key={referrer.userId} style={styles.leaderText}>
-                    <Text style={styles.boldText}>{index + 1}.</Text> {referrer.name} - {referrer.totalReferrals}{" "}
-                    Referrals
-                  </Text>
-                ))}
-              </View>
-              <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
-                <Text style={styles.referButtonText}>Refer a friend!</Text>
-              </Pressable>
-            </View>
-          </View>
+          <CommunityLeaders />
 
           {/* Prizes */}
           <View style={styles.chartsSection}>
@@ -425,71 +376,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  communitySection: {
-    marginBottom: 24,
-  },
   sectionTitle: {
     fontSize: 24,
     marginBottom: 16,
     fontWeight: "bold",
     textAlign: "center",
-  },
-  communityStatsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  communityStatBox: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 16,
-    width: "47%",
-    height: 160,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-  },
-  statLargeText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  statMediumText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  leadersSection: {
-    marginBottom: 24,
-  },
-  leadersContainer: {
-    flexDirection: "column",
-    justifyContent: "space-between",
-    backgroundColor: "#eeeeee",
-    padding: 24,
-    alignItems: "center",
-    borderRadius: 16,
-  },
-  leaderText: {
-    fontSize: 18,
-    marginBottom: 8,
-  },
-  boldText: {
-    fontWeight: "bold",
-  },
-  referButton: {
-    backgroundColor: "#409858",
-    marginLeft: 5,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 40,
-    width: 150,
-  },
-  referButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
   },
   chartsSection: {
     backgroundColor: "#eeeeee",

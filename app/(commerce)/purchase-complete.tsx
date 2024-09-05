@@ -20,6 +20,22 @@ interface CreditWithQuantity extends CarbonCredit {
   quantity: number;
 }
 
+const MAX_RETRIES = 10;
+const RETRY_DELAY = 1000; // 1 seconds
+
+const retryFetch = async (fetchFunction: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
+  try {
+    return await fetchFunction();
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`Retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return retryFetch(fetchFunction, retries - 1);
+    }
+    throw error;
+  }
+};
+
 const PurchaseCompleteScreen = () => {
   const { productType, paymentIntentId } = useLocalSearchParams<{ productType: string; paymentIntentId: string }>();
   const [payment, setPayment] = useState<Payment | null>(null);
@@ -39,7 +55,7 @@ const PurchaseCompleteScreen = () => {
       }
 
       try {
-        const fetchedPayment = await getPaymentById(paymentIntentId);
+        const fetchedPayment = await retryFetch(() => getPaymentById(paymentIntentId));
         if (!fetchedPayment) {
           throw new Error("Payment not found");
         }
@@ -62,13 +78,13 @@ const PurchaseCompleteScreen = () => {
   }, [paymentIntentId, productType]);
 
   const fetchSubscriptionData = async (fetchedPayment: Payment) => {
-    const invoice = await fetchInvoiceById(fetchedPayment.invoice || "");
+    const invoice = await retryFetch(() => fetchInvoiceById(fetchedPayment.invoice || ""));
     if (!invoice) {
       throw new Error("Invoice not found");
     }
     setPrice(invoice.amount_paid);
 
-    const fetchedSubscription = await fetchSubscriptionByInvoice(invoice.subscription);
+    const fetchedSubscription = await retryFetch(() => fetchSubscriptionByInvoice(invoice.subscription));
     if (!fetchedSubscription) {
       throw new Error("Subscription not found");
     }
@@ -77,7 +93,7 @@ const PurchaseCompleteScreen = () => {
     const userEmissionsData = await fetchEmissionsData();
     if (userEmissionsData) {
       const userEmissions = userEmissionsData.totalEmissions;
-      const carbonCreditSubscription = await fetchCarbonCreditSubscription(userEmissions);
+      const carbonCreditSubscription = await retryFetch(() => fetchCarbonCreditSubscription(userEmissions));
       setCarbonCreditSubscription(carbonCreditSubscription?.product || null);
       setTotalCO2Offset(fetchedSubscription.items[0].plan.amount / 1000);
     } else {
@@ -86,7 +102,7 @@ const PurchaseCompleteScreen = () => {
   };
 
   const fetchOneTimePurchaseData = async (fetchedPayment: Payment) => {
-    const creditRequest = await fetchCreditRequestByPaymentId(fetchedPayment.id);
+    const creditRequest = await retryFetch(() => fetchCreditRequestByPaymentId(fetchedPayment.id));
     if (!creditRequest) {
       throw new Error("Credit request not found");
     }

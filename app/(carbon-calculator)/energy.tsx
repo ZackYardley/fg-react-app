@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import * as Location from "expo-location";
 import analytics from "@react-native-firebase/analytics";
 import statesData from "@/constants/states.json";
-import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
+import { fetchEmissionsData, saveCommunityEmissionsData, saveEmissionsData } from "@/api/emissions";
 import {
   Header,
   NumberInput,
@@ -208,13 +208,19 @@ export default function EnergyCalculator() {
 
   const handleNextButton = async () => {
     try {
+      const totalEmissions = (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions;
+
       await saveEmissionsData({
         surveyData: { ...surveyData },
         surveyEmissions: { ...surveyEmissions },
-        totalEmissions: (surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions,
+        totalEmissions: totalEmissions,
         monthlyEmissions: ((surveyEmissions.energyEmissions || 0) + dietEmissions + transportationEmissions) / 12,
       });
-      // The use of params here is wrong. There is no emissions document parameter for the logEvent method
+
+      // Update community emissions data
+      await saveCommunityEmissionsData(totalEmissions);
+
+      // todo: The use of params here is wrong. There is no emissions document parameter for the logEvent method
       await analytics().logEvent("energy_emission_calculated", {
         emissionsDocument: {
           surveyData: surveyData,

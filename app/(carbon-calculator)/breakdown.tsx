@@ -8,6 +8,7 @@ import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { AVERAGE_AMERICAN_EMISSIONS, TARGET_EMISSIONS } from "@/constants";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
@@ -60,7 +61,7 @@ const Breakdown = () => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           {/* Header */}
@@ -205,7 +206,7 @@ const Breakdown = () => {
           explosionSpeed={1}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
