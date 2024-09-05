@@ -13,17 +13,17 @@ import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";
 import { getTopReferrers } from "@/api/referral";
+import { fetchCarbonCreditProducts } from "@/api/products";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
-import { CarbonFootprint } from "@/components/home";
+import { CarbonFootprint, FastFact } from "@/components/home";
 import { PageHeader } from "@/components/common";
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
-import { fetchCarbonCreditProducts } from "@/api/products";
 import { CarbonCredit } from "@/types";
-import { LinearGradient } from "expo-linear-gradient";
 
 type EmissionGroup = "Transportation" | "Diet" | "Energy";
 
@@ -53,15 +53,11 @@ const HomeScreen = () => {
   const [transportationEmissions, setTransportationEmissions] = useState(0.0);
   const [dietEmissions, setDietEmissions] = useState(0.0);
   const [energyEmissions, setEnergyEmissions] = useState(0.0);
-  const [fact, setFact] = useState<string>(getRandomFact());
   const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
   const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
-  const handleNewFact = () => {
-    setFact(getRandomFact());
-  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -166,22 +162,10 @@ const HomeScreen = () => {
       <StatusBar style="dark" />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
-          {/* Header */}
           <PageHeader />
 
-          {/* Fast Fact */}
-          <View style={styles.fastFact}>
-            <Text style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</Text>
-            <Text style={styles.fastFactText}>{fact}</Text>
-            <TouchableOpacity
-              style={styles.factButton}
-              onPress={handleNewFact} // Call the function directly
-            >
-              <Text style={styles.offsetButtonText}>See New Fact</Text>
-            </TouchableOpacity>
-          </View>
+          <FastFact />
 
-          {/* Carbon Footprint and Calculator */}
           <CarbonFootprint monthlyEmissions={monthlyEmissions} totalOffset={totalOffset} />
 
           {/* Monthly Graph of Emissions */}
@@ -342,13 +326,13 @@ const HomeScreen = () => {
           </View>
 
           {/* Tips */}
-          <View style={styles.fastFact}>
+          {/* <View style={styles.fastFact}>
             <Text style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</Text>
             <Text style={styles.highestEmissionsText}>Your highest emissions source: {highestEmissionGroup}</Text>
             <Text style={styles.fastFactText}>Turn off your lights!</Text>
             <Text style={styles.fastFactText}>Carpool to work!</Text>
             <Text style={styles.fastFactText}>Try meatless Monday!</Text>
-          </View>
+          </View> */}
 
           {/* Credits */}
           <TouchableOpacity style={styles.creditBox} onPress={() => router.navigate("/carbon-credit")}>
@@ -382,22 +366,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-  },
-  fastFact: {
-    backgroundColor: "#eeeeee",
-    marginBottom: 24,
-    padding: 24,
-    borderRadius: 16,
-  },
-  fastFactTitle: {
-    fontSize: 24,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  fastFactText: {
-    fontSize: 18,
-    textAlign: "center",
   },
   subtitleText: {
     fontSize: 18,

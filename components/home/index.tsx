@@ -1,3 +1,4 @@
 import CarbonFootprint from "./CarbonFootprint";
+import FastFact from "./FastFact";
 
-export { CarbonFootprint };
+export { CarbonFootprint, FastFact };
