@@ -12,6 +12,7 @@ import ProjectCard from "@/components/carbon-credit/ProjectCard";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
 import { formatPrice } from "@/utils";
 import { CarbonCredit, CartItem } from "@/types";
+import { ComingSoon } from "@/constants/Images";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
@@ -36,7 +37,20 @@ export default function CarbonCreditScreen() {
               prices: credit.prices.filter((price) => price.active),
             }))
           );
-          setCredits(credits);
+
+          // Add placeholder credits to fill out the rows
+          const placeholderCount = credits.length % 3 === 0 ? 0 : 3 - (credits.length % 3);
+          const placeholderCredits = Array(placeholderCount).fill({
+            name: "Coming Soon",
+            prices: [{ unit_amount: 0 }],
+            images: [],
+            stripe_metadata_color_0: "#BBBBBB",
+            stripe_metadata_color_1: "#EEEEEE",
+            stripe_metadata_color_2: "#B4B4B4",
+            isPlaceholder: true,
+          });
+
+          setCredits([...credits, ...placeholderCredits]);
           setSelectedProject(credits[0]);
         }
 
@@ -76,12 +90,20 @@ export default function CarbonCreditScreen() {
       price={item.prices[0].unit_amount}
       image={item.images[0]}
       colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
-      onPress={() => setSelectedProject(item)}
+      onPress={() => !item.isPlaceholder && setSelectedProject(item)}
+      isPlaceholder={item.isPlaceholder}
     />
   );
 
   const renderSkeletonItem = () => (
-    <CreditItem name={null} price={null} image={null} colors={["#eee", "#ddd", "#ccc"]} onPress={() => {}} />
+    <CreditItem
+      name={null}
+      price={null}
+      image={null}
+      colors={["#eee", "#ddd", "#ccc"]}
+      onPress={() => {}}
+      isSkeleton={true}
+    />
   );
 
   const renderHeader = () => (
@@ -143,7 +165,7 @@ export default function CarbonCreditScreen() {
         ListHeaderComponent={renderHeader}
         data={credits}
         renderItem={renderCreditItem}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item, index) => item.name + index}
         numColumns={3}
         columnWrapperStyle={styles.columnWrapper}
         style={styles.flatList}
