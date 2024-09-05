@@ -5,7 +5,6 @@ import { StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GreenButton } from "@/components/auth";
-import { useState } from "react";
 
 export default function GetStartedScreen() {
   const appUrl = "com.fgdevteam.fgreactapp://";
