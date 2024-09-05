@@ -1,51 +1,119 @@
 import { router, useFocusEffect } from "expo-router";
-import React, { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ScrollView, Text, Pressable, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Map, CostaRica, Brazil, Penn } from "@/constants/Images";
-import { Overlay, Button, Icon } from "@rneui/themed";
-import { PageHeader } from "@/components/common";
+import { Overlay } from "@rneui/themed";
+import { Loading, PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 export default function TreePlantingScreen() {
-  const [visible, setVisible] = useState(false);
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isWaitlisted, setIsWaitlisted] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const auth = getAuth();
+  const db = getFirestore();
+
+  useEffect(() => {
+    checkWaitlistStatus();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      // Reset the overlay visibility to true every time the screen comes into focus
-      setVisible(true);
+      setOverlayVisible(true);
     }, [])
   );
 
-  const handleWaitlistYes = () => {
-    setVisible(false);
-    router.push("/waitlist");
+  const checkWaitlistStatus = async () => {
+    if (auth.currentUser) {
+      const userDocRef = doc(db, "users", auth.currentUser.uid);
+      try {
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          if (userData.customAppWaitlist === "Tree Planting") {
+            setIsWaitlisted(true);
+            setMessage("You're already on the Tree Planting waitlist");
+          } else {
+            setMessage("Coming Soon... Join Waitlist?");
+          }
+        }
+      } catch (error) {
+        console.error("Error checking waitlist status:", error);
+        setMessage("An error occurred. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setMessage("You must be logged in to join the waitlist.");
+    }
+  };
+
+  const handleWaitlistYes = async () => {
+    if (auth.currentUser) {
+      const userDocRef = doc(db, "users", auth.currentUser.uid);
+      try {
+        await updateDoc(userDocRef, {
+          customAppWaitlist: "Tree Planting",
+        });
+        setIsWaitlisted(true);
+        setMessage("You have been added to the Tree Planting waitlist!");
+        setShowConfirmation(true);
+      } catch (error) {
+        console.error("Error updating user document:", error);
+        setMessage("An error occurred. Please try again later.");
+      }
+    } else {
+      setMessage("You must be logged in to join the waitlist.");
+    }
+    setOverlayVisible(false);
   };
 
   const handleWaitlistNo = () => {
-    setVisible(false);
-    router.push("/home");
+    setOverlayVisible(false);
+    router.navigate("/home");
+  };
+
+  const handleOk = () => {
+    if (showConfirmation) {
+      setShowConfirmation(false);
+    }
+    setOverlayVisible(false);
+    router.navigate("/home");
   };
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView style={styles.container}>
-        <Overlay isVisible={visible} onBackdropPress={handleWaitlistNo}>
+        <Overlay isVisible={overlayVisible} onBackdropPress={handleWaitlistNo}>
           <View style={styles.overlayContent}>
-            <Text style={styles.overlayText}>Coming Soon... Waitlist?</Text>
+            <Text style={styles.overlayText}>{loading ? "Loading..." : message}</Text>
             <View style={styles.overlayButtonsContainer}>
-              <TouchableOpacity style={styles.overlayButton} onPress={handleWaitlistYes}>
-                <Text style={styles.overlayButtonText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.overlayNoButton} onPress={handleWaitlistNo}>
-                <Text style={styles.overlayNoButtonText}>Home</Text>
-              </TouchableOpacity>
+              {isWaitlisted || loading ? (
+                <TouchableOpacity style={styles.overlayButton} onPress={loading ? () => {} : () => handleOk()}>
+                  <Text style={styles.overlayButtonText}>{loading ? "Loading..." : "Ok"}</Text>
+                </TouchableOpacity>
+              ) : (
+                <>
+                  <TouchableOpacity style={styles.overlayButton} onPress={() => handleWaitlistYes()}>
+                    <Text style={styles.overlayButtonText}>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.overlayNoButton} onPress={() => handleWaitlistNo()}>
+                    <Text style={styles.overlayNoButtonText}>No</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
         </Overlay>
 
         <PageHeader subtitle="Tree Planting" description="Subscribe today to plant a tree monthly!" />
         <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => router.push("/plant-a-tree")}>
+          <Pressable style={styles.button} onPress={() => router.navigate("/plant-a-tree")}>
             <Text style={styles.buttonEmoji}>🌱</Text>
             <Text style={styles.buttonText}>Plant a new tree!</Text>
           </Pressable>
@@ -231,7 +299,7 @@ const styles = StyleSheet.create({
   },
   overlayButtonsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     width: "100%",
   },
   overlayButton: {
@@ -261,5 +329,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  waitlistStatus: {
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: "#e0f2e9",
+    borderRadius: 5,
   },
 });
