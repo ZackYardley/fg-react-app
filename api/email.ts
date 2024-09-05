@@ -66,9 +66,153 @@ const sendAccountDeletionEmail = async (email: string, name: string): Promise<vo
   await sendEmail([email], subject, text, html);
 };
 
-// todo: add carbon credit purchase email
+const sendSuccessfulPaymentEmail = async (
+  email: string,
+  name: string,
+  transactionId: string,
+  customerId: string,
+  carbonCreditDetails: string,
+  paymentAmount: number,
+  timestamp: string
+): Promise<void> => {
+  const subject = "🎉 Payment Success! You're Making a Greener Future 🌱";
+  const text = `Hi ${name},
+
+Woohoo! 🎉 Your payment has been successfully processed, and your carbon credits are now working hard to make the planet a better place. 🌍 Here's a summary of your transaction:
+
+* Transaction ID: ${transactionId}
+* Customer ID: ${customerId}
+* Carbon Credit Details: ${carbonCreditDetails}
+* Payment Amount: $${paymentAmount}
+* Timestamp: ${timestamp}
+
+Your contribution isn't just a drop in the ocean—it's a wave of positive change! 🌊 Thanks to you, we're one step closer to a greener, more sustainable future.
+
+Need help or have questions? Our friendly support team is just an email away at info@forevergreen.earth. 😊
+
+Keep being awesome,
+The Forevergreen Team 🌿`;
+
+  const html = `
+    <h2>🎉 Payment Success! You're Making a Greener Future 🌱</h2>
+    <p>Hi ${name},</p>
+    <p>Woohoo! 🎉 Your payment has been successfully processed, and your carbon credits are now working hard to make the planet a better place. 🌍 Here's a summary of your transaction:</p>
+    <ul>
+      <li><strong>Transaction ID:</strong> ${transactionId}</li>
+      <li><strong>Customer ID:</strong> ${customerId}</li>
+      <li><strong>Carbon Credit Details:</strong> ${carbonCreditDetails}</li>
+      <li><strong>Payment Amount:</strong> $${paymentAmount}</li>
+      <li><strong>Timestamp:</strong> ${timestamp}</li>
+    </ul>
+    <p>Your contribution isn't just a drop in the ocean—it's a wave of positive change! 🌊 Thanks to you, we're one step closer to a greener, more sustainable future.</p>
+    <p>Need help or have questions? Our friendly support team is just an email away at info@forevergreen.earth. 😊</p>
+    <p>Keep being awesome,<br>The Forevergreen Team 🌿</p>
+  `;
+
+  await sendEmail([email], subject, text, html);
+};
+
+const sendPaymentProcessingEmail = async (
+  email: string,
+  name: string,
+  transactionId: string,
+  customerId: string,
+  carbonCreditDetails: string,
+  paymentAmount: number,
+  timestamp: string
+): Promise<void> => {
+  const subject = "⏳ Payment Processing - Your Carbon Credits are on the Way!";
+  const text = `Hi ${name},
+
+Just a quick update: we've received your payment request, and it's currently being processed. Your carbon credits will soon be hard at work reducing carbon footprints! 🌍
+
+Here are the details of your transaction:
+
+* Transaction ID: ${transactionId}
+* Customer ID: ${customerId}
+* Carbon Credit Details: ${carbonCreditDetails}
+* Payment Amount: $${paymentAmount}
+* Timestamp: ${timestamp}
+
+Hang tight! We'll let you know as soon as everything's finalized. If you have any questions in the meantime, our support team is here to help—just drop us a line at info@forevergreen.earth. 📧
+
+Thanks for being a part of the green movement! 🌱
+
+Warm regards,
+The Forevergreen Team 🌿`;
+
+  const html = `
+    <h2>⏳ Payment Processing - Your Carbon Credits are on the Way!</h2>
+    <p>Hi ${name},</p>
+    <p>Just a quick update: we've received your payment request, and it's currently being processed. Your carbon credits will soon be hard at work reducing carbon footprints! 🌍</p>
+    <p>Here are the details of your transaction:</p>
+    <ul>
+      <li><strong>Transaction ID:</strong> ${transactionId}</li>
+      <li><strong>Customer ID:</strong> ${customerId}</li>
+      <li><strong>Carbon Credit Details:</strong> ${carbonCreditDetails}</li>
+      <li><strong>Payment Amount:</strong> $${paymentAmount}</li>
+      <li><strong>Timestamp:</strong> ${timestamp}</li>
+    </ul>
+    <p>Hang tight! We'll let you know as soon as everything's finalized. If you have any questions in the meantime, our support team is here to help—just drop us a line at info@forevergreen.earth. 📧</p>
+    <p>Thanks for being a part of the green movement! 🌱</p>
+    <p>Warm regards,<br>The Forevergreen Team 🌿</p>
+  `;
+
+  await sendEmail([email], subject, text, html);
+};
+
+const sendFailedPaymentEmail = async (
+  email: string,
+  name: string,
+  transactionId: string,
+  customerId: string,
+  carbonCreditDetails: string,
+  paymentAmount: number,
+  timestamp: string
+): Promise<void> => {
+  const subject = "⚠️ Payment Issue - Let's Try Again!";
+  const text = `Hi ${name},
+
+Uh-oh! 🚨 It looks like there was an issue processing your payment for the carbon credits. But don't worry—we've got your back. Here's what happened:
+
+* Transaction ID: ${transactionId}
+* Customer ID: ${customerId}
+* Carbon Credit Details: ${carbonCreditDetails}
+* Payment Amount: $${paymentAmount}
+* Timestamp: ${timestamp}
+
+Please try again, or use a different payment method. If you need any help, our support team is ready to assist at info@forevergreen.earth. We're here to ensure your contribution helps make the world a better place! 🌍
+
+Thanks for your dedication to a sustainable future,
+The Forevergreen Team 🌿`;
+
+  const html = `
+    <h2>⚠️ Payment Issue - Let's Try Again!</h2>
+    <p>Hi ${name},</p>
+    <p>Uh-oh! 🚨 It looks like there was an issue processing your payment for the carbon credits. But don't worry—we've got your back. Here's what happened:</p>
+    <ul>
+      <li><strong>Transaction ID:</strong> ${transactionId}</li>
+      <li><strong>Customer ID:</strong> ${customerId}</li>
+      <li><strong>Carbon Credit Details:</strong> ${carbonCreditDetails}</li>
+      <li><strong>Payment Amount:</strong> $${paymentAmount}</li>
+      <li><strong>Timestamp:</strong> ${timestamp}</li>
+    </ul>
+    <p>Please try again, or use a different payment method. If you need any help, our support team is ready to assist at info@forevergreen.earth. We're here to ensure your contribution helps make the world a better place! 🌍</p>
+    <p>Thanks for your dedication to a sustainable future,<br>The Forevergreen Team 🌿</p>
+  `;
+
+  await sendEmail([email], subject, text, html);
+};
+
 // todo: add carbon credit subscription email
 // todo: add carbon credit subscription cancellation email
 // todo: add carbon credit subscription renewal email
 
-export { sendEmail, sendWelcomeEmail, sendAccountDeletionEmail };
+export {
+  sendEmail,
+  sendWelcomeEmail,
+  sendAccountDeletionEmail,
+  sendSuccessfulPaymentEmail,
+  sendPaymentProcessingEmail,
+  sendFailedPaymentEmail,
+};

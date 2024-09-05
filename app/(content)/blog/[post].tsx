@@ -2,8 +2,7 @@ import { MDXStyles } from "@bacons/mdx";
 import { useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useMemo } from "react";
-import { ScrollView, View, Text, StyleSheet, useWindowDimensions, Platform, Dimensions } from "react-native";
-import { Image } from "expo-image";
+import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton, PageHeader } from "@/components/common";
 

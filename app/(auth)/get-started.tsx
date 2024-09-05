@@ -5,17 +5,14 @@ import { StyleSheet } from "react-native";
 import { AppStore, GooglePlay, TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GreenButton } from "@/components/auth";
+import { APP_STORE_URL, APP_URL, PLAY_STORE_URL } from "@/constants";
 
 export default function GetStartedScreen() {
-  const appUrl = "com.fgdevteam.fgreactapp://";
-  const appStoreUrl = "https://apps.apple.com/app/6578432563";
-  const playStoreUrl = "https://play.google.com/store/apps/details?id=com.fgdevteam.fgreactapp";
-
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
-      window.location.href = appUrl;
+      window.location.href = APP_URL;
     } else {
-      Linking.openURL(appUrl);
+      Linking.openURL(APP_URL);
     }
   };
 
@@ -48,10 +45,10 @@ export default function GetStartedScreen() {
             />
             <Text style={styles.orText}>or</Text>
             <View style={styles.storeButtonsContainer}>
-              <TouchableOpacity onPress={() => Linking.openURL(appStoreUrl)}>
+              <TouchableOpacity onPress={() => Linking.openURL(APP_STORE_URL)}>
                 <Image source={AppStore} style={styles.storeButton} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => Linking.openURL(playStoreUrl)}>
+              <TouchableOpacity onPress={() => Linking.openURL(PLAY_STORE_URL)}>
                 <Image source={GooglePlay} style={styles.storeButton} />
               </TouchableOpacity>
             </View>

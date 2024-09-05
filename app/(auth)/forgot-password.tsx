@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, StatusBar } from "react-native";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { handleResetPassword } from "@/api/auth";
 import { TreeLogo } from "@/constants/Images";
 import { GreenButton, CustomTextInput, GoogleButton, OrLine } from "@/components/auth";
@@ -11,7 +12,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar style="dark" />
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {/* Header */}

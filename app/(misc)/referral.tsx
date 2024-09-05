@@ -1,114 +1,109 @@
-// Import necessary libraries and components
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  // Alert,
-  Pressable,
-  KeyboardAvoidingView,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
-// import axios from "axios";
+import { incrementUserReferrals, sendReferralEmail } from "@/api/referral";
+import { BackButton, PageHeader } from "@/components/common";
+import { router } from "expo-router";
+import { getAuth } from "firebase/auth";
+import { useState } from "react";
+import { View, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ReferralForm = () => {
-  // Define state variables to hold the input values
+  const auth = getAuth();
   const [friendName, setFriendName] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
   const [note, setNote] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  // Function to validate email
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
 
   // Function to handle the referral form submission
-  // const handleReferral = async () => {
-  //   try {
-  //     // Send a POST request to the Flask backend to send an email
-  //     const res = await axios.post("http://<YOUR_MACHINE_IP>:5000/send-email", {
-  //       to: friendEmail,
-  //       subject: "Help the earth! Join Forevergreen today!",
-  //       content:
-  //         "Your friend " +
-  //         friendName +
-  //         " has referred you to join Forevergreen, a platform that helps you track your carbon footprint and make a positive impact on the environment. " +
-  //         friendName +
-  //         " says: " +
-  //         note +
-  //         " Sign up today to start your journey to a greener future!",
-  //     });
+  const handleReferral = async () => {
+    if (!validateEmail(friendEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
 
-  //     // Show a success alert if the email was sent successfully
-  //     Alert.alert("Success", "Referral sent successfully!");
+    try {
+      await sendReferralEmail(friendEmail, friendName, auth.currentUser?.displayName || "", note);
 
-  //     // Clear input fields after successful send
-  //     setFriendName("");
-  //     setFriendEmail("");
-  //     setNote("");
-  //   } catch (error) {
-  //     // Show an error alert if the email sending failed
-  //     Alert.alert("Error", "Failed to send referral.");
-  //   }
-  // };
+      // Show a success alert if the email was sent successfully
+      Alert.alert("Success", "Referral sent successfully!");
+
+      // Clear input fields after successful send
+      setFriendName("");
+      setFriendEmail("");
+      setNote("");
+      setEmailError("");
+
+      // Increment the referral count
+      await incrementUserReferrals(auth.currentUser?.uid || "");
+
+      // Navigate back to the previous screen
+      router.back();
+    } catch (error) {
+      // Show an error alert if the email sending failed
+      Alert.alert("Error", "Failed to send referral.");
+      console.error("Error sending referral:", error);
+    }
+  };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.content}>
-          <View style={styles.greenCircle1} />
-          <View style={styles.greenCircle2} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            <View style={styles.greenCircle1} />
+            <View style={styles.greenCircle2} />
 
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              Forever<Text style={styles.greenText}>green</Text>
-            </Text>
-            <Text style={styles.subtitle}>Refer a Friend</Text>
-            <Text style={styles.description}>
-              Help the Cause Today by Referring a Friend
-            </Text>
+            <PageHeader subtitle="Refer a Friend" description="Help the Cause Today by Referring a Friend" />
+            <BackButton />
+            <View style={styles.formContainer}>
+              <Text style={styles.formTitle}>Refer a Friend</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Enter Your Friend's Name Below:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Your Answer"
+                  value={friendName}
+                  onChangeText={setFriendName}
+                  placeholderTextColor={"#B6ABAB"}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Enter Your Friend's Email Address Below:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Your Answer"
+                  value={friendEmail}
+                  onChangeText={(text) => {
+                    setFriendEmail(text);
+                    setEmailError("");
+                  }}
+                  placeholderTextColor={emailError ? "red" : "#B6ABAB"}
+                />
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Enter a Note or Leave Blank:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Your Answer"
+                  value={note}
+                  onChangeText={setNote}
+                  placeholderTextColor={"#B6ABAB"}
+                />
+              </View>
+              <Pressable style={styles.submitButton} onPress={handleReferral}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </Pressable>
+            </View>
           </View>
-
-          <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Refer a Friend</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Enter Your Friend's Name Below:
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Your Answer"
-                value={friendName}
-                onChangeText={setFriendName}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Enter Your Friend's Email Address Below:
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Your Answer"
-                value={friendEmail}
-                onChangeText={setFriendEmail}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>
-                Enter a Note or Leave Blank:
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Your Answer"
-                value={note}
-                onChangeText={setNote}
-              />
-            </View>
-            <Pressable style={styles.submitButton} 
-            // onPress={handleReferral}
-            >
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -120,10 +115,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
-    padding: 24,
+    padding: 20,
   },
   greenCircle1: {
     position: "absolute",
@@ -143,25 +137,6 @@ const styles = StyleSheet.create({
     bottom: 100,
     right: 300,
   },
-  header: {
-    alignItems: "center",
-    marginTop: 32,
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: "bold",
-  },
-  greenText: {
-    color: "#409858",
-  },
-  subtitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  description: {
-    fontSize: 20,
-    marginTop: 8,
-  },
   formContainer: {
     backgroundColor: "#eeeeee",
     marginTop: 32,
@@ -172,6 +147,11 @@ const styles = StyleSheet.create({
     fontSize: 36,
     marginTop: 8,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 5,
   },
   inputContainer: {
     marginTop: 16,

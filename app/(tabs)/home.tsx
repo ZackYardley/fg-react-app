@@ -9,13 +9,17 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
-import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
+import { fetchEmissionsData } from "@/api/emissions";
+import { getTopReferrers } from "@/api/referral";
 import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, LineChartBreakdown } from "@/components/breakdown";
 import { getRandomFact } from "@/constants/facts";
-import { TARGET_EMISSIONS } from "@/constants";
 import { CarbonFootprint } from "@/components/home";
+import { PageHeader } from "@/components/common";
 import {
   Russas,
   Colombia,
@@ -28,9 +32,6 @@ import {
   CuttingBoard,
   Crewneck,
 } from "@/constants/Images";
-import Carousel from "react-native-reanimated-carousel";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { PageHeader } from "@/components/common";
 
 type EmissionGroup = "Transportation" | "Diet" | "Energy";
 
@@ -64,6 +65,7 @@ const HomeScreen = () => {
   const [highestEmissionGroup, setHighestEmissionGroup] = useState<EmissionGroup>("Transportation");
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
+  const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
   const handleNewFact = () => {
     setFact(getRandomFact());
   };
@@ -95,6 +97,14 @@ const HomeScreen = () => {
         } else {
           setNetZeroMonths(0);
         }
+      }
+
+      // Fetch top referrers
+      try {
+        const referrersData = await getTopReferrers();
+        setTopReferrers(referrersData);
+      } catch (error) {
+        console.error("Error fetching top referrers:", error);
       }
     };
 
@@ -132,6 +142,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <StatusBar style="dark" />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
           {/* Header */}
@@ -219,15 +230,12 @@ const HomeScreen = () => {
             <Text style={styles.sectionTitle}>Community Leaders</Text>
             <View style={styles.leadersContainer}>
               <View>
-                <Text style={styles.leaderText}>
-                  <Text style={styles.boldText}>1.</Text> jpear - 10 Referrals
-                </Text>
-                <Text style={styles.leaderText}>
-                  <Text style={styles.boldText}>2.</Text> joegjoe - 9 Referrals
-                </Text>
-                <Text style={styles.leaderText}>
-                  <Text style={styles.boldText}>3.</Text> zyardley - 8 Referrals
-                </Text>
+                {topReferrers.map((referrer, index) => (
+                  <Text key={referrer.userId} style={styles.leaderText}>
+                    <Text style={styles.boldText}>{index + 1}.</Text> {referrer.name} - {referrer.totalReferrals}{" "}
+                    Referrals
+                  </Text>
+                ))}
               </View>
               <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
                 <Text style={styles.referButtonText}>Refer a friend!</Text>
@@ -362,19 +370,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   content: {
-    paddingHorizontal: 24,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 32,
-    marginBottom: 24,
-  },
-  headerText: {
-    fontSize: 40,
-    fontWeight: "bold",
-  },
-  headerGreen: {
-    color: "#409858",
+    paddingHorizontal: 20,
   },
   fastFact: {
     backgroundColor: "#eeeeee",
@@ -604,12 +600,6 @@ const styles = StyleSheet.create({
   section: {
     flex: 1,
     alignItems: "center",
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
   },
   creditIcon: {
     width: 200,

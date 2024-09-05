@@ -1,6 +1,8 @@
+import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Loading = () => {
   const [dotCount, setDotCount] = useState(1);
@@ -16,9 +18,10 @@ const Loading = () => {
   const dots = ".".repeat(dotCount);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
       <Text style={styles.loadingText}>Loading{dots}</Text>
-    </View>
+    </SafeAreaView>
   );
 };
 
