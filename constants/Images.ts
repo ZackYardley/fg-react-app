@@ -21,6 +21,8 @@ const WaterBottle = require("../assets/images/waterbottle.png");
 const CuttingBoard = require("../assets/images/cuttingboard.png");
 const Crewneck = require("../assets/images/crewneck.png");
 const ComingSoon = require("../assets/images/coming-soon.png");
+const AppStore = require("../assets/images/app-store.png");
+const GooglePlay = require("../assets/images/google-play.png");
 
 export {
   Earth,
@@ -46,4 +48,6 @@ export {
   CuttingBoard,
   Crewneck,
   ComingSoon,
+  AppStore,
+  GooglePlay,
 };

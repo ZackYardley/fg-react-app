@@ -12,7 +12,6 @@ import ProjectCard from "@/components/carbon-credit/ProjectCard";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
 import { formatPrice } from "@/utils";
 import { CarbonCredit, CartItem } from "@/types";
-import { ComingSoon } from "@/constants/Images";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);

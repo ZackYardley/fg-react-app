@@ -2,7 +2,7 @@ import { View, Text, StatusBar, Image, ScrollView, Platform, TouchableOpacity } 
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
 import { StyleSheet } from "react-native";
-import { TreeLogo } from "@/constants/Images";
+import { AppStore, GooglePlay, TreeLogo } from "@/constants/Images";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GreenButton } from "@/components/auth";
 
@@ -10,7 +10,7 @@ export default function GetStartedScreen() {
   const appUrl = "com.fgdevteam.fgreactapp://";
   const appStoreUrl = "https://apps.apple.com/app/6578432563";
   const playStoreUrl = "https://play.google.com/store/apps/details?id=com.fgdevteam.fgreactapp";
-  
+
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = appUrl;
@@ -28,16 +28,18 @@ export default function GetStartedScreen() {
           </Text>
           <View style={styles.centeredContent}>
             <Text style={styles.description}>
-              Forevergreen is your all-in-one tool for understanding and managing your carbon footprint. Designed for eco-conscious individuals, our app provides everything you need to take control of your environmental impact.
-            </Text> 
-              <View style={styles.featuresList}>
-                <Text style={styles.featuresTitle}>Key Features</Text>
-                <Text style={styles.feature}>• Carbon Footprint Calculator</Text>
-                <Text style={styles.feature}>• Track Your Progress</Text>
-                <Text style={styles.feature}>• Offset Your Emissions</Text>
-                <Text style={styles.feature}>• Personalized Insights</Text>
-                <Text style={styles.feature}>• Join a Community</Text>
-              </View>
+              Forevergreen is your all-in-one tool for understanding and managing your carbon footprint. Designed for
+              eco-conscious individuals, our app provides everything you need to take control of your environmental
+              impact.
+            </Text>
+            <View style={styles.featuresList}>
+              <Text style={styles.featuresTitle}>Key Features</Text>
+              <Text style={styles.feature}>• Carbon Footprint Calculator</Text>
+              <Text style={styles.feature}>• Track Your Progress</Text>
+              <Text style={styles.feature}>• Offset Your Emissions</Text>
+              <Text style={styles.feature}>• Personalized Insights</Text>
+              <Text style={styles.feature}>• Join a Community</Text>
+            </View>
             <GreenButton
               title="Open App"
               onPress={handleOpenApp}
@@ -47,21 +49,15 @@ export default function GetStartedScreen() {
             <Text style={styles.orText}>or</Text>
             <View style={styles.storeButtonsContainer}>
               <TouchableOpacity onPress={() => Linking.openURL(appStoreUrl)}>
-                <Image
-                  source={require('../../assets/images/app-store.png')}
-                  style={styles.storeButton}
-                />
+                <Image source={AppStore} style={styles.storeButton} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => Linking.openURL(playStoreUrl)}>
-                <Image
-                  source={require('../../assets/images/google-play.png')}
-                  style={styles.storeButton}
-                />
+                <Image source={GooglePlay} style={styles.storeButton} />
               </TouchableOpacity>
             </View>
             <Text style={styles.callToAction}>
               Download Forevergreen today and take the first step towards a greener future!
-            </Text> 
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -158,8 +154,8 @@ const styles = StyleSheet.create({
   },
   webContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   webTitle: {
@@ -176,29 +172,29 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     maxWidth: 800,
-    width: '100%',
+    width: "100%",
     marginBottom: 100,
   },
   description: {
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
     lineHeight: 28,
   },
   featuresList: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     marginBottom: 20,
-    alignItems: 'center'
+    alignItems: "center",
   },
   featuresTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#409858',
-    textDecorationLine: 'underline',
+    color: "#409858",
+    textDecorationLine: "underline",
   },
   feature: {
     fontSize: 18,
@@ -206,8 +202,8 @@ const styles = StyleSheet.create({
   },
   callToAction: {
     fontSize: 20,
-    textAlign: 'center',
-    fontStyle: 'italic',
+    textAlign: "center",
+    fontStyle: "italic",
     marginTop: 20,
   },
   webButton: {
