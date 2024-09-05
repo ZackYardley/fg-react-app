@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, TextInput, Alert, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { Href, useRouter } from "expo-router";
+import { Href, router, useFocusEffect } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import { Image } from "expo-image";
 import { PageHeader } from "@/components/common";
@@ -24,9 +24,10 @@ interface SettingsItemProps {
 
 export default function ProfileScreen() {
   const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
+  const auth = getAuth();
 
   const [user, setUser] = useState<User | null>(null);
-  const [totalEmissions, setTotalEmissions] = useState<number>(0);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [monthlyEmissions, setMonthlyEmissions] = useState<number>(0);
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -35,9 +36,22 @@ export default function ProfileScreen() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
 
-  const router = useRouter();
-  const auth = getAuth();
-  const profileIcon = auth.currentUser?.photoURL;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserData = async () => {
+        if (auth.currentUser) {
+          // Force refresh the user data
+          await auth.currentUser.reload();
+          const freshUser = auth.currentUser;
+          setUser(freshUser);
+          setProfilePicture(freshUser.photoURL);
+          setIsGoogleUser(freshUser.providerData.some((provider) => provider.providerId === "google.com"));
+        }
+      };
+
+      fetchUserData();
+    }, [auth.currentUser])
+  );
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -51,7 +65,7 @@ export default function ProfileScreen() {
     });
 
     return () => unsubscribe();
-  }, [auth, router]);
+  }, [auth]);
 
   const checkSubscriptionStatus = async () => {
     try {
@@ -73,7 +87,6 @@ export default function ProfileScreen() {
     const loadData = async () => {
       const data = await fetchEmissionsData();
       if (data) {
-        setTotalEmissions(data.totalEmissions || 0);
         setMonthlyEmissions(data.monthlyEmissions || 0);
         setTotalOffset(data.totalOffset || 0);
       }
@@ -196,10 +209,10 @@ export default function ProfileScreen() {
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
             <View style={styles.profileImageBG}>
-              {profileIcon ? (
+              {profilePicture ? (
                 <Image
                   style={styles.profileImage}
-                  source={{ uri: profileIcon }}
+                  source={{ uri: profilePicture }}
                   placeholder={blurhash}
                   contentFit="cover"
                 />
@@ -221,7 +234,7 @@ export default function ProfileScreen() {
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
           <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
-          {/*<SettingsItem title="Notifications" screen="/notifications-settings" />*/}
+          <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
           <View style={styles.carbonFootprint}>

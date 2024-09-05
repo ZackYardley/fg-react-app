@@ -25,7 +25,7 @@ export default function ProfileSettings() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
