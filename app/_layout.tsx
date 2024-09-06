@@ -9,7 +9,6 @@ import { StripeProvider, useStripe } from "@/utils/stripe";
 import { initializeFirebase } from "@/utils/firebaseConfig";
 import { Notifications } from "../api/notifications"; // Import the new module
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import * as SystemUI from "expo-system-ui";
 
 export default function RootLayout() {
   initializeFirebase();
@@ -28,7 +27,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      SystemUI.setBackgroundColorAsync("black");
     }
     GoogleSignin.configure({
       webClientId: "489135632905-iu340mh7lub0iis2q18upvus42fa2roo.apps.googleusercontent.com",
