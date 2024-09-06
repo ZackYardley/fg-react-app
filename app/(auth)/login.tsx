@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
+import { View, Text, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Link } from "expo-router";
 import { onLogin, onGoogleLogin } from "@/api/auth";
