@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { Link } from "expo-router";
 import { onLogin, onGoogleLogin } from "@/api/auth";
 import { TitleWithLogo, GreenButton, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
+import { ThemedSafeAreaView, ThemedText } from "@/components/common";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -11,10 +12,10 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <SafeAreaView style={styles.safeAreaView}>
+    <ThemedSafeAreaView style={styles.safeAreaView}>
+      <StatusBar />
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <StatusBar barStyle="dark-content" />
           <TitleWithLogo title="Log" titleAlt="in" />
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
@@ -40,7 +41,9 @@ export default function LoginScreen() {
             </View>
             <View style={styles.forgotPasswordContainer}>
               <Link href="/forgot-password">
-                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                <ThemedText type="link" style={styles.forgotPasswordText}>
+                  Forgot Password?
+                </ThemedText>
               </Link>
             </View>
             <GreenButton
@@ -65,7 +68,7 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
@@ -79,7 +82,6 @@ const styles = StyleSheet.create({
   },
   safeAreaView: {
     flex: 1,
-    backgroundColor: "white",
   },
   header: {
     fontSize: 48,

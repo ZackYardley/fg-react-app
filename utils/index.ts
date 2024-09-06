@@ -18,4 +18,30 @@ const formatDate = (timestamp: number) => {
   return date.toLocaleDateString();
 };
 
-export { formatPrice, formatDate };
+const darkenColor = (hex: string, percent: number = 10): string => {
+  // Remove the # if it exists
+  hex = hex.replace(/^#/, "");
+
+  // Parse the hex string into RGB values
+  let r = parseInt(hex.substr(0, 2), 16);
+  let g = parseInt(hex.substr(2, 2), 16);
+  let b = parseInt(hex.substr(4, 2), 16);
+
+  // Calculate the amount to darken
+  const darkenAmount = 1 - percent / 100;
+
+  // Darken each channel
+  r = Math.floor(r * darkenAmount);
+  g = Math.floor(g * darkenAmount);
+  b = Math.floor(b * darkenAmount);
+
+  // Ensure the values don't go below 0
+  r = Math.max(0, r);
+  g = Math.max(0, g);
+  // Convert back to hex
+  const darkenedHex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
+
+  return `#${darkenedHex}`;
+};
+
+export { formatPrice, formatDate, darkenColor };

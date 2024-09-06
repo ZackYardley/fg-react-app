@@ -1,5 +1,7 @@
 import React, { useRef, useCallback } from "react";
 import { Pressable, Text, StyleSheet, Animated } from "react-native";
+import { useThemeColor } from "@/hooks";
+import { darkenColor } from "@/utils";
 
 const GreenButton = ({
   title,
@@ -13,6 +15,8 @@ const GreenButton = ({
   textStyle?: any;
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const primaryColor = useThemeColor({}, "primary");
+  const textColor = useThemeColor({}, "text");
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scaleAnim, {
@@ -31,12 +35,17 @@ const GreenButton = ({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
-        style={({ pressed }) => [styles.button, style, pressed && styles.buttonPressed]}
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: primaryColor },
+          style,
+          pressed && { backgroundColor: darkenColor(primaryColor) },
+        ]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >
-        <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+        <Text style={[styles.buttonText, { color: textColor }, textStyle]}>{title}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -44,7 +53,6 @@ const GreenButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#409858",
     borderRadius: 50,
     padding: 16,
     alignItems: "center",
@@ -57,11 +65,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 2,
   },
-  buttonPressed: {
-    backgroundColor: "#367d4a",
-  },
   buttonText: {
-    color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
   },

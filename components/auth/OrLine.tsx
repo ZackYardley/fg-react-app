@@ -1,11 +1,14 @@
 import { View, Text, StyleSheet } from "react-native";
+import { useThemeColor } from "@/hooks";
 
 const OrLine = () => {
+  const textColor = useThemeColor({}, "text");
+
   return (
     <View style={styles.orContainer}>
-      <View style={styles.orLine} />
-      <Text style={styles.orText}>Or</Text>
-      <View style={styles.orLine} />
+      <View style={[styles.orLine, { backgroundColor: textColor }]} />
+      <Text style={[styles.orText, { color: textColor }]}>Or</Text>
+      <View style={[styles.orLine, { backgroundColor: textColor }]} />
     </View>
   );
 };
@@ -21,11 +24,9 @@ const styles = StyleSheet.create({
   orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "black",
   },
   orText: {
     paddingHorizontal: 16,
-    color: "black",
     fontWeight: "bold",
     fontSize: 20,
   },

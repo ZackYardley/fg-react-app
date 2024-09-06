@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TextInput } from "react-native-paper";
+import { useThemeColor } from "@/hooks";
 
 const CustomTextInput = ({
   label,
@@ -21,6 +22,10 @@ const CustomTextInput = ({
   rightIcon?: string;
   onRightIconPress?: () => void;
 }) => {
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "primary");
+  const backgroundColor = useThemeColor({}, "background");
+
   return (
     <View style={styles.inputContainer}>
       <Text style={styles.inputLabel}>{label}</Text>
@@ -31,13 +36,13 @@ const CustomTextInput = ({
         onChangeText={onChangeText}
         mode="outlined"
         dense={true}
-        outlineStyle={{ borderColor: "#000" }}
-        theme={{ roundness: 9999, colors: { background: "#fff" } }}
-        textColor="#000"
+        outlineStyle={{ borderColor: textColor }}
+        theme={{ roundness: 9999, colors: { background: backgroundColor } }}
+        textColor={textColor}
         secureTextEntry={secureTextEntry}
-        left={leftIcon && <TextInput.Icon icon={leftIcon} color="#000" style={styles.icon} />}
+        left={leftIcon && <TextInput.Icon icon={leftIcon} color={textColor} style={styles.icon} />}
         right={
-          rightIcon && <TextInput.Icon icon={rightIcon} color="#000" style={styles.icon} onPress={onRightIconPress} />
+          rightIcon && <TextInput.Icon icon={rightIcon} color={textColor} style={styles.icon} onPress={onRightIconPress} />
         }
       />
     </View>

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { View, Text, KeyboardAvoidingView, ScrollView, useWindowDimensions, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, KeyboardAvoidingView, ScrollView, useWindowDimensions, StyleSheet } from "react-native";
+import { ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "expo-router";
 import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
 import { GreenButton, TitleWithLogo, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
+import { useThemeColor } from "@/hooks";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ export default function SignupScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={styles.safeArea}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
           <View style={[styles.contentContainer, { minHeight: height }]}>
@@ -73,22 +74,28 @@ export default function SignupScreen() {
               <GoogleButton title="Continue with Google" onPress={() => onGoogleSignUp()} />
 
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already helping our planet?</Text>
+                <ThemedText type="default" style={styles.loginText}>
+                  Already helping our planet?
+                </ThemedText>
                 <Link href={"/login"}>
-                  <Text style={styles.loginLink}>Log In</Text>
+                  <ThemedText type="link" style={styles.loginLink}>
+                    Log In
+                  </ThemedText>
                 </Link>
               </View>
               {isAnonymous ? (
                 <View style={styles.anonymousContainer}>
-                  <Text style={styles.anonymousText}>
+                  <ThemedText style={styles.anonymousText}>
                     Create an account to save your progress, access all features, and continue making a real impact on
                     the the environment!
-                  </Text>
+                  </ThemedText>
                 </View>
               ) : (
                 <View style={styles.guestContainer}>
                   <Link onPress={() => onContinueAnonymously()} href={"/pre-survey"} replace>
-                    <Text style={styles.guestLink}>Or continue as guest</Text>
+                    <ThemedText type="link" style={styles.guestLink}>
+                      Or continue as guest
+                    </ThemedText>
                   </Link>
                 </View>
               )}
@@ -96,14 +103,13 @@ export default function SignupScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   safeArea: {
     flex: 1,
@@ -197,13 +203,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   loginText: {
-    color: "#000",
     fontSize: 20,
     fontWeight: "bold",
   },
   loginLink: {
     textDecorationLine: "underline",
-    color: "#000",
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -221,7 +225,6 @@ const styles = StyleSheet.create({
   },
   guestLink: {
     textDecorationLine: "underline",
-    color: "#000",
     fontSize: 20,
     fontWeight: "bold",
   },
