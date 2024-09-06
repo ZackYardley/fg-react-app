@@ -176,7 +176,7 @@ export default function CarbonCreditScreen() {
   };
 
   return (
-    <ThemedSafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={{ flexGrow: 1 }}>{renderContent()}</View>
     </ThemedSafeAreaView>
   );
