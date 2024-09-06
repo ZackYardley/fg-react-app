@@ -1,5 +1,5 @@
 import { APP_STORE_URL, APP_URL, PLAY_STORE_URL } from "@/constants";
-import { getFirestore, doc, runTransaction, getDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, runTransaction, getDoc } from "firebase/firestore";
 import { sendEmail } from "./email";
 import { getAuth } from "firebase/auth";
 import { TopReferrer, ReferralLeaderboard } from "@/types";

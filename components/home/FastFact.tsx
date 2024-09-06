@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { getRandomFact } from "@/constants/facts";
+import { ThemedText, ThemedView } from "../common";
 
 const FastFact = () => {
   const [fact, setFact] = useState<string>(getRandomFact());
@@ -9,16 +10,16 @@ const FastFact = () => {
   };
 
   return (
-    <View style={styles.fastFact}>
-      <Text style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</Text>
-      <Text style={styles.fastFactText}>{fact}</Text>
+    <ThemedView style={styles.fastFact}>
+      <ThemedText style={styles.fastFactTitle}>Forevergreen Fast Fact of the Day</ThemedText>
+      <ThemedText style={styles.fastFactText}>{fact}</ThemedText>
       <TouchableOpacity
         style={styles.factButton}
         onPress={handleNewFact} // Call the function directly
       >
-        <Text style={styles.offsetButtonText}>See New Fact</Text>
+        <ThemedText style={styles.offsetButtonText}>See New Fact</ThemedText>
       </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -26,7 +27,6 @@ export default FastFact;
 
 const styles = StyleSheet.create({
   fastFact: {
-    backgroundColor: "#eeeeee",
     marginBottom: 24,
     padding: 24,
     borderRadius: 16,

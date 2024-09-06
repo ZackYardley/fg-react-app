@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, ScrollView, StyleSheet, Pressable, StatusBar } from "react-native";
 import { router } from "expo-router";
 import * as Location from "expo-location";
 import analytics from "@react-native-firebase/analytics";
@@ -14,10 +13,12 @@ import {
   RadioButtonGroup,
   PlatformPicker,
 } from "@/components/carbon-calculator";
-import { Loading } from "@/components/common";
+import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { StateData, SurveyData, SurveyEmissions } from "@/types";
+import { useThemeColor } from "@/hooks";
 
 export default function EnergyCalculator() {
+  const onPrimary = useThemeColor({}, "onPrimary");
   const [surveyData, setSurveyData] = useState<SurveyData>({
     state: "",
     electricBill: "",
@@ -232,7 +233,7 @@ export default function EnergyCalculator() {
     } catch (error) {
       console.error("Error saving emissions data:", error);
     } finally {
-      router.push("/breakdown");
+      router.navigate("/breakdown");
     }
   };
 
@@ -241,14 +242,16 @@ export default function EnergyCalculator() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar />
         <View style={styles.contentContainer}>
           <Header progress={progress} title="Energy" />
-          <Text>The last section are your energy emissions! These are all your utilties and energy usage at home.</Text>
+          <ThemedText>
+            The last section are your energy emissions! These are all your utilties and energy usage at home.
+          </ThemedText>
 
-          <Text style={styles.stateSelectionText}>Which State do you live in? 🏠</Text>
+          <ThemedText style={styles.stateSelectionText}>Which State do you live in? 🏠</ThemedText>
           {stateItems && (
             <PlatformPicker
               selectedValue={surveyData.state}
@@ -263,7 +266,9 @@ export default function EnergyCalculator() {
             onPress={handleUseCurrentLocation}
             disabled={isProcessing}
           >
-            <Text style={styles.locationButtonText}>{isProcessing ? "Loading..." : "Use my current location"}</Text>
+            <ThemedText style={[styles.locationButtonText, { color: onPrimary }]}>
+              {isProcessing ? "Loading..." : "Use my current location"}
+            </ThemedText>
           </Pressable>
 
           <NumberInput
@@ -330,30 +335,36 @@ export default function EnergyCalculator() {
           />
 
           <View style={styles.emissionsContainer}>
-            <Text style={styles.emissionsTitle}>Your Individual Energy/Utilities Emissions</Text>
+            <ThemedText style={styles.emissionsTitle}>Your Individual Energy/Utilities Emissions</ThemedText>
             <View style={styles.emissionsContent}>
               <View style={styles.emissionRow}>
-                <Text>Electric Emissions:</Text>
-                <Text>{(surveyEmissions.electricEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
+                <ThemedText>Electric Emissions:</ThemedText>
+                <ThemedText>
+                  {(surveyEmissions.electricEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}
+                </ThemedText>
               </View>
               <View style={styles.emissionRow}>
-                <Text>Water:</Text>
-                <Text>{(surveyEmissions.waterEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
+                <ThemedText>Water:</ThemedText>
+                <ThemedText>
+                  {(surveyEmissions.waterEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}
+                </ThemedText>
               </View>
               <View style={styles.emissionRow}>
-                <Text>Other Energy:</Text>
-                <Text>{(surveyEmissions.otherEnergyEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}</Text>
+                <ThemedText>Other Energy:</ThemedText>
+                <ThemedText>
+                  {(surveyEmissions.otherEnergyEmissions || 0 / (surveyData.peopleInHome || 1)).toFixed(2)}
+                </ThemedText>
               </View>
               <View style={styles.emissionRow}>
-                <Text>Transportation + Diet:</Text>
-                <Text>{(dietEmissions + transportationEmissions).toFixed(2)}</Text>
+                <ThemedText>Transportation + Diet:</ThemedText>
+                <ThemedText>{(dietEmissions + transportationEmissions).toFixed(2)}</ThemedText>
               </View>
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total:</Text>
-                <Text>
+                <ThemedText style={styles.totalLabel}>Total:</ThemedText>
+                <ThemedText>
                   {(transportationEmissions + dietEmissions + (surveyEmissions.energyEmissions || 0)).toFixed(2)}
-                </Text>
-                <Text>tons CO2 per year</Text>
+                </ThemedText>
+                <ThemedText>tons CO2 per year</ThemedText>
               </View>
             </View>
           </View>
@@ -361,17 +372,16 @@ export default function EnergyCalculator() {
 
         <NextButton isFormValid={isFormValid && !isProcessing} onPress={() => handleNextButton()} />
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 1,
-    backgroundColor: "#fff",
   },
   contentContainer: {
-    paddingHorizontal: 48,
+    paddingHorizontal: 24,
   },
   stateSelectionText: {
     marginTop: 24,
@@ -390,7 +400,6 @@ const styles = StyleSheet.create({
   },
   locationButtonText: {
     fontSize: 16,
-    color: "white",
     fontWeight: "bold",
   },
   emissionsContainer: {

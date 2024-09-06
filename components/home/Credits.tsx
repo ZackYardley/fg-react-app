@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { fetchCarbonCreditProducts } from "@/api/products";
 import { CarbonCredit } from "@/types";
+import { ThemedView, ThemedText } from "../common";
 
 const Credits = () => {
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
@@ -38,26 +39,28 @@ const Credits = () => {
       >
         <Image source={{ uri: credit.images[0] }} style={styles.creditIcon} />
       </LinearGradient>
-      <Text style={styles.creditName}>{credit.name}</Text>
+      <ThemedText style={styles.creditName}>{credit.name}</ThemedText>
     </View>
   );
 
   return (
-    <TouchableOpacity style={styles.creditBox} onPress={() => router.navigate("/carbon-credit")}>
-      <View style={{ padding: 24 }}>
-        <Text style={styles.sectionTitle}>Explore Our Carbon Credits!</Text>
-        <Text style={styles.subtitleText}>
-          From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
-        </Text>
-      </View>
+    <TouchableOpacity onPress={() => router.navigate("/carbon-credit")}>
+      <ThemedView style={styles.creditBox}>
+        <View style={{ padding: 24 }}>
+          <ThemedText style={styles.sectionTitle}>Explore Our Carbon Credits!</ThemedText>
+          <ThemedText style={styles.subtitleText}>
+            From Reforestation to Renewable Energy, Choose How You Offset Your Footprint!
+          </ThemedText>
+        </View>
 
-      <View style={styles.creditsContainer}>
-        {carbonCredits.length > 0 ? (
-          carbonCredits.map((credit, index) => renderCreditItem(credit, index))
-        ) : (
-          <Text>Loading carbon credits...</Text>
-        )}
-      </View>
+        <View style={styles.creditsContainer}>
+          {carbonCredits.length > 0 ? (
+            carbonCredits.map((credit, index) => renderCreditItem(credit, index))
+          ) : (
+            <ThemedText>Loading carbon credits...</ThemedText>
+          )}
+        </View>
+      </ThemedView>
     </TouchableOpacity>
   );
 };
@@ -69,7 +72,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
-    backgroundColor: "#eeeeee",
   },
   sectionTitle: {
     fontSize: 24,

@@ -1,23 +1,33 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Linking, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import { useStripe } from "@/utils/stripe";
 import dayjs from "dayjs";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { BackButton, Loading, NotFoundComponent, PageHeader } from "@/components/common";
+import {
+  BackButton,
+  Loading,
+  NotFoundComponent,
+  PageHeader,
+  ThemedSafeAreaView,
+  ThemedView,
+} from "@/components/common";
 import { fetchSubscriptionPaymentSheetParams } from "@/api/purchase";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { fetchSubscriptionStatus, fetchSubscriptionByProduct } from "@/api/subscriptions";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { formatPrice } from "@/utils";
 import { CarbonCreditSubscription, Price } from "@/types";
+import { ThemedText } from "@/components/common";
+import { StatusBar } from "expo-status-bar";
+import { useThemeColor } from "@/hooks";
 
 const { height } = Dimensions.get("window");
 
 const CarbonCreditSubscriptionScreen = () => {
+  const textColor = useThemeColor({}, "text");
   const auth = getAuth();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -168,8 +178,8 @@ const CarbonCreditSubscriptionScreen = () => {
     text: string;
   }) => (
     <View style={styles.detailsItem}>
-      <Ionicons name={icon} size={24} color="#000" />
-      <Text style={styles.detailsText}>{text}</Text>
+      <Ionicons name={icon} size={24} color={textColor} />
+      <ThemedText style={styles.detailsText}>{text}</ThemedText>
     </View>
   );
 
@@ -181,32 +191,32 @@ const CarbonCreditSubscriptionScreen = () => {
     } else {
       return (
         <>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Monthly Subscription</Text>
-            <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Monthly Subscription</ThemedText>
+            <ThemedText style={{ fontSize: 30, fontWeight: "bold" }}>
               {formatPrice(carbonCreditSubscription?.recommendedPrice.unit_amount)}
               <Text style={{ fontSize: 18, fontWeight: "normal" }}>/month</Text>
-            </Text>
-            <Text style={styles.cardDescription}>Offset your calculated carbon emissions</Text>
-            <Text style={styles.cardDescription}>
+            </ThemedText>
+            <ThemedText style={styles.cardDescription}>Offset your calculated carbon emissions</ThemedText>
+            <ThemedText style={styles.cardDescription}>
               <Icon name="check" size={24} color="#409858" />
               <Text style={{ fontWeight: "bold" }}>Purchase of Carbon Credits: </Text>
               Includes buying the nearest whole number of carbon credits to ensure you are net zero.
-            </Text>
-            <Text style={styles.cardDescription}>
+            </ThemedText>
+            <ThemedText style={styles.cardDescription}>
               <Icon name="check" size={24} color="#409858" />
               <Text style={{ fontWeight: "bold" }}>Hassle-Free: </Text>
               Easy way to reduce your environmental impact.
-            </Text>
-            <Text style={styles.cardDescription}>
+            </ThemedText>
+            <ThemedText style={styles.cardDescription}>
               <Icon name="check" size={24} color="#409858" />
               <Text style={{ fontWeight: "bold" }}>Support Climate Projects: </Text>
               Contributes to awesome climate initiatives.
-            </Text>
+            </ThemedText>
             {isSubscribed ? (
               <View style={styles.subscribedContainer}>
                 <Ionicons name="checkmark-circle" size={24} color="#409858" />
-                <Text style={styles.subscribedText}>Subscribed</Text>
+                <ThemedText style={styles.subscribedText}>Subscribed</ThemedText>
               </View>
             ) : (
               <TouchableOpacity
@@ -214,23 +224,23 @@ const CarbonCreditSubscriptionScreen = () => {
                 onPress={openPaymentSheet}
                 disabled={isProcessingPayment}
               >
-                <Text style={styles.subscribeButtonText}>
+                <ThemedText style={styles.subscribeButtonText}>
                   {isProcessingPayment ? "Processing..." : `Subscribe now`}
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
             )}
-          </View>
+          </ThemedView>
           {isSubscribed && (
-            <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Subscription Details</Text>
+            <ThemedView style={styles.card}>
+              <ThemedText style={styles.sectionTitle}>Subscription Details</ThemedText>
               <SubscriptionDetailsItem icon="time-outline" text={`Payment due on ${currentPeriodStart}`} />
               <SubscriptionDetailsItem icon="calendar-outline" text={`Ends on ${currentPeriodEnd}`} />
               <SubscriptionDetailsItem icon="receipt-outline" text="Billed Monthly" />
               <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSubscription}>
                 <Icon name="close" size={24} color="#D22626" />
-                <Text style={styles.cancelButtonText}>Cancel Subscription</Text>
+                <ThemedText style={styles.cancelButtonText}>Cancel Subscription</ThemedText>
               </TouchableOpacity>
-            </View>
+            </ThemedView>
           )}
         </>
       );
@@ -238,7 +248,8 @@ const CarbonCreditSubscriptionScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.greenCircleLarge} />
         <View style={styles.greenCircleSmall} />
@@ -252,14 +263,13 @@ const CarbonCreditSubscriptionScreen = () => {
           <View style={styles.content}>{renderContent()}</View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
@@ -296,7 +306,6 @@ const styles = StyleSheet.create({
     left: "-25%",
   },
   card: {
-    backgroundColor: "#f0f0f0",
     borderRadius: 10,
     padding: 16,
     marginVertical: 16,

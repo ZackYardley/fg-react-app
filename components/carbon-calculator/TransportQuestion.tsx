@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { RadioButton, TextInput, HelperText } from "react-native-paper";
+import { ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
 
 const TransportQuestion = ({
   question,
@@ -20,10 +22,12 @@ const TransportQuestion = ({
   label?: string;
 }) => {
   const inputRef = useRef<any>(null);
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "background");
 
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>{question}</Text>
+      <ThemedText style={styles.questionText}>{question}</ThemedText>
       <View style={styles.optionsContainer}>
         <View style={styles.optionsColumn}>
           {["Yes", "No"].map((option) => (
@@ -36,14 +40,14 @@ const TransportQuestion = ({
                   color="#44945F"
                   uncheckedColor="#808080"
                 />
-                <Text style={styles.optionText}>{option}</Text>
+                <ThemedText style={styles.optionText}>{option}</ThemedText>
               </View>
             </TouchableOpacity>
           ))}
         </View>
         {useTransport === "Yes" && (
           <View style={styles.frequencyContainer}>
-            <Text style={styles.frequencyLabel}>How many times a week?</Text>
+            <ThemedText style={styles.frequencyLabel}>How many times a week?</ThemedText>
             <TextInput
               ref={inputRef}
               placeholder=""
@@ -56,10 +60,10 @@ const TransportQuestion = ({
                 borderRadius: 10,
               }}
               outlineColor="#D9D9D9"
-              style={styles.textInput}
+              style={[styles.textInput, { backgroundColor }]}
               dense={true}
-              textColor="#000"
-              right={label ? <TextInput.Affix text={label} textStyle={{ color: "#000" }} /> : null}
+              textColor={textColor}
+              right={label ? <TextInput.Affix text={label} textStyle={{ color: textColor }} /> : null}
             />
             <HelperText type="error" visible={!!frequencyError}>
               {frequencyError}
@@ -106,7 +110,6 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 40,
-    backgroundColor: "#FFF",
     width: "auto",
     borderRadius: 10,
     marginTop: 12,

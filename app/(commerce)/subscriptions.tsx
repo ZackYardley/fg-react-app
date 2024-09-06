@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { fetchCarbonCreditSubscription } from "@/api/products";
@@ -74,17 +74,19 @@ const ForevergreenSubscriptions = () => {
     price: string;
     onPress: () => void;
   }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardDescription}>{description}</Text>
+    <ThemedView style={styles.card}>
+      <ThemedText style={styles.cardTitle}>{title}</ThemedText>
+      <ThemedText style={styles.cardDescription}>{description}</ThemedText>
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>{loading ? "Loading..." : isSubscribed ? "Manage Subscription" : price}</Text>
+        <ThemedText style={styles.buttonText}>
+          {loading ? "Loading..." : isSubscribed ? "Manage Subscription" : price}
+        </ThemedText>
       </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.greenCircleLarge} />
         <View style={styles.greenCircleSmall} />
@@ -116,20 +118,20 @@ const ForevergreenSubscriptions = () => {
             ) : (
               <Text>Carbon Credit Subscription not available</Text>
             )}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Newsletter Subscription</Text>
-              <Text style={styles.cardDescription}>
+            <ThemedView style={styles.card}>
+              <ThemedText style={styles.cardTitle}>Newsletter Subscription</ThemedText>
+              <ThemedText style={styles.cardDescription}>
                 By joining the newsletter you will be sent personalized info about your journey towards net-zero. This
                 is a free an easy way to reduce your emissions.
-              </Text>
+              </ThemedText>
               <TouchableOpacity style={styles.button} onPress={handleNewsletterSubscribption}>
-                <Text style={styles.buttonText}>
+                <ThemedText style={styles.buttonText}>
                   {loading ? "Loading..." : isNewsletterSubscribed ? "Unsubscribe" : "Subscribe"}
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Current Subscriptions</Text>
+            </ThemedView>
+            <ThemedView style={styles.card}>
+              <ThemedText style={styles.cardTitle}>Current Subscriptions</ThemedText>
               <View style={styles.subscriptionContainer}>
                 {/* <View style={styles.subscriptionItem}>
                   <Ionicons name="close" size={18} color="red" />
@@ -143,7 +145,7 @@ const ForevergreenSubscriptions = () => {
                   ) : (
                     <Ionicons name="close" size={18} color="red" />
                   )}
-                  <Text style={styles.subscriptionText}>Carbon Credit Subscription</Text>
+                  <ThemedText style={styles.subscriptionText}>Carbon Credit Subscription</ThemedText>
                 </View>
                 <View style={styles.subscriptionItem}>
                   {loading ? (
@@ -153,21 +155,20 @@ const ForevergreenSubscriptions = () => {
                   ) : (
                     <Ionicons name="close" size={18} color="red" />
                   )}
-                  <Text style={styles.subscriptionText}>Email Subscription</Text>
+                  <ThemedText style={styles.subscriptionText}>Email Subscription</ThemedText>
                 </View>
               </View>
-            </View>
+            </ThemedView>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollView: {
     flex: 1,
@@ -191,7 +192,6 @@ const styles = StyleSheet.create({
     left: "-25%",
   },
   card: {
-    backgroundColor: "#f0f0f0",
     borderRadius: 10,
     padding: 15,
     marginHorizontal: 15,
@@ -233,7 +233,6 @@ const styles = StyleSheet.create({
   },
   subscriptionText: {
     marginLeft: 10,
-    color: "#333",
     fontSize: 16,
   },
 });

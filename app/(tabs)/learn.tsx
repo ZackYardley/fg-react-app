@@ -4,8 +4,7 @@ import * as WebBrowser from "expo-web-browser";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { PageHeader } from "@/components/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { Link } from "expo-router";
 import { Book, Camera, Blog, FastFacts, Credit, Newsletter, Methodology,} from "@/constants/Images";
 import { useRouter } from 'expo-router';
@@ -56,7 +55,7 @@ const LearnScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
@@ -199,7 +198,7 @@ const LearnScreen = () => {
 
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -208,7 +207,6 @@ export default LearnScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
     flex: 2,

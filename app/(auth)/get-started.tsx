@@ -3,11 +3,15 @@ import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
 import { StyleSheet } from "react-native";
 import { AppStore, GooglePlay, TreeLogo } from "@/constants/Images";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { GreenButton } from "@/components/auth";
 import { APP_STORE_URL, APP_URL, PLAY_STORE_URL } from "@/constants";
+import { ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 export default function GetStartedScreen() {
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "primary");
+
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = APP_URL;
@@ -62,38 +66,39 @@ export default function GetStartedScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ThemedSafeAreaView style={[styles.container]}>
+      <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>
-            Forever<Text style={styles.titleHighlight}>green</Text>
+          <Text style={[styles.title, { color: textColor }]}>
+            Forever<Text style={{ color: primaryColor }}>green</Text>
           </Text>
           <Image style={styles.logo} source={TreeLogo} />
         </View>
         <View style={styles.buttonContainer}>
           <GreenButton
             title="Get Started"
-            onPress={() => router.push("/signup")}
+            onPress={() => router.navigate("/signup")}
             style={styles.button}
             textStyle={styles.buttonText}
           />
           <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Already helping our planet? </Text>
+            <ThemedText style={styles.loginText}>Already helping our planet? </ThemedText>
             <Link href={"/login"}>
-              <Text style={styles.loginLinkText}>Log in</Text>
+              <ThemedText type="link" style={styles.loginLinkText}>
+                Log in
+              </ThemedText>
             </Link>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
     paddingHorizontal: 20,
   },
   scrollViewContent: {
@@ -108,24 +113,20 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "bold",
   },
-  titleHighlight: {
-    color: "#409858",
-  },
   logo: {
-    width: 768,
-    height: 384,
+    width: 300,
+    height: 300,
+    resizeMode: "contain",
   },
   buttonContainer: {
     width: "100%",
   },
   button: {
-    backgroundColor: "#409858",
     borderRadius: 9999,
     padding: 24,
     paddingHorizontal: 48,
   },
   buttonText: {
-    color: "#fff",
     textAlign: "center",
     fontSize: 30,
     fontWeight: "bold",

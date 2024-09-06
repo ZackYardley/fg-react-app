@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { getTopReferrers } from "@/api/referral";
+import { ThemedView, ThemedText } from "../common";
 
 const CommunityLeaders = () => {
   const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
@@ -32,25 +33,26 @@ const CommunityLeaders = () => {
 
   return (
     <View style={styles.leadersSection}>
-      <Text style={styles.sectionTitle}>Community Leaders</Text>
-      <View style={styles.leadersContainer}>
+      <ThemedText style={styles.sectionTitle}>Community Leaders</ThemedText>
+      <ThemedView style={styles.leadersContainer}>
         <View>
           {topReferrers ? (
             topReferrers.map((referrer, index) => (
-              <Text key={referrer.userId} style={styles.leaderText}>
-                <Text style={styles.boldText}>{index + 1}.</Text> {referrer.name} - {referrer.totalReferrals} Referrals
-              </Text>
+              <ThemedText key={referrer.userId} style={styles.leaderText}>
+                <ThemedText style={styles.boldText}>{index + 1}.</ThemedText> {referrer.name} -{" "}
+                {referrer.totalReferrals} Referrals
+              </ThemedText>
             ))
           ) : (
-            <Text style={styles.leaderText}>
-              <Text style={styles.boldText}>There are no top referrers! Be the first one :)</Text>
-            </Text>
+            <ThemedText style={styles.leaderText}>
+              <ThemedText style={styles.boldText}>There are no top referrers! Be the first one :)</ThemedText>
+            </ThemedText>
           )}
         </View>
         <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
-          <Text style={styles.referButtonText}>Refer a friend!</Text>
+          <ThemedText style={styles.referButtonText}>Refer a friend!</ThemedText>
         </Pressable>
-      </View>
+      </ThemedView>
     </View>
   );
 };
@@ -70,7 +72,6 @@ const styles = StyleSheet.create({
   leadersContainer: {
     flexDirection: "column",
     justifyContent: "space-between",
-    backgroundColor: "#eeeeee",
     padding: 24,
     alignItems: "center",
     borderRadius: 16,

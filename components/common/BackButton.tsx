@@ -2,8 +2,10 @@ import React from "react";
 import { Text, Pressable, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { Href, router } from "expo-router";
+import { useThemeColor } from "@/hooks";
 
 const BackButton = ({ link }: { link?: Href<string> }) => {
+  const textColor = useThemeColor({}, "text");
   const navigate = () => {
     if (link) {
       router.replace(link);
@@ -16,7 +18,7 @@ const BackButton = ({ link }: { link?: Href<string> }) => {
 
   return (
     <Pressable style={styles.container} onPress={() => navigate()} hitSlop={24}>
-      <Icon name="chevron-left" size={36} color="black" />
+      <Icon name="chevron-left" size={36} color={textColor} />
     </Pressable>
   );
 };

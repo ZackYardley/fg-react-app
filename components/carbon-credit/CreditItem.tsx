@@ -1,9 +1,10 @@
 import React from "react";
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { formatPrice } from "@/utils";
 import { ComingSoon } from "@/constants/Images";
+import { ThemedText } from "@/components/common";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -44,11 +45,11 @@ const CreditItem: React.FC<CreditItemProps> = ({
       </LinearGradient>
       {!isSkeleton && (
         <>
-          <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+          <ThemedText style={styles.name} numberOfLines={2} ellipsizeMode="tail">
             {isPlaceholder ? "Coming Soon" : name || ""}
-          </Text>
+          </ThemedText>
           <View style={styles.amountContainer}>
-            <Text style={styles.amount}>{isPlaceholder ? "??" : price ? formatPrice(price) : ""}</Text>
+            <ThemedText style={styles.amount}>{isPlaceholder ? "??" : price ? formatPrice(price) : ""}</ThemedText>
           </View>
         </>
       )}

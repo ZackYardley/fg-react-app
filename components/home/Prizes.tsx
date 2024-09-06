@@ -1,10 +1,15 @@
 import { useRef } from "react";
-import { View, Text, useWindowDimensions, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, useWindowDimensions, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { router } from "expo-router";
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
+import { ThemedText, ThemedView } from "../common";
+import { useThemeColor } from "@/hooks";
 
 const Prizes = ({ isNetZero, displayNetZeroMonths }: { isNetZero: boolean; displayNetZeroMonths: string }) => {
+  const backgroundColor = useThemeColor({}, "background");
+  const positive = useThemeColor({}, "positive");
+  const negative = useThemeColor({}, "negative");
   const carouselRef = useRef(null);
   const { width: screenWidth } = useWindowDimensions();
   const carouselData = [
@@ -19,20 +24,20 @@ const Prizes = ({ isNetZero, displayNetZeroMonths }: { isNetZero: boolean; displ
   const renderCarouselItem = ({ item }: any) => (
     <View style={styles.carouselItem}>
       <Image source={item.image} style={styles.carouselImage} />
-      <Text style={styles.carouselText}>{item.title}</Text>
+      <ThemedText style={styles.carouselText}>{item.title}</ThemedText>
     </View>
   );
   return (
-    <View style={styles.chartsSection}>
-      <View style={styles.chartBox}>
-        <Text style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</Text>
+    <ThemedView style={styles.chartsSection}>
+      <View style={[styles.chartBox, { backgroundColor }]}>
+        <ThemedText style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</ThemedText>
         <View style={styles.prizeSection}>
           <TouchableOpacity
-            style={[styles.prizeBox, isNetZero ? styles.prizeBox : {}]}
+            style={[styles.prizeBox, isNetZero ? {backgroundColor: positive} : {backgroundColor: negative}]}
             onPress={() => router.push("/journey")}
           >
-            <Text style={styles.monthNetZeroText}>{displayNetZeroMonths}</Text>
-            <Text style={styles.subtitleText}>Months Net-Zero</Text>
+            <ThemedText style={styles.monthNetZeroText}>{displayNetZeroMonths}</ThemedText>
+            <ThemedText style={styles.subtitleText}>Months Net-Zero</ThemedText>
           </TouchableOpacity>
           <View style={styles.prizeSection}>
             <Carousel
@@ -48,7 +53,7 @@ const Prizes = ({ isNetZero, displayNetZeroMonths }: { isNetZero: boolean; displ
           </View>
         </View>
       </View>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -56,7 +61,6 @@ export default Prizes;
 
 const styles = StyleSheet.create({
   chartsSection: {
-    backgroundColor: "#eeeeee",
     padding: 24,
     borderRadius: 16,
     marginBottom: 24,
@@ -79,7 +83,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   prizeBox: {
-    backgroundColor: "#d4edda",
     borderRadius: 16,
     width: "40%",
     padding: 16,

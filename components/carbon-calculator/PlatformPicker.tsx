@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Platform, View, Text, Modal, FlatList, StyleSheet, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
+import { darkenColor } from "@/utils";
 
 interface PickerProps {
   selectedValue: string | undefined;
@@ -14,19 +17,22 @@ const IOSPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProp
 
   const selectedItem = items.find((item) => item.value === selectedValue);
 
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+
   return (
     <View>
       <Pressable
-        style={[styles.iosPickerTrigger, disabled && styles.disabledTrigger]}
+        style={[styles.iosPickerTrigger, { backgroundColor, borderColor: textColor }]}
         onPress={() => !disabled && setIsPickerVisible(true)}
       >
-        <Text style={[styles.iosPickerTriggerText, disabled && styles.disabledText]}>
+        <ThemedText style={[styles.iosPickerTriggerText, disabled && styles.disabledText]}>
           {selectedItem ? selectedItem.label : "Select a state"}
-        </Text>
+        </ThemedText>
       </Pressable>
       <Modal visible={isPickerVisible} animationType="slide" transparent={true}>
         <View style={styles.iosModalContainer}>
-          <View style={styles.iosModalContent}>
+          <View style={[styles.iosModalContent, { backgroundColor }]}>
             <Pressable style={styles.iosDoneButton} onPress={() => setIsPickerVisible(false)}>
               <Text style={styles.iosDoneButtonText}>Done</Text>
             </Pressable>
@@ -35,8 +41,9 @@ const IOSPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProp
               onValueChange={(itemValue) => {
                 onValueChange(itemValue);
               }}
-              itemStyle={styles.iosPickerItem}
+              itemStyle={[styles.iosPickerItem, { color: textColor }]}
               enabled={!disabled}
+              style={{ backgroundColor }}
             >
               {items.map((item) => (
                 <Picker.Item key={item.value} label={item.label} value={item.value} />
@@ -64,15 +71,18 @@ const AndroidPicker = ({ selectedValue, onValueChange, items, disabled }: Picker
     </Pressable>
   );
 
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+
   return (
     <View>
       <Pressable
-        style={[styles.androidPickerTrigger, disabled && styles.disabledTrigger]}
+        style={[styles.androidPickerTrigger, { backgroundColor, borderColor: textColor }]}
         onPress={() => !disabled && setModalVisible(true)}
       >
-        <Text style={[styles.androidPickerTriggerText, disabled && styles.disabledText]}>
+        <ThemedText style={[styles.androidPickerTriggerText, disabled && styles.disabledText]}>
           {selectedValue ? items.find((item) => item.value === selectedValue)?.label : "Select a state"}
-        </Text>
+        </ThemedText>
       </Pressable>
       <Modal
         animationType="slide"
@@ -117,7 +127,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   iosModalContent: {
-    backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 20,
@@ -136,9 +145,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   androidPickerTrigger: {
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 8,
     padding: 12,
     marginTop: 8,
@@ -181,10 +188,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: "white",
     fontSize: 16,
-  },
-  disabledTrigger: {
-    backgroundColor: "#F3F4F6",
-    borderColor: "#E5E7EB",
   },
   disabledText: {
     color: "#9CA3AF",

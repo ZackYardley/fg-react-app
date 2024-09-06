@@ -5,13 +5,11 @@ import NumberInput from "./NumberInput";
 import TransportQuestion from "./TransportQuestion";
 import NextButton from "./NextButton";
 import CalculatingScreen from "./Calculating";
-import QuestionSliderColor from "./QuestionSliderColor";
 import PlatformPicker from "./PlatformPicker";
 
 export {
   Header,
   QuestionSlider,
-  QuestionSliderColor,
   RadioButtonGroup,
   NumberInput,
   TransportQuestion,

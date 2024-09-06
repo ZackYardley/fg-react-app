@@ -4,12 +4,13 @@ import { Image } from "expo-image";
 import { getAuth, updateProfile } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { Feather } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { useThemeColor } from "@/hooks";
 
 export default function ProfileSettings() {
+  const textColor = useThemeColor({}, "text");
   const auth = getAuth();
   const storage = getStorage();
 
@@ -73,7 +74,7 @@ export default function ProfileSettings() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Profile Settings" />
         <BackButton />
@@ -98,31 +99,30 @@ export default function ProfileSettings() {
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.label}>Display Name</Text>
+            <ThemedText style={styles.label}>Display Name</ThemedText>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: textColor }]}
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Enter your name"
             />
 
-            <Text style={styles.label}>Email</Text>
-            <Text style={styles.emailText}>{user?.email}</Text>
+            <ThemedText style={styles.label}>Email</ThemedText>
+            <ThemedText style={styles.emailText}>{user?.email}</ThemedText>
           </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <ThemedText style={styles.saveButtonText}>Save</ThemedText>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   profileImageContainer: {
     alignItems: "center",
@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 20,
-    color: "black",
     fontWeight: "600",
     marginBottom: 5,
   },

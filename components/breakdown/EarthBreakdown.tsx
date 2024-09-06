@@ -2,6 +2,7 @@ import React from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import { Earth } from "@/constants/Images";
 import { TARGET_EMISSIONS } from "@/constants";
+import { ThemedText } from "../common";
 
 const EarthBreakdown = ({ emissions }: { emissions: number }) => {
   const earthsRequired = parseFloat((emissions / TARGET_EMISSIONS).toFixed(2));
@@ -13,9 +14,9 @@ const EarthBreakdown = ({ emissions }: { emissions: number }) => {
       return (
         <View style={styles.specialCaseContainer}>
           <Image source={Earth} style={styles.earthImage} />
-          <Text style={styles.specialCaseText}>
+          <ThemedText style={styles.specialCaseText}>
             {emissions === 0 ? "Your emissions are neutral!" : "Great job! You're having a net positive impact."}
-          </Text>
+          </ThemedText>
         </View>
       );
     }
@@ -50,11 +51,11 @@ const EarthBreakdown = ({ emissions }: { emissions: number }) => {
 
     return (
       <View>
-        <Text style={styles.impactText}>If everyone lived like you, we would need:</Text>
+        <ThemedText style={styles.impactText}>If everyone lived like you, we would need:</ThemedText>
         {rows}
-        <Text style={styles.earthsRequiredText}>{earthsRequired.toFixed(2)} Earths</Text>
+        <ThemedText style={styles.earthsRequiredText}>{earthsRequired.toFixed(2)} Earths</ThemedText>
         {wholeEarths > maxEarths && (
-          <Text style={styles.additionalEarthsText}>+{wholeEarths - maxEarths} more Earths not shown</Text>
+          <ThemedText style={styles.additionalEarthsText}>({wholeEarths - maxEarths} more Earths not shown)</ThemedText>
         )}
       </View>
     );
