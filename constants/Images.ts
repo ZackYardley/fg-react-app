@@ -23,6 +23,13 @@ const Crewneck = require("../assets/images/crewneck.png");
 const ComingSoon = require("../assets/images/coming-soon.png");
 const AppStore = require("../assets/images/app-store.png");
 const GooglePlay = require("../assets/images/google-play.png");
+const Book = require("../assets/images/book.png");
+const Camera = require("../assets/images/camera.png");
+const Blog = require("../assets/images/blog.png");
+const FastFacts = require("../assets/images/fast-facts.png");
+const Credit = require("../assets/images/credit.png");
+const Methodology = require("../assets/images/methodology.png");
+const Newsletter = require("../assets/images/newsletter.png");
 
 export {
   Earth,
@@ -50,4 +57,11 @@ export {
   ComingSoon,
   AppStore,
   GooglePlay,
+  Book,
+  Camera,
+  Blog,
+  FastFacts,
+  Credit,
+  Methodology,
+  Newsletter,
 };

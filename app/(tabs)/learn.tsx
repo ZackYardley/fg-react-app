@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ScrollView, Text, Pressable, View, StyleSheet, StatusBar } from "react-native";
+import { ScrollView, Text, Pressable, View, StyleSheet, StatusBar, Dimensions, Image } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
@@ -7,6 +7,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
+import { Book,
+  Camera,
+  Blog,
+  FastFacts,
+  Credit,
+  Newsletter,
+  Methodology,} from "@/constants/Images";
+
+const { width: screenWidth } = Dimensions.get('window');
+
 
 const LearnScreen = () => {
   const [loading, setLoading] = useState(true);
@@ -52,79 +62,140 @@ const LearnScreen = () => {
           <View style={[styles.circle, styles.topLeftCircle]} />
           <View style={[styles.circle, styles.bottomRightCircle]} />
 
-          {/* <View style={styles.header}>
-          <Text style={styles.titleText}>
-            Forever<Text style={styles.greenText}>green</Text>
-          </Text>
-          <Text style={styles.subtitleText}>Learn</Text>
-        </View> */}
           <PageHeader subtitle="Learn" />
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Resources Guides</Text>
-            <Text style={styles.cardText}>
-              Check out our resources guides with tons of info about how to live a more sustainable lifestyle!
-            </Text>
-            <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>Learn More</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Course</Text>
-            <Text style={styles.cardText}>
-              We have created some follow at your own pace courses about sustainable living!
-            </Text>
-            <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>Explore</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Blogs</Text>
-            <Text style={styles.cardText}>
-              We have tons of blogs about hot climate topics that are easy to read and educational!
-            </Text>
-            <Link href="/blog">
-              <View style={styles.button}>
-                <Text style={styles.buttonText}>Read Now</Text>
+          { /* Resource Guides */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Resource Guides</Text>
+                <Text style={styles.cardText}>
+                Check out our  guides with info about how to live a sustainable lifestyle!                </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>Explore</Text>
+                </Pressable>
               </View>
-            </Link>
+              <View style={styles.imageContainer}>
+                <Image source={Book} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Fast Facts</Text>
-            <Text style={styles.cardText}>
-              Want a quick fact about climate related topics to expand your view? Check out our fast facts now!
-            </Text>
-            <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>View</Text>
-            </Pressable>
+          { /* Course */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Courses</Text>
+                <Text style={styles.cardText}>  
+                  Follow at your own pace: courses about sustainable living!                </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>Explore</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={Camera} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Newsletter Subscription</Text>
-            <Text style={styles.cardText}>
-              By joining the newsletter you will be sent personalized info about your journey towards net-zero. This is
-              a free an easy way to reduce your emissions.
-            </Text>
-            <Pressable
-              style={[styles.button, loading && styles.disabledButton]}
-              onPress={() => !loading && handleNewsletterSubscription()}
-              disabled={loading || isNewsletterSubscribed}
-            >
-              {loading ? (
-                <Text style={styles.buttonText}>Loading...</Text>
-              ) : isNewsletterSubscribed ? (
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <Ionicons name="checkmark-circle" size={24} color="white" />
-                  <Text style={styles.buttonText}>Subscribed</Text>
-                </View>
-              ) : (
-                <Text style={styles.buttonText}>Subscribe</Text>
-              )}
-            </Pressable>
+          { /* Blogs */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Blogs</Text>
+                <Text style={styles.cardText}>
+                Blogs about hot climate topics: easy to read and educational!
+                </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>Read Now</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={Blog} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
           </View>
+
+          { /* Fast Facts */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Fast Facts</Text>
+                <Text style={styles.cardText}>
+                  Want a quick fact about climate related topics to expand your view?                </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>View</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={FastFacts} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
+          </View>
+
+          { /* Credit */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Carbon Credits</Text>
+                <Text style={styles.cardText}>
+                  Learn more about Carbon Credits and what goes into our projects!            </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>View</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={Credit} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
+          </View>
+
+
+          { /* Methodology */}
+        
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Methodology</Text>
+                <Text style={styles.cardText}>
+                  Find out how we calculate your emissions first-hand!            </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>Learn More</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={Methodology} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
+          </View>
+
+          { /* Methodology */}
+
+
+          <View style={styles.resource}>
+            <View style={styles.cardContainer}>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Newsletter</Text>
+                <Text style={styles.cardText}>
+                Stay up to date with the latest sustainability tips and eco-friendly news!                   </Text>
+                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                  <Text style={styles.buttonText}>View</Text>
+                </Pressable>
+              </View>
+              <View style={styles.imageContainer}>
+                <Image source={Newsletter} style={styles.image} resizeMode="contain" />
+              </View>        
+            </View>
+          </View>
+
+          
+        
+
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -139,6 +210,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   content: {
+    flex: 2,
+    flexDirection: "column",
     paddingHorizontal: 24,
   },
   circle: {
@@ -172,12 +245,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
+    width: '80%',
     backgroundColor: "#eeeeee",
-    marginTop: 16,
-    marginBottom: 24,
     padding: 16,
     borderRadius: 16,
-    alignItems: "center",
+    marginRight: '2%',
+    alignItems: 'center',
   },
   cardTitle: {
     fontSize: 30,
@@ -206,5 +279,34 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
+  },
+  iconContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  resource: {
+    flex: 2,
+    flexDirection: "row",
+    marginTop: 24,
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  imageContainer: {
+    width: '20%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '200%',
+    height: '200%',
   },
 });
