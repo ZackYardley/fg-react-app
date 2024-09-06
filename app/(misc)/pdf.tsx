@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Dimensions, Image, TouchableOpacity, Modal } from 'react-native';
 import { PageHeader, BackButton } from '@/components/common';
-import Pdf from 'react-native-pdf';
+import Pdf from "@/utils/pdf";
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 

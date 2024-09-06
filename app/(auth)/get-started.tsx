@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, StatusBar, Image, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
@@ -11,10 +12,16 @@ import { useThemeColor } from "@/hooks";
 export default function GetStartedScreen() {
   const textColor = useThemeColor({}, "text");
   const primaryColor = useThemeColor({}, "primary");
+  const [error, setError] = useState<string | null>(null);
 
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = APP_URL;
+      if (window.location.href === APP_URL) {
+        window.location.reload();
+      } else {
+        setError("Looks like you don't have the app installed. Please download it from the app store.");
+      }
     } else {
       Linking.openURL(APP_URL);
     }
@@ -47,6 +54,7 @@ export default function GetStartedScreen() {
               style={styles.webButton}
               textStyle={styles.webButtonText}
             />
+            <Text style={styles.errorText}>{error}</Text>
             <Text style={styles.orText}>or</Text>
             <View style={styles.storeButtonsContainer}>
               <TouchableOpacity onPress={() => Linking.openURL(APP_STORE_URL)}>
@@ -157,7 +165,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   webTitle: {
-    fontSize: 64,
+    fontSize: 48,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 40,
@@ -222,6 +230,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
   },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: "center",
+  },
   orText: {
     fontSize: 28,
     marginVertical: 20,
@@ -230,6 +244,8 @@ const styles = StyleSheet.create({
   },
   storeButtonsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 20,
     justifyContent: "center",
     alignItems: "center",
   },
