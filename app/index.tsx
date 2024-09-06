@@ -62,8 +62,8 @@ export default function Index() {
 
   if (debugMode) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-        <ScrollView style={styles.container}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+        <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.confettiContainer} pointerEvents="none">
             <ConfettiCannon
               count={200}

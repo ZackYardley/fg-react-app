@@ -39,7 +39,7 @@ const ReferralForm = () => {
       setEmailError("");
 
       // Increment the referral count
-      await incrementUserReferrals(auth.currentUser?.uid || "");
+      await incrementUserReferrals();
 
       // Navigate back to the previous screen
       router.back();

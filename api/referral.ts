@@ -1,16 +1,8 @@
 import { APP_STORE_URL, APP_URL, PLAY_STORE_URL } from "@/constants";
-import {
-  getFirestore,
-  doc,
-  updateDoc,
-  increment,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-} from "firebase/firestore";
+import { getFirestore, doc, runTransaction, getDoc, serverTimestamp } from "firebase/firestore";
 import { sendEmail } from "./email";
+import { getAuth } from "firebase/auth";
+import { TopReferrer, ReferralLeaderboard } from "@/types";
 
 const sendReferralEmail = async (
   email: string,
@@ -76,14 +68,68 @@ The Forevergreen Team 🌱`;
   await sendEmail([email], subject, text, html);
 };
 
-const incrementUserReferrals = async (userId: string) => {
+const AGGREGATE_DOC_ID = "emissions_stats";
+
+const incrementUserReferrals = async () => {
   const db = getFirestore();
+  const auth = getAuth();
+
+  const userId = auth.currentUser?.uid;
+  if (!userId) {
+    console.error("User is not authenticated, skipping referral increment");
+    return;
+  }
+
   const userRef = doc(db, "users", userId);
+  const aggregateDataRef = doc(db, "community", AGGREGATE_DOC_ID);
 
   try {
-    await updateDoc(userRef, {
-      totalReferrals: increment(1),
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists()) {
+        throw "User document does not exist!";
+      }
+
+      const referralLeaderboardDoc = await transaction.get(aggregateDataRef);
+      let referralLeaderboard: ReferralLeaderboard;
+
+      if (!referralLeaderboardDoc.exists()) {
+        // Initialize the leaderboard if it doesn't exist
+        referralLeaderboard = { topReferrers: [], lastUpdated: new Date() };
+      } else {
+        referralLeaderboard = referralLeaderboardDoc.data() as ReferralLeaderboard;
+        // Ensure topReferrers exists
+        if (!referralLeaderboard.topReferrers) {
+          referralLeaderboard.topReferrers = [];
+        }
+      }
+
+      const userData = userDoc.data();
+      const newTotalReferrals = (userData.totalReferrals || 0) + 1;
+      // Update user's referral count
+      transaction.update(userRef, { totalReferrals: newTotalReferrals });
+
+      // Update top referrers
+      const userIndex = referralLeaderboard.topReferrers.findIndex((r) => r.userId === userId);
+      if (userIndex !== -1) {
+        // User is already in top referrers, update their count
+        referralLeaderboard.topReferrers[userIndex].totalReferrals++;
+      } else {
+        // Add user to top referrers
+        referralLeaderboard.topReferrers.push({
+          userId,
+          totalReferrals: newTotalReferrals,
+          name: userData.name || "Anonymous",
+        });
+      }
+
+      // Sort and trim the top referrers
+      referralLeaderboard.topReferrers.sort((a, b) => b.totalReferrals - a.totalReferrals);
+      referralLeaderboard.topReferrers = referralLeaderboard.topReferrers.slice(0, 3);
+
+      transaction.set(aggregateDataRef, referralLeaderboard);
     });
+
     console.log(`Successfully incremented referral count for user ${userId}`);
   } catch (error) {
     console.error(`Error incrementing referral count for user ${userId}:`, error);
@@ -91,28 +137,19 @@ const incrementUserReferrals = async (userId: string) => {
   }
 };
 
-const getTopReferrers = async () => {
+const getTopReferrers = async (): Promise<TopReferrer[]> => {
   const db = getFirestore();
-  const usersRef = collection(db, "users");
+  const aggregateDataRef = doc(db, "community", AGGREGATE_DOC_ID);
 
   try {
-    // Create a query to order users by totalReferrals in descending order and limit to top 3
-    const q = query(usersRef, orderBy("totalReferrals", "desc"), limit(3));
+    const referralLeaderboardDoc = await getDoc(aggregateDataRef);
 
-    // Execute the query
-    const querySnapshot = await getDocs(q);
+    if (!referralLeaderboardDoc.exists()) {
+      return [];
+    }
 
-    // Process the results
-    const topReferrers = querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        userId: doc.id,
-        name: data.name || "Anonymous", // Fallback to 'Anonymous' if name is not available
-        totalReferrals: data.totalReferrals || 0,
-      };
-    });
-
-    return topReferrers;
+    const referralLeaderboard = referralLeaderboardDoc.data() as ReferralLeaderboard;
+    return referralLeaderboard.topReferrers;
   } catch (error) {
     console.error("Error getting top referrers:", error);
     throw error;

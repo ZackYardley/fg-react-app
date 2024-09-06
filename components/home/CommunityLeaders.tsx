@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { getTopReferrers } from "@/api/referral";
 
 const CommunityLeaders = () => {
   const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -18,18 +19,33 @@ const CommunityLeaders = () => {
     };
 
     loadData();
-  }, []);
+  }, [focused]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setFocused(true);
+      return () => {
+        setFocused(false);
+      };
+    }, [])
+  );
 
   return (
     <View style={styles.leadersSection}>
       <Text style={styles.sectionTitle}>Community Leaders</Text>
       <View style={styles.leadersContainer}>
         <View>
-          {topReferrers.map((referrer, index) => (
-            <Text key={referrer.userId} style={styles.leaderText}>
-              <Text style={styles.boldText}>{index + 1}.</Text> {referrer.name} - {referrer.totalReferrals} Referrals
+          {topReferrers ? (
+            topReferrers.map((referrer, index) => (
+              <Text key={referrer.userId} style={styles.leaderText}>
+                <Text style={styles.boldText}>{index + 1}.</Text> {referrer.name} - {referrer.totalReferrals} Referrals
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.leaderText}>
+              <Text style={styles.boldText}>There are no top referrers! Be the first one :)</Text>
             </Text>
-          ))}
+          )}
         </View>
         <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
           <Text style={styles.referButtonText}>Refer a friend!</Text>
