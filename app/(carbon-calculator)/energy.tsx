@@ -15,8 +15,10 @@ import {
 } from "@/components/carbon-calculator";
 import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { StateData, SurveyData, SurveyEmissions } from "@/types";
+import { useThemeColor } from "@/hooks";
 
 export default function EnergyCalculator() {
+  const onPrimary = useThemeColor({}, "onPrimary");
   const [surveyData, setSurveyData] = useState<SurveyData>({
     state: "",
     electricBill: "",
@@ -264,7 +266,7 @@ export default function EnergyCalculator() {
             onPress={handleUseCurrentLocation}
             disabled={isProcessing}
           >
-            <ThemedText style={styles.locationButtonText}>
+            <ThemedText style={[styles.locationButtonText, { color: onPrimary }]}>
               {isProcessing ? "Loading..." : "Use my current location"}
             </ThemedText>
           </Pressable>

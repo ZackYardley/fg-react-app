@@ -53,7 +53,7 @@ const PurchaseHistoryScreen = () => {
 
   const renderPaymentItem = (item: Payment) =>
     item.metadata.items ? (
-      <View style={styles.paymentCard}>
+      <ThemedView style={styles.paymentCard}>
         <View style={styles.paymentHeader}>
           <ThemedText style={styles.date}>{formatDate(item.created)}</ThemedText>
           <ThemedText style={styles.amount}>{formatPrice(item.amount)}</ThemedText>
@@ -70,7 +70,7 @@ const PurchaseHistoryScreen = () => {
           <ThemedText style={styles.paymentMethod}>Transaction ID:</ThemedText>
           <ThemedText style={styles.paymentMethod}>{item.id}</ThemedText>
         </View>
-      </View>
+      </ThemedView>
     ) : null;
 
   const renderInvoiceItem = (item: Invoice) => (

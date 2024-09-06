@@ -8,10 +8,10 @@ type BarChartProps = {
   values: number[];
   colors: string[];
   width: number;
+  backgroundColor: string;
 };
 
-const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
-  const backgroundColor = useThemeColor({}, "primaryContainer");
+const BarChartBreakdown = ({ names, values, colors, width, backgroundColor }: BarChartProps) => {
   const textColor = useThemeColor({}, "text");
 
   const data = {
@@ -25,8 +25,11 @@ const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
   };
 
   const chartConfig = {
+    backgroundColor: backgroundColor,
+    backgroundGradientFrom: backgroundColor,
+    backgroundGradientTo: backgroundColor,
     decimalPlaces: 0,
-    color: (opacity = 1) => darkenColor(textColor, 50),
+    color: (opacity = 1) => "#999999",
     labelColor: (opacity = 1) => textColor,
     barPercentage: 1.5,
   };
@@ -44,7 +47,7 @@ const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
       withCustomBarColorFromData={true}
       flatColor={true}
       style={{}}
-      yLabelsOffset={0}
+      yLabelsOffset={width / 7}
     />
   );
 };

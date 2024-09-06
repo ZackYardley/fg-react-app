@@ -3,7 +3,7 @@ import { useThemeColor } from "@/hooks";
 import { ThemedText, ThemedView } from "../common";
 
 const Tips = ({ highestEmissionGroup }: { highestEmissionGroup: string }) => {
-  const negative = useThemeColor({}, "negative");
+  const negative = useThemeColor({}, "error");
   return (
     <ThemedView style={styles.fastFact}>
       <ThemedText style={styles.fastFactTitle}>Top 3 Ways to Reduce your Emissions</ThemedText>

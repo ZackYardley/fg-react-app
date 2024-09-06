@@ -136,6 +136,7 @@ const Breakdown = () => {
                   values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
                   colors={["#44945F", "#A9A9A9"]}
                   width={width - 104}
+                  backgroundColor={backgroundColor}
                 />
               </View>
             </View>

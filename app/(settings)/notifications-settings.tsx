@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
 import messaging from "@react-native-firebase/messaging";
 import { Notifications } from "@/api/notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 
 const NotificationSettingsScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -35,19 +35,19 @@ const NotificationSettingsScreen = () => {
     value: boolean;
     onValueChange: (value: boolean) => void;
   }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
+    <ThemedView style={styles.card}>
+      <ThemedText style={styles.cardTitle}>{title}</ThemedText>
       <Switch
         value={value}
         onValueChange={onValueChange}
         trackColor={{ false: "#767577", true: "#409858" }}
         thumbColor={value ? "#f4f3f4" : "#f4f3f4"}
       />
-    </View>
+    </ThemedView>
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <View style={[styles.circle, styles.topLeftCircle]} />
         <View style={[styles.circle, styles.bottomRightCircle]} />
@@ -57,14 +57,13 @@ const NotificationSettingsScreen = () => {
           <SettingItem title="Enable Notifications" value={notificationsEnabled} onValueChange={toggleNotifications} />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
     paddingHorizontal: 20,
@@ -85,7 +84,6 @@ const styles = StyleSheet.create({
     left: 300,
   },
   card: {
-    backgroundColor: "#eeeeee",
     marginTop: 16,
     marginBottom: 24,
     padding: 16,

@@ -35,8 +35,8 @@ const Legend: React.FC<{ datasets: Dataset[] }> = ({ datasets }) => {
 };
 
 const LineChartBreakdown = ({ userId }: { userId?: string }) => {
-  const positive = useThemeColor({}, "positive");
-  const negative = useThemeColor({}, "negative");
+  const positive = useThemeColor({}, "success");
+  const negative = useThemeColor({}, "error");
   const backgroundColor = useThemeColor({}, "primaryContainer");
   const textColor = useThemeColor({}, "text");
   const [emissionsData, setEmissionsData] = useState<number[]>([]);

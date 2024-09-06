@@ -16,8 +16,8 @@ const EmissionsOffset = ({
   displayNetZeroMonths: string;
   netZeroMonths?: number;
 }) => {
-  const positive = useThemeColor({}, "positive");
-  const negative = useThemeColor({}, "negative");
+  const positive = useThemeColor({}, "success");
+  const negative = useThemeColor({}, "error");
   const backgroundColor = useThemeColor({}, "primaryContainer");
 
   return (

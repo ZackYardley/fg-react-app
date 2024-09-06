@@ -15,6 +15,8 @@ export const Colors = {
     tabBackground: "#F4F4F4",
     positive: "#D4EDDA",
     negative: "#F8D7DA",
+    success: "#16a34a",
+    error: "#dc2626",
   },
   dark: {
     primary: "#409858",
@@ -27,5 +29,7 @@ export const Colors = {
     tabBackground: "#646464",
     positive: "#589867",
     negative: "#A26166",
+    success: "#16a34a",
+    error: "#dc2626",
   },
 };

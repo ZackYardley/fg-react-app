@@ -17,6 +17,7 @@ const GreenButton = ({
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const primaryColor = useThemeColor({}, "primary");
   const textColor = useThemeColor({}, "text");
+  const onPrimary = useThemeColor({}, "onPrimary");
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scaleAnim, {
@@ -45,7 +46,7 @@ const GreenButton = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >
-        <Text style={[styles.buttonText, { color: textColor }, textStyle]}>{title}</Text>
+        <Text style={[styles.buttonText, { color: onPrimary }, textStyle]}>{title}</Text>
       </Pressable>
     </Animated.View>
   );

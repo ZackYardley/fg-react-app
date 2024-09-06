@@ -1,17 +1,19 @@
 import { router } from "expo-router";
-import { StyleSheet, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, TouchableOpacity, Text } from "react-native";
 import { fourofour } from "@/constants/Images";
 import ThemedSafeAreaView from "./ThemedSafeAreaView";
 import ThemedText from "./ThemedText";
+import { useThemeColor } from "@/hooks";
 
 const NotFoundComponent = () => {
+  const onPrimary = useThemeColor({}, "onPrimary");
   return (
     <ThemedSafeAreaView style={styles.container}>
       <ThemedText style={styles.errorCode}>404</ThemedText>
       <ThemedText style={styles.errorMessage}>Page Not Found</ThemedText>
       <Image source={fourofour} style={styles.image} />
       <TouchableOpacity onPress={() => router.replace("/")} style={styles.button}>
-        <ThemedText style={styles.buttonText}>Back Home</ThemedText>
+        <Text style={[styles.buttonText, { color: onPrimary }]}>Back Home</Text>
       </TouchableOpacity>
     </ThemedSafeAreaView>
   );

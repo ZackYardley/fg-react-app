@@ -113,7 +113,7 @@ const HomeScreen = () => {
           {/* Charts */}
           <ThemedView style={styles.chartsSection}>
             {/* Your Breakdown Pie Chart */}
-            <View style={[styles.chartBox, {backgroundColor}]}>
+            <View style={[styles.chartBox, { backgroundColor }]}>
               <ThemedText style={styles.chartTitle}>Your Breakdown</ThemedText>
               <View style={styles.pieChartContainer}>
                 <PieChartBreakdown
@@ -141,7 +141,7 @@ const HomeScreen = () => {
             </View>
 
             {/* You vs the Average American */}
-            <View style={[styles.chartBox, {backgroundColor}]}>
+            <View style={[styles.chartBox, { backgroundColor }]}>
               <ThemedText style={styles.chartTitle}>You vs the Average American</ThemedText>
               <ThemedText style={styles.chartSubtitle}>See how you rank vs the average American</ThemedText>
               <BarChartBreakdown
@@ -149,11 +149,12 @@ const HomeScreen = () => {
                 values={[totalEmissions - totalOffset, 21]}
                 colors={["#44945F", "#A9A9A9"]}
                 width={width - 128}
+                backgroundColor={backgroundColor}
               />
             </View>
 
             {/* If everyone lived like you */}
-            <View style={[styles.chartBox, {backgroundColor}]}>
+            <View style={[styles.chartBox, { backgroundColor }]}>
               <ThemedText style={styles.chartTitle}>Earth Breakdown</ThemedText>
               <EarthBreakdown emissions={totalEmissions - totalOffset} />
             </View>
