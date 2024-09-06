@@ -20,7 +20,7 @@ export const Colors = {
   },
   dark: {
     primary: "#409858",
-    onPrimary: "FFFFFF",
+    onPrimary: "#FFFFFF",
     primaryContainer: "#111111",
     text: "#FFFFFF",
     background: "#000000",
