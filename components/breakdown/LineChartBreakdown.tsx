@@ -35,7 +35,7 @@ const Legend: React.FC<{ datasets: Dataset[] }> = ({ datasets }) => {
 };
 
 const LineChartBreakdown = ({ userId }: { userId?: string }) => {
-  const positive = useThemeColor({}, "success");
+  const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
   const backgroundColor = useThemeColor({}, "primaryContainer");
   const textColor = useThemeColor({}, "text");

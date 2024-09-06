@@ -233,7 +233,7 @@ export default function EnergyCalculator() {
     } catch (error) {
       console.error("Error saving emissions data:", error);
     } finally {
-      router.navigate("/breakdown");
+      router.navigate({ pathname: "/breakdown", params: { from: "survey" } });
     }
   };
 

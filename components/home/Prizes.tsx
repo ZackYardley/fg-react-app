@@ -8,7 +8,7 @@ import { useThemeColor } from "@/hooks";
 
 const Prizes = ({ isNetZero, displayNetZeroMonths }: { isNetZero: boolean; displayNetZeroMonths: string }) => {
   const backgroundColor = useThemeColor({}, "background");
-  const positive = useThemeColor({}, "positive");
+  const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "negative");
   const carouselRef = useRef(null);
   const { width: screenWidth } = useWindowDimensions();

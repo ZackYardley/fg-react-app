@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
+import { View, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";

@@ -21,14 +21,14 @@ const CarbonFootprintSection = ({
     </View>
   );
 
-  const positive = useThemeColor({}, "positive");
-  const negative = useThemeColor({}, "negative");
+  const positive = useThemeColor({}, "primary");
+  const negative = useThemeColor({}, "error");
   const backgroundColor = useThemeColor({}, "primaryContainer");
 
   return (
     <View style={styles.footprintContainer}>
       <TouchableOpacity
-        onPress={() => router.navigate("/user-breakdown")}
+        onPress={() => router.navigate("/breakdown")}
         style={[styles.footprintBox, isPositiveImpact ? { backgroundColor: positive } : { backgroundColor: negative }]}
       >
         <ThemedText style={styles.boxTitle}>Your Monthly Emissions</ThemedText>

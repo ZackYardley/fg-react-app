@@ -3,15 +3,20 @@ import { View, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } f
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
-import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown } from "@/components/breakdown";
+import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown, StyledEmissions } from "@/components/breakdown";
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { AVERAGE_AMERICAN_EMISSIONS } from "@/constants";
-import { ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { BackButton, Loading, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { useThemeColor } from "@/hooks";
+import { useLocalSearchParams } from "expo-router";
+import dayjs from "dayjs";
 
 const Breakdown = () => {
+  const { from } = useLocalSearchParams<{ from: string }>();
+  const { width } = useWindowDimensions();
+
   const [totalEmissions, setTotalEmissions] = useState(0);
   const [monthlyEmissions, setMonthlyEmissions] = useState(0);
   const [transportationEmissions, setTransportationEmissions] = useState(0);
@@ -19,9 +24,13 @@ const Breakdown = () => {
   const [energyEmissions, setEnergyEmissions] = useState(0);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [totalOffset, setTotalOffset] = useState(0);
+  const [userName, setUserName] = useState("");
 
-  const textColor = useThemeColor({}, "text");
-  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const backgroundColor = useThemeColor({}, "background");
+  const onPrimary = useThemeColor({}, "onPrimary");
+  const primary = useThemeColor({}, "primary");
+  const primaryContainer = useThemeColor({}, "primaryContainer");
 
   const explosionRef = useRef<ConfettiCannon>(null);
 
@@ -34,6 +43,7 @@ const Breakdown = () => {
         setTransportationEmissions(data.surveyEmissions.transportationEmissions || 0);
         setDietEmissions(data.surveyEmissions.dietEmissions || 0);
         setEnergyEmissions(data.surveyEmissions.energyEmissions || 0);
+        setTotalOffset(data.totalOffset || 0);
         setDataLoaded(true);
       }
     };
@@ -42,18 +52,19 @@ const Breakdown = () => {
   }, []);
 
   useEffect(() => {
-    if (dataLoaded) {
+    if (dataLoaded && from === "survey") {
       explosionRef.current?.start();
     }
-  }, [dataLoaded]);
-
-  const width = useWindowDimensions().width;
+  }, [dataLoaded, from]);
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsAnonymous(user.isAnonymous);
+        setUserName(user.displayName || "User");
+      } else {
+        setUserName("");
       }
     });
 
@@ -61,31 +72,105 @@ const Breakdown = () => {
   }, []);
 
   if (!dataLoaded) {
-    return <CalculatingScreen />;
+    if (from === "survey") {
+      return <CalculatingScreen />;
+    } else {
+      return <Loading />;
+    }
   }
+
+  const netImpact = monthlyEmissions - totalOffset;
+  const isPositiveImpact = netImpact <= 0;
+
+  // Generate a list of 6 months ago to now
+  const months = [];
+  for (let i = 0; i < 6; i++) {
+    months.push(dayjs().subtract(i, "month").format("YYYY-MM"));
+  }
+  months.reverse();
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Icon name="arrow-left" size={24} color={textColor} onPress={() => router.back()} />
-            <ThemedText style={styles.headerTitle}>Results</ThemedText>
-          </View>
+        <PageHeader
+          title="Forever"
+          titleAlt="green"
+          subtitle="Your Breakdown"
+          description={from !== "survey" ? `Welcome, ${userName}! Here is your carbon footprint breakdown.` : undefined}
+        />
+        <BackButton />
 
-          <View style={styles.contentContainer}>
+        <View style={styles.contentContainer}>
+          <View style={styles.container}>
+            {from !== "survey" && (
+              // <>
+              //   {/* Annual Footprint */}
+              //   <View style={styles.card}>
+              //     <ThemedText style={styles.cardTitle}>Annual Footprint</ThemedText>
+              //     <ThemedText>Your total emissions this year:</ThemedText>
+              //     <ThemedText style={styles.emissionsStat}>{totalEmissions.toFixed(1)}</ThemedText>
+              //     <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
+              //   </View>
+
+              //   {/* Monthly Carbon Emissions */}
+              //   <View style={styles.cardSideBySide}>
+              //     <View style={styles.communityStatsContainer}>
+              //       <View style={[styles.communityStatBox, { backgroundColor }]}>
+              //         <ThemedText style={styles.cardTitle}>Monthly Carbon Emissions</ThemedText>
+              //         <ThemedText style={styles.emissionsStat}>{monthlyEmissions.toFixed(1)}</ThemedText>
+              //         <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
+              //       </View>
+              //     </View>
+              //   </View>
+
+              //   {/* Monthly Carbon Offsets */}
+              //   <View style={styles.cardSideBySide}>
+              //     <View style={styles.communityStatsContainer}>
+              //       <View style={[styles.communityStatBox, { backgroundColor }]}>
+              //         <ThemedText style={styles.cardTitle}>Monthly Carbon Offsets</ThemedText>
+              //         <ThemedText style={styles.emissionsStat}>{totalOffset.toFixed(1)}</ThemedText>
+              //         <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
+              //       </View>
+              //     </View>
+              //   </View>
+
+              //   <View style={[styles.separator, { backgroundColor: textColor }]} />
+
+              //   {/* Net Impact */}
+              //   <View
+              //     style={[
+              //       styles.card,
+              //       isPositiveImpact ? styles.positiveImpact : styles.negativeImpact,
+              //       { backgroundColor },
+              //     ]}
+              //   >
+              //     <ThemedText style={styles.cardTitle}>Net Impact this month</ThemedText>
+              //     <ThemedText style={styles.emissionsStat}>{Math.abs(netImpact).toFixed(1)}</ThemedText>
+              //     <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
+              //     <ThemedText style={styles.emissionsLabel}>
+              //       {isPositiveImpact ? "You are net Net-Zero! 😊" : "You are not Net-Zero 😥"}
+              //     </ThemedText>
+              //   </View>
+              // </>
+              <StyledEmissions
+                monthlyEmissions={monthlyEmissions}
+                totalEmissions={totalEmissions}
+                totalOffset={totalOffset}
+                netImpact={netImpact}
+              />
+            )}
+
             {/* Carbon Footprint */}
-            <View style={[styles.card, {backgroundColor}]}>
+            <ThemedView style={styles.card}>
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>Your Carbon Footprint</ThemedText>
               <ThemedText>Your total emissions are:</ThemedText>
               <ThemedText style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</ThemedText>
               <ThemedText>Your total monthly emissions are:</ThemedText>
               <ThemedText style={styles.greenText}>{monthlyEmissions.toFixed(2)} tons co2/month</ThemedText>
-            </View>
+            </ThemedView>
 
             {/* Emission Breakdown */}
-            <View style={[styles.card, {backgroundColor}]}>
+            <ThemedView style={styles.card}>
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>Your Emission Breakdown</ThemedText>
               <View style={{ alignItems: "center", marginBottom: 16 }}>
                 <PieChartBreakdown
@@ -108,10 +193,10 @@ const Breakdown = () => {
                   </View>
                 ))}
               </View>
-            </View>
+            </ThemedView>
 
             {/* Average American */}
-            <View style={[styles.card, {backgroundColor}]}>
+            <ThemedView style={styles.card}>
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</ThemedText>
               <View style={styles.legendContainer}>
                 {[
@@ -136,19 +221,19 @@ const Breakdown = () => {
                   values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
                   colors={["#44945F", "#A9A9A9"]}
                   width={width - 104}
-                  backgroundColor={backgroundColor}
+                  backgroundColor={primaryContainer}
                 />
               </View>
-            </View>
+            </ThemedView>
 
             {/* Earth Breakdown */}
-            <View style={[styles.card, {backgroundColor}]}>
+            <ThemedView style={styles.card}>
               <ThemedText style={styles.earthBreakdownTitle}>Earth Breakdown</ThemedText>
               <EarthBreakdown emissions={totalEmissions || 0} />
-            </View>
+            </ThemedView>
 
             {/* Call to Action */}
-            <View style={[styles.card, {backgroundColor}]}>
+            <ThemedView style={styles.card}>
               <ThemedText style={styles.ctaTitle}>Help us help you change the World 🌍</ThemedText>
               <ThemedText style={styles.ctaText}>Support green projects around the world!</ThemedText>
 
@@ -160,9 +245,10 @@ const Breakdown = () => {
                     router.navigate("/offset-now");
                   }
                 }}
-                style={styles.ctaButton}
               >
-                <ThemedText style={styles.ctaButtonText}>Learn More</ThemedText>
+                <View style={[styles.ctaButton, { backgroundColor: primary }]}>
+                  <ThemedText style={[styles.ctaButtonText, { color: onPrimary }]}>Learn More</ThemedText>
+                </View>
               </TouchableOpacity>
               <ThemedText style={styles.ctaText}>
                 Build your legacy and leave a lasting impact by planting your own forest.
@@ -176,11 +262,12 @@ const Breakdown = () => {
                     router.replace("/tree-planting");
                   }
                 }}
-                style={styles.ctaButton}
               >
-                <ThemedText style={styles.ctaButtonText}>Start the Pledge today!</ThemedText>
+                <View style={[styles.ctaButton, { backgroundColor: primary }]}>
+                  <ThemedText style={[styles.ctaButtonText, { color: onPrimary }]}>Start the Pledge today!</ThemedText>
+                </View>
               </TouchableOpacity>
-            </View>
+            </ThemedView>
           </View>
         </View>
         {/* Next Button */}
@@ -190,7 +277,11 @@ const Breakdown = () => {
               if (isAnonymous) {
                 router.navigate("/signup");
               } else {
-                router.replace("/home");
+                if (from === "survey") {
+                  router.replace("/home");
+                } else {
+                  router.navigate("/home");
+                }
               }
             }}
           >
@@ -248,6 +339,43 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 8,
   },
+  emissionsStat: {
+    fontSize: 36,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emissionsLabel: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  cardSideBySide: {
+    marginBottom: 16,
+  },
+  communityStatsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  communityStatBox: {
+    borderRadius: 16,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+  },
+  separator: {
+    height: 2,
+    marginVertical: 16,
+    width: "100%",
+  },
+  positiveImpact: {
+    backgroundColor: "#d4edda",
+  },
+  negativeImpact: {
+    backgroundColor: "#f8d7da",
+  },
+
   greenText: {
     color: "#16a34a",
     fontSize: 20,
@@ -293,10 +421,8 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     paddingVertical: 12,
     marginBottom: 16,
-    backgroundColor: "#44945F",
   },
   ctaButtonText: {
-    color: "white",
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
