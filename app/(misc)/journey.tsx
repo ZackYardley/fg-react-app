@@ -1,32 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Dimensions, Image, TouchableOpacity, Modal } from 'react-native';
-import * as Progress from 'react-native-progress';
-import { PageHeader, BackButton } from '@/components/common';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Modal } from "react-native";
+import * as Progress from "react-native-progress";
+import { PageHeader, BackButton, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
 import { fetchEmissionsData } from "@/api/emissions"; // Assume this function exists to fetch user data
+import { useThemeColor } from "@/hooks";
 
+const prizeImages = [Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck];
 
-
-const prizeImages = [
-  Sticker,
-  Tote, 
-  Shirt, 
-  WaterBottle,
-  CuttingBoard,
-  Crewneck,
-];
-
-const prizeNames = [
-  "Sticker",
-  "Tote Bag",
-  "T-Shirt",
-  "Water Bottle",
-  "Cutting Board",
-  "Crewneck Sweater",
-];
+const prizeNames = ["Sticker", "Tote Bag", "T-Shirt", "Water Bottle", "Cutting Board", "Crewneck Sweater"];
 
 const prizeMonths = [1, 3, 6, 12, 18, 24];
-
 
 const prizeDescriptions = [
   "Welcome to the club! Enjoy this cool sticker to rep your new net-zero status 😎",
@@ -46,76 +30,75 @@ const lockedPrizeDescriptions = [
   "After a full two years, you are a true part of the Forevergreen Family and will get a crewneck sweater!",
 ];
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-
-
-
-const Popup: React.FC<{ visible: boolean; onClose: () => void; title: string; image: any; description: string }> = ({ visible, onClose, title, image, description }) => (
-  <Modal
-    animationType="fade"
-    transparent={true}
-    visible={visible}
-    onRequestClose={onClose}
-  >
-    <TouchableOpacity style={styles.modalOverlay} onPress={onClose} activeOpacity={1}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>{title}</Text>
-        <View style={styles.modalBody}>
-          <Image source={image} style={styles.modalImage} />
-          <View style={styles.modalTextContainer}>
-            <Text style={styles.modalDescription}>{description}</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  </Modal>
-);
-
 const Journey: React.FC = () => {
   const [selectedPrize, setSelectedPrize] = useState<number | null>(null);
   const cardHeight = 100;
   const cardGap = 16;
-  const totalHeight = (6 * cardHeight + 5 * cardGap) + 30;
+  const totalHeight = 6 * cardHeight + 5 * cardGap + 30;
   const [netZeroMonths, setNetZeroMonths] = useState(0);
   const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-      const loadData = async () => {
-        const data = await fetchEmissionsData();
-        if (data !== null) {
-          const netZero = data.totalOffset >= data.monthlyEmissions;
-          if (netZero && data.monthlyEmissions > 0) {
-            const months = Math.floor(data.totalOffset - data.monthlyEmissions);
-            const cappedMonths = Math.min(24, Math.max(0, months));
-            setNetZeroMonths(cappedMonths);
-            setProgress(cappedMonths / 24); // 24 months is the maximum
-          } else {
-            setNetZeroMonths(0);
-            setProgress(0);
-          }
+  const backgroundColor = useThemeColor({}, "background");
+
+  const Popup: React.FC<{ visible: boolean; onClose: () => void; title: string; image: any; description: string }> = ({
+    visible,
+    onClose,
+    title,
+    image,
+    description,
+  }) => (
+    <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
+      <TouchableOpacity style={styles.modalOverlay} onPress={onClose} activeOpacity={1}>
+        <View style={[styles.modalContent, { backgroundColor }]}>
+          <ThemedText style={styles.modalTitle}>{title}</ThemedText>
+          <View style={styles.modalBody}>
+            <Image source={image} style={styles.modalImage} />
+            <View style={styles.modalTextContainer}>
+              <ThemedText style={styles.modalDescription}>{description}</ThemedText>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <ThemedText style={styles.closeButtonText}>Close</ThemedText>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchEmissionsData();
+      if (data !== null) {
+        const netZero = data.totalOffset >= data.monthlyEmissions;
+        if (netZero && data.monthlyEmissions > 0) {
+          const months = Math.floor(data.totalOffset - data.monthlyEmissions);
+          const cappedMonths = Math.min(24, Math.max(0, months));
+          setNetZeroMonths(cappedMonths);
+          setProgress(cappedMonths / 24); // 24 months is the maximum
+        } else {
+          setNetZeroMonths(0);
+          setProgress(0);
         }
-      };
-
-      loadData();
-    }, []);
-
-    const getPrizeDescription = (index: number) => {
-      if (netZeroMonths >= prizeMonths[index]) {
-        return prizeDescriptions[index];
-      } else {
-        return `${lockedPrizeDescriptions[index]} You're currently at ${netZeroMonths} months.`;
       }
     };
 
+    loadData();
+  }, []);
+
+  const getPrizeDescription = (index: number) => {
+    if (netZeroMonths >= prizeMonths[index]) {
+      return prizeDescriptions[index];
+    } else {
+      return `${lockedPrizeDescriptions[index]} You're currently at ${netZeroMonths} months.`;
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <PageHeader title="Forever" titleAlt="green" subtitle="Sustainability Journey" description="Build a sustainable future by living net-zero" />
+        <PageHeader subtitle="Sustainability Journey" description="Build a sustainable future by living net-zero" />
         <BackButton />
-       
+
         <View style={styles.mainContent}>
           <View style={styles.progressBarContainer}>
             <Progress.Bar
@@ -132,15 +115,11 @@ const Journey: React.FC = () => {
           </View>
           <View style={styles.prizesContainer}>
             {prizeImages.map((image, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.prizeRow}
-                onPress={() => setSelectedPrize(index)}
-              >
+              <TouchableOpacity key={index} style={styles.prizeRow} onPress={() => setSelectedPrize(index)}>
                 <View style={netZeroMonths >= prizeMonths[index] ? styles.card : styles.grayCard}>
                   <Image source={image} style={styles.cardImage} />
                 </View>
-                <Text style={styles.boxText}>{prizeMonths[index]}</Text>
+                <ThemedText style={styles.boxText}>{prizeMonths[index]}</ThemedText>
               </TouchableOpacity>
             ))}
           </View>
@@ -155,14 +134,13 @@ const Journey: React.FC = () => {
           description={getPrizeDescription(selectedPrize)}
         />
       )}
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -170,35 +148,35 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   mainContent: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 2,
     marginTop: 16,
   },
   progressBarContainer: {
     width: 30,
     marginRight: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   progressBar: {
-    transform: [{ rotate: '90deg' }],
+    transform: [{ rotate: "90deg" }],
   },
   prizesContainer: {
     flex: 1,
     marginLeft: 36,
   },
   prizeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
     paddingRight: 16, // Add some padding to the right for the text
   },
@@ -228,38 +206,37 @@ const styles = StyleSheet.create({
     height: 76,
     width: 76,
   },
-  
+
   boxText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   netZeroMonthsText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
+    alignItems: "center",
+    width: "80%",
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   modalBody: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
   modalImage: {
@@ -276,12 +253,12 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#409858',
+    backgroundColor: "#409858",
     borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
