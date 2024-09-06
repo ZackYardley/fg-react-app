@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
+import { useThemeColor } from "@/hooks";
 
 const PageHeader = ({
   title = "Forever",
@@ -11,10 +12,11 @@ const PageHeader = ({
   subtitle?: string;
   description?: string;
 }) => {
+  const textColor = useThemeColor({}, "text");
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: textColor }]}>
           {title}
           <Text style={styles.titleGreen}>{titleAlt}</Text>
         </Text>
@@ -28,10 +30,6 @@ const PageHeader = ({
 export default PageHeader;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
   header: {
     paddingHorizontal: 24,
   },

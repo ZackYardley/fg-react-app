@@ -1,5 +1,7 @@
 import React from "react";
 import { BarChart } from "react-native-chart-kit";
+import { useThemeColor } from "@/hooks";
+import { darkenColor } from "@/utils";
 
 type BarChartProps = {
   names: string[];
@@ -9,6 +11,9 @@ type BarChartProps = {
 };
 
 const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
+  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const textColor = useThemeColor({}, "text");
+
   const data = {
     labels: names,
     datasets: [
@@ -20,12 +25,12 @@ const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
   };
 
   const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
+    backgroundColor: backgroundColor,
+    backgroundGradientFrom: backgroundColor,
+    backgroundGradientTo: backgroundColor,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(68, 148, 95, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    color: (opacity = 1) => darkenColor(textColor, 50),
+    labelColor: (opacity = 1) => textColor,
     barPercentage: 1.5,
   };
 
@@ -42,7 +47,7 @@ const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
       withCustomBarColorFromData={true}
       flatColor={true}
       style={{}}
-      yLabelsOffset={width / 6}
+      yLabelsOffset={0}
     />
   );
 };

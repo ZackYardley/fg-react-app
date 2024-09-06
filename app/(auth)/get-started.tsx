@@ -78,7 +78,7 @@ export default function GetStartedScreen() {
         <View style={styles.buttonContainer}>
           <GreenButton
             title="Get Started"
-            onPress={() => router.push("/signup")}
+            onPress={() => router.navigate("/signup")}
             style={styles.button}
             textStyle={styles.buttonText}
           />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
+import { View, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -7,8 +7,9 @@ import { PieChartBreakdown, BarChartBreakdown, EarthBreakdown } from "@/componen
 import CalculatingScreen from "@/components/carbon-calculator/Calculating";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ConfettiCannon from "react-native-confetti-cannon";
-import { AVERAGE_AMERICAN_EMISSIONS, TARGET_EMISSIONS } from "@/constants";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { AVERAGE_AMERICAN_EMISSIONS } from "@/constants";
+import { ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 const Breakdown = () => {
   const [totalEmissions, setTotalEmissions] = useState(0);
@@ -18,6 +19,9 @@ const Breakdown = () => {
   const [energyEmissions, setEnergyEmissions] = useState(0);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "primaryContainer");
 
   const explosionRef = useRef<ConfettiCannon>(null);
 
@@ -61,28 +65,28 @@ const Breakdown = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <Icon name="arrow-left" size={24} color="black" onPress={() => router.back()} />
-            <Text style={styles.headerTitle}>Results</Text>
+            <Icon name="arrow-left" size={24} color={textColor} onPress={() => router.back()} />
+            <ThemedText style={styles.headerTitle}>Results</ThemedText>
           </View>
 
           <View style={styles.contentContainer}>
             {/* Carbon Footprint */}
-            <View style={styles.card}>
-              <Text style={[styles.cardTitle, { textAlign: "center" }]}>Your Carbon Footprint</Text>
-              <Text>Your total emissions are:</Text>
-              <Text style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</Text>
-              <Text>Your total monthly emissions are:</Text>
-              <Text style={styles.greenText}>{monthlyEmissions.toFixed(2)} tons co2/month</Text>
+            <View style={[styles.card, {backgroundColor}]}>
+              <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>Your Carbon Footprint</ThemedText>
+              <ThemedText>Your total emissions are:</ThemedText>
+              <ThemedText style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</ThemedText>
+              <ThemedText>Your total monthly emissions are:</ThemedText>
+              <ThemedText style={styles.greenText}>{monthlyEmissions.toFixed(2)} tons co2/month</ThemedText>
             </View>
 
             {/* Emission Breakdown */}
-            <View style={styles.card}>
-              <Text style={[styles.cardTitle, { textAlign: "center" }]}>Your Emission Breakdown</Text>
+            <View style={[styles.card, {backgroundColor}]}>
+              <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>Your Emission Breakdown</ThemedText>
               <View style={{ alignItems: "center", marginBottom: 16 }}>
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
@@ -100,15 +104,15 @@ const Breakdown = () => {
                 ].map((item, index) => (
                   <View key={index} style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                    <Text>{item.name}</Text>
+                    <ThemedText>{item.name}</ThemedText>
                   </View>
                 ))}
               </View>
             </View>
 
             {/* Average American */}
-            <View style={styles.card}>
-              <Text style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</Text>
+            <View style={[styles.card, {backgroundColor}]}>
+              <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</ThemedText>
               <View style={styles.legendContainer}>
                 {[
                   { name: "You", color: "#44945F" },
@@ -116,7 +120,7 @@ const Breakdown = () => {
                 ].map((item, index) => (
                   <View key={index} style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                    <Text>{item.name}</Text>
+                    <ThemedText>{item.name}</ThemedText>
                   </View>
                 ))}
               </View>
@@ -137,43 +141,43 @@ const Breakdown = () => {
             </View>
 
             {/* Earth Breakdown */}
-            <View style={styles.card}>
-              <Text style={styles.earthBreakdownTitle}>Earth Breakdown</Text>
+            <View style={[styles.card, {backgroundColor}]}>
+              <ThemedText style={styles.earthBreakdownTitle}>Earth Breakdown</ThemedText>
               <EarthBreakdown emissions={totalEmissions || 0} />
             </View>
 
             {/* Call to Action */}
-            <View style={styles.card}>
-              <Text style={styles.ctaTitle}>Help us help you change the World 🌍</Text>
-              <Text style={styles.ctaText}>Support green projects around the world!</Text>
+            <View style={[styles.card, {backgroundColor}]}>
+              <ThemedText style={styles.ctaTitle}>Help us help you change the World 🌍</ThemedText>
+              <ThemedText style={styles.ctaText}>Support green projects around the world!</ThemedText>
 
               <TouchableOpacity
                 onPress={() => {
                   if (isAnonymous) {
-                    router.push("/signup");
+                    router.navigate("/signup");
                   } else {
-                    router.push("/offset-now");
+                    router.navigate("/offset-now");
                   }
                 }}
                 style={styles.ctaButton}
               >
-                <Text style={styles.ctaButtonText}>Learn More</Text>
+                <ThemedText style={styles.ctaButtonText}>Learn More</ThemedText>
               </TouchableOpacity>
-              <Text style={styles.ctaText}>
+              <ThemedText style={styles.ctaText}>
                 Build your legacy and leave a lasting impact by planting your own forest.
-              </Text>
+              </ThemedText>
 
               <TouchableOpacity
                 onPress={() => {
                   if (isAnonymous) {
-                    router.push("/signup");
+                    router.navigate("/signup");
                   } else {
                     router.replace("/tree-planting");
                   }
                 }}
                 style={styles.ctaButton}
               >
-                <Text style={styles.ctaButtonText}>Start the Pledge today!</Text>
+                <ThemedText style={styles.ctaButtonText}>Start the Pledge today!</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -183,7 +187,7 @@ const Breakdown = () => {
           <TouchableOpacity
             onPress={() => {
               if (isAnonymous) {
-                router.push("/signup");
+                router.navigate("/signup");
               } else {
                 router.replace("/home");
               }
@@ -206,14 +210,13 @@ const Breakdown = () => {
           explosionSpeed={1}
         />
       </View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: "white",
   },
   container: {
     padding: 20,
@@ -234,13 +237,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   card: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     elevation: 5,
     borderRadius: 12,
-    backgroundColor: "white",
     padding: 16,
     marginBottom: 16,
   },

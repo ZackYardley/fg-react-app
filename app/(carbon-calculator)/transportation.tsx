@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, StyleSheet, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Header, RadioButtonGroup, NumberInput, TransportQuestion, NextButton } from "@/components/carbon-calculator";
-import QuestionSliderColor from "@/components/carbon-calculator/QuestionSliderColor";
+import {
+  Header,
+  RadioButtonGroup,
+  NumberInput,
+  TransportQuestion,
+  NextButton,
+  QuestionSlider,
+} from "@/components/carbon-calculator";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { SurveyData, SurveyEmissions } from "@/types";
-import { Loading } from "@/components/common";
+import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { router } from "expo-router";
 
 export default function TransportationCalculator() {
@@ -145,7 +150,7 @@ export default function TransportationCalculator() {
       surveyEmissions: { ...surveyEmissions },
     });
     // Navigate to next screen
-    router.push("/diet");
+    router.navigate("/diet");
   };
 
   if (isLoading) {
@@ -153,16 +158,16 @@ export default function TransportationCalculator() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>
             <Header progress={progress} title="Transportation" />
-            <Text>
+            <ThemedText>
               First you will calculate your transportation emissions! These are all the related emissions for how you
               choose to get around.
-            </Text>
-            <QuestionSliderColor
+            </ThemedText>
+            <QuestionSlider
               question="In the last year, how many long round-trip flights have you been on? (more than 10 hours round trip) ✈️"
               value={surveyData.longFlights || 0}
               onChange={(value: number) => {
@@ -171,9 +176,10 @@ export default function TransportationCalculator() {
               }}
               minimumValue={0}
               maximumValue={7}
+              useColoredSlider={true}
             />
 
-            <QuestionSliderColor
+            <QuestionSlider
               question="In the last year, how many short round-trip flights have you been on? (less than 10 hours round trip) ✈️"
               value={surveyData.shortFlights || 0}
               onChange={(value: number) => {
@@ -182,6 +188,7 @@ export default function TransportationCalculator() {
               }}
               minimumValue={0}
               maximumValue={7}
+              useColoredSlider={true}
             />
 
             <RadioButtonGroup
@@ -248,24 +255,24 @@ export default function TransportationCalculator() {
             />
 
             <View style={styles.emissionsContainer}>
-              <Text style={styles.emissionsTitle}>Your Individual Transportation Emissions</Text>
+              <ThemedText style={styles.emissionsTitle}>Your Individual Transportation Emissions</ThemedText>
               <View style={styles.emissionsContent}>
                 <View style={styles.emissionRow}>
-                  <Text>Flight Emissions:</Text>
-                  <Text>{surveyEmissions.flightEmissions?.toFixed(2)}</Text>
+                  <ThemedText>Flight Emissions:</ThemedText>
+                  <ThemedText>{surveyEmissions.flightEmissions?.toFixed(2)}</ThemedText>
                 </View>
                 <View style={styles.emissionRow}>
-                  <Text>Car Emissions:</Text>
-                  <Text>{surveyEmissions.carEmissions?.toFixed(2)}</Text>
+                  <ThemedText>Car Emissions:</ThemedText>
+                  <ThemedText>{surveyEmissions.carEmissions?.toFixed(2)}</ThemedText>
                 </View>
                 <View style={styles.emissionRow}>
-                  <Text>Public Transport:</Text>
-                  <Text>{surveyEmissions.publicTransportEmissions?.toFixed(2)}</Text>
+                  <ThemedText>Public Transport:</ThemedText>
+                  <ThemedText>{surveyEmissions.publicTransportEmissions?.toFixed(2)}</ThemedText>
                 </View>
                 <View style={styles.totalRow}>
-                  <Text style={styles.totalLabel}>Total:</Text>
-                  <Text>{surveyEmissions.transportationEmissions?.toFixed(2)}</Text>
-                  <Text>tons of CO2 per year</Text>
+                  <ThemedText style={styles.totalLabel}>Total:</ThemedText>
+                  <ThemedText>{surveyEmissions.transportationEmissions?.toFixed(2)}</ThemedText>
+                  <ThemedText>tons of CO2 per year</ThemedText>
                 </View>
               </View>
             </View>
@@ -273,14 +280,13 @@ export default function TransportationCalculator() {
           <NextButton isFormValid={isFormValid} onPress={() => handleNextButton()} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollViewContent: {
     flexGrow: 1,

@@ -3,15 +3,18 @@ import { View, Text, StyleSheet } from "react-native";
 import * as Progress from "react-native-progress";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
+import { useThemeColor } from "@/hooks";
+import { ThemedText } from "../common";
 
 const Header = ({ progress, title }: any) => {
+  const textColor = useThemeColor({}, "text");
   return (
     <>
       <View style={styles.container}>
         <Icon
           name="arrow-left"
           size={24}
-          color="black"
+          color={textColor}
           onPress={() => router.back()}
           style={styles.backButton}
         />
@@ -28,7 +31,7 @@ const Header = ({ progress, title }: any) => {
           />
         </View>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <ThemedText style={styles.title}>{title}</ThemedText>
     </>
   );
 };

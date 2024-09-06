@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import { Text, StyleSheet } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
+import { useThemeColor } from "@/hooks";
+import { ThemedText } from "../common";
 
 const NumberInput = ({
   question,
@@ -20,10 +22,12 @@ const NumberInput = ({
   disabled?: boolean;
 }) => {
   const inputRef = useRef<any>(null);
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "background");
 
   return (
     <>
-      <Text style={styles.question}>{question}</Text>
+      <ThemedText style={styles.question}>{question}</ThemedText>
       <TextInput
         ref={inputRef}
         placeholder={disabled ? "Loading..." : "Your Answer"}
@@ -33,10 +37,10 @@ const NumberInput = ({
         mode="outlined"
         outlineStyle={styles.outlineStyle}
         outlineColor="#D9D9D9"
-        style={styles.input}
-        textColor="#000"
-        right={label ? <TextInput.Affix text={label} textStyle={styles.affixText} /> : null}
-        left={unit ? <TextInput.Affix text={unit} textStyle={styles.affixText} /> : null}
+        style={[styles.input, { backgroundColor }]}
+        textColor={textColor}
+        right={label ? <TextInput.Affix text={label} textStyle={[styles.affixText, { color: textColor }]} /> : null}
+        left={unit ? <TextInput.Affix text={unit} textStyle={[styles.affixText, { color: textColor }]} /> : null}
         disabled={disabled}
       />
       <HelperText type="error" visible={!!error}>
@@ -52,7 +56,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   input: {
-    backgroundColor: "#fff",
     width: "100%",
     marginTop: 16,
   },

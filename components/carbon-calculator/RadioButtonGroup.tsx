@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { RadioButton } from "react-native-paper";
+import { ThemedText } from "../common";
 
 const RadioButtonGroup = ({
   question,
@@ -15,7 +16,7 @@ const RadioButtonGroup = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>{question}</Text>
+      <ThemedText style={styles.questionText}>{question}</ThemedText>
       <View style={styles.optionsContainer}>
         {options.map((item) => (
           <TouchableOpacity
@@ -31,7 +32,7 @@ const RadioButtonGroup = ({
                 color="#44945F"
                 uncheckedColor="#808080"
               />
-              <Text style={styles.optionText}>{item}</Text>
+              <ThemedText style={styles.optionText}>{item}</ThemedText>
             </View>
           </TouchableOpacity>
         ))}
