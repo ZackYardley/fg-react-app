@@ -10,11 +10,13 @@ import { getPaymentById } from "@/api/payments";
 import { fetchInvoiceById, fetchSubscriptionByInvoice } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription, fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { fetchEmissionsData } from "@/api/emissions";
-import { Loading, PageHeader, NotFoundComponent } from "@/components/common";
+import { Loading, PageHeader, NotFoundComponent, ThemedSafeAreaView } from "@/components/common";
 import { Pamona } from "@/constants/Images";
 import { CarbonCreditSubscription, Subscription, Payment, CarbonCredit, TransactionItem } from "@/types";
-import { formatPrice } from "@/utils";
+import { darkenColor, formatPrice } from "@/utils";
 import { fetchCreditRequestByPaymentId } from "@/api/purchase";
+import { ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 interface CreditWithQuantity extends CarbonCredit {
   quantity: number;
@@ -29,7 +31,7 @@ const retryFetch = async (fetchFunction: () => Promise<any>, retries = MAX_RETRI
   } catch (error) {
     if (retries > 0) {
       console.log(`Retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       return retryFetch(fetchFunction, retries - 1);
     }
     throw error;
@@ -45,6 +47,8 @@ const PurchaseCompleteScreen = () => {
   const [credits, setCredits] = useState<CreditWithQuantity[]>([]);
   const [totalCO2Offset, setTotalCO2Offset] = useState(0);
   const [loading, setLoading] = useState(true);
+  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const textColor = useThemeColor({}, "text");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,19 +143,19 @@ const PurchaseCompleteScreen = () => {
     text: string;
   }) => (
     <View style={styles.detailsItem}>
-      <Ionicons name={icon} size={24} color="#000" />
-      <Text style={styles.detailsText}>{text}</Text>
+      <Ionicons name={icon} size={24} color={textColor} />
+      <ThemedText style={styles.detailsText}>{text}</ThemedText>
     </View>
   );
 
   const renderSubscriptionContent = () => (
     <>
       <View style={styles.subscriptionInfo}>
-        <Text style={styles.subscriptionTitle}>Monthly Subscription</Text>
-        <Text style={styles.subscriptionPrice}>
+        <ThemedText style={styles.subscriptionTitle}>Monthly Subscription</ThemedText>
+        <ThemedText style={styles.subscriptionPrice}>
           {formatPrice(price || 0)}
           <Text style={styles.perMonth}>/month</Text>
-        </Text>
+        </ThemedText>
       </View>
       {carbonCreditSubscription && (
         <LinearGradient
@@ -168,18 +172,31 @@ const PurchaseCompleteScreen = () => {
         </LinearGradient>
       )}
       <Text style={styles.offsetText}>
-        <Text>{totalCO2Offset} tons of CO</Text>
-        <Text style={{ fontSize: 18 }}>2</Text>
-        <Text> Offset Monthly</Text>
+        <ThemedText>{totalCO2Offset} tons of CO</ThemedText>
+        <ThemedText style={{ fontSize: 18 }}>2</ThemedText>
+        <ThemedText> Offset Monthly</ThemedText>
       </Text>
     </>
   );
 
   const renderOneTimePurchaseContent = () => (
     <>
-      <View style={{ display: "flex", flexDirection: "row", rowGap: 12, columnGap: 32, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 }}>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          rowGap: 12,
+          columnGap: 32,
+          flexWrap: "wrap",
+          justifyContent: "center",
+          marginBottom: 20,
+        }}
+      >
         {credits.map((credit, index) => (
-          <View key={index} style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center", maxWidth: "47%" }}>
+          <View
+            key={index}
+            style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center", maxWidth: "47%" }}
+          >
             <LinearGradient
               colors={[credit.stripe_metadata_color_0, credit.stripe_metadata_color_1, credit.stripe_metadata_color_2]}
               start={{ x: 0.5, y: 0 }}
@@ -188,22 +205,22 @@ const PurchaseCompleteScreen = () => {
             >
               <Image source={credit.images[0]} style={{ height: 104, width: 98 }} />
             </LinearGradient>
-            <Text
+            <ThemedText
               style={styles.itemDescription}
-            >{`${credit.quantity} ${credit.stripe_metadata_carbon_credit_type} Credits`}</Text>
+            >{`${credit.quantity} ${credit.stripe_metadata_carbon_credit_type} Credits`}</ThemedText>
           </View>
         ))}
       </View>
       <Text style={styles.offsetText}>
-        <Text>{totalCO2Offset} tons of CO</Text>
-        <Text style={{ fontSize: 18 }}>2</Text>
-        <Text> Offset</Text>
+        <ThemedText>{totalCO2Offset} tons of CO</ThemedText>
+        <ThemedText style={{ fontSize: 18 }}>2</ThemedText>
+        <ThemedText> Offset</ThemedText>
       </Text>
     </>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <ScrollView style={{ flexGrow: 1 }}>
         <PageHeader
           title="Thank you for your "
@@ -212,7 +229,7 @@ const PurchaseCompleteScreen = () => {
         <View style={{ paddingHorizontal: 16 }}>
           <LinearGradient
             style={styles.card}
-            colors={["#EFEFEF", "#E5F5F6"]}
+            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >
@@ -221,13 +238,13 @@ const PurchaseCompleteScreen = () => {
 
           <LinearGradient
             style={styles.infoContainer}
-            colors={["#EFEFEF", "#E5F5F6"]}
+            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >
             {productType === "subscription" ? (
               <>
-                <Text style={styles.infoTitle}>Subscription Details</Text>
+                <ThemedText style={styles.infoTitle}>Subscription Details</ThemedText>
                 {subscription && (
                   <>
                     <SubscriptionDetailsItem
@@ -247,10 +264,10 @@ const PurchaseCompleteScreen = () => {
                 )}
               </>
             ) : (
-              <Text style={styles.infoTitle}>
+              <ThemedText style={styles.infoTitle}>
                 You will be receiving an email with more
                 <Text style={{ color: "#409858" }}> information shortly!</Text>
-              </Text>
+              </ThemedText>
             )}
             <Image source={Pamona} style={styles.infoImage} />
             <View style={styles.buttonContainer}>
@@ -261,14 +278,14 @@ const PurchaseCompleteScreen = () => {
                   start={{ x: 0.4, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
                 >
-                  <Text style={styles.buttonText}>Back Home</Text>
+                  <ThemedText style={styles.buttonText}>Back Home</ThemedText>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
           </LinearGradient>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -277,7 +294,6 @@ export default PurchaseCompleteScreen;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "white",
   },
   card: {
     backgroundColor: "#f0f0f0",
@@ -376,7 +392,6 @@ const styles = StyleSheet.create({
   },
   itemDescription: {
     fontSize: 18,
-    color: "#000",
     fontWeight: "bold",
     textAlign: "center",
   },

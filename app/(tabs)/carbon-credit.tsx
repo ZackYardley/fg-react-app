@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/products";
 import { subscribeToCart } from "@/api/cart";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
-import { PageHeader } from "@/components/common";
+import { PageHeader, ThemedSafeAreaView, ThemedView } from "@/components/common";
 import CreditItem from "@/components/carbon-credit/CreditItem";
 import ProjectCard from "@/components/carbon-credit/ProjectCard";
 import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
-import { formatPrice } from "@/utils";
+import { darkenColor, formatPrice } from "@/utils";
 import { CarbonCredit, CartItem } from "@/types";
+import { ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
@@ -20,6 +21,7 @@ export default function CarbonCreditScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const primaryContainer = useThemeColor({}, "primaryContainer");
 
   useEffect(() => {
     const initializeData = async () => {
@@ -99,7 +101,7 @@ export default function CarbonCreditScreen() {
       name={null}
       price={null}
       image={null}
-      colors={["#eee", "#ddd", "#ccc"]}
+      colors={[primaryContainer, darkenColor(primaryContainer, 0.1), darkenColor(primaryContainer, 0.2)]}
       onPress={() => {}}
       isSkeleton={true}
     />
@@ -116,20 +118,20 @@ export default function CarbonCreditScreen() {
     <>
       <View style={styles.projectContainer}>
         {loading ? (
-          <View style={[styles.skeletonCard, { height: 200 }]} />
+          <View style={[styles.skeletonCard, { height: 200, backgroundColor: primaryContainer }]} />
         ) : (
           selectedProject && <ProjectCard project={selectedProject} />
         )}
       </View>
-      <View style={styles.footer}>
-        <Text style={styles.footerTitle}>Carbon Credit Subscription</Text>
-        <Text style={styles.footerText}>
+      <ThemedView style={styles.footer}>
+        <ThemedText style={styles.footerTitle}>Carbon Credit Subscription</ThemedText>
+        <ThemedText style={styles.footerText}>
           The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
           credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
           and support awesome climate projects!
-        </Text>
+        </ThemedText>
         <TouchableOpacity style={styles.button} onPress={() => router.push("/carbon-credit-sub")}>
-          <Text style={styles.buttonText}>
+          <ThemedText style={styles.buttonText}>
             {loading
               ? "Loading..."
               : isSubscribed
@@ -137,9 +139,9 @@ export default function CarbonCreditScreen() {
                 : subscriptionPrice
                   ? `${formatPrice(subscriptionPrice)}/Month`
                   : "Subscription Unavailable"}
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
-      </View>
+      </ThemedView>
     </>
   );
 
@@ -174,22 +176,20 @@ export default function CarbonCreditScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <View style={{ flexGrow: 1 }}>{renderContent()}</View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   projectContainer: {
     padding: 16,
   },
   footer: {
-    backgroundColor: "#f3f4f6",
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,
@@ -230,7 +230,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   skeletonCard: {
-    backgroundColor: "#f0f0f0",
     borderRadius: 8,
   },
 });

@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { ScrollView, Text, Pressable, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Map, CostaRica, Brazil, Penn } from "@/constants/Images";
 import { Overlay } from "@rneui/themed";
-import { Loading, PageHeader } from "@/components/common";
+import { PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar } from "react-native";
+import { View, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
@@ -7,18 +7,22 @@ import { getAuth } from "firebase/auth";
 import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
 import { TransactionItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
-import { PageHeader, BackButton } from "@/components/common";
+import { PageHeader, BackButton, ThemedSafeAreaView, ThemedView } from "@/components/common";
 import { fetchOneTimePaymentSheetParams, requestCarbonCredits } from "@/api/purchase";
 import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useStripe } from "@/utils/stripe";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
+import { ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 
 export default function ShoppingCartScreen() {
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "background");
+
   const auth = getAuth();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [credits, setCredits] = useState<CartCarbonCredits[]>([]);
@@ -201,7 +205,7 @@ export default function ShoppingCartScreen() {
 
   // Render cart items
   const renderItem = ({ item }: { item: CartCarbonCredits }) => (
-    <View style={styles.itemContainer}>
+    <ThemedView style={styles.itemContainer}>
       <View style={styles.itemInfo}>
         <LinearGradient
           colors={[item.stripe_metadata_color_0, item.stripe_metadata_color_1, item.stripe_metadata_color_2]}
@@ -213,21 +217,27 @@ export default function ShoppingCartScreen() {
         </LinearGradient>
       </View>
       <View style={styles.itemActions}>
-        <Text style={styles.itemName}>{item.name}</Text>
+        <ThemedText style={styles.itemName}>{item.name}</ThemedText>
         <View style={styles.quantityControl}>
-          <TouchableOpacity onPress={() => handleDecrementQuantity(item.id)} style={styles.quantityButton}>
-            <Icon name="minus" size={24} color="#fff" />
+          <TouchableOpacity
+            onPress={() => handleDecrementQuantity(item.id)}
+            style={[styles.quantityButton, { backgroundColor: textColor }]}
+          >
+            <Icon name="minus" size={24} color={backgroundColor} />
           </TouchableOpacity>
-          <Text style={styles.quantityText}>{item.quantity}</Text>
-          <TouchableOpacity onPress={() => handleIncrementQuantity(item.id)} style={styles.quantityButton}>
-            <Icon name="plus" size={24} color="#fff" />
+          <ThemedText style={styles.quantityText}>{item.quantity}</ThemedText>
+          <TouchableOpacity
+            onPress={() => handleIncrementQuantity(item.id)}
+            style={[styles.quantityButton, { backgroundColor: textColor }]}
+          >
+            <Icon name="plus" size={24} color={backgroundColor} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.priceContainer}>
-        <Text style={styles.itemPrice}>{formatPrice(item.prices[0].unit_amount * item.quantity)}</Text>
+        <ThemedText style={styles.itemPrice}>{formatPrice(item.prices[0].unit_amount * item.quantity)}</ThemedText>
       </View>
-    </View>
+    </ThemedView>
   );
 
   const ListHeaderComponent = () => (
@@ -244,20 +254,20 @@ export default function ShoppingCartScreen() {
         <ActivityIndicator size="large" color="#409858" />
       </View>
     ) : (
-      <View style={styles.emptyCartContainer}>
+      <ThemedView style={styles.emptyCartContainer}>
         <Ionicons name="cart" size={64} color="#409858" />
-        <Text style={styles.emptyCartTitle}>Your cart is empty</Text>
-        <Text style={styles.emptyCartText}>
+        <ThemedText style={styles.emptyCartTitle}>Your cart is empty</ThemedText>
+        <ThemedText style={styles.emptyCartText}>
           Start adding carbon credits to make a positive impact on the environment!
-        </Text>
-      </View>
+        </ThemedText>
+      </ThemedView>
     );
 
   const ListFooterComponent = () => (
-    <View style={styles.footer}>
+    <ThemedView style={styles.footer}>
       <View style={styles.totalContainer}>
-        <Text style={styles.totalLabel}>Total:</Text>
-        <Text style={styles.totalValueText}>{formatPrice(getCartTotal())}</Text>
+        <ThemedText style={styles.totalLabel}>Total:</ThemedText>
+        <ThemedText style={styles.totalValueText}>{formatPrice(getCartTotal())}</ThemedText>
       </View>
       <TouchableOpacity
         style={[
@@ -267,28 +277,31 @@ export default function ShoppingCartScreen() {
         onPress={openPaymentSheet}
         disabled={credits.length === 0 || isUpdatingQuantity || isProcessingPayment}
       >
-        <Text style={styles.purchaseButtonText}>
+        <ThemedText style={styles.purchaseButtonText}>
           {loading
             ? "Loading..."
             : isUpdatingQuantity
-            ? "Updating..."
-            : isProcessingPayment
-            ? "Processing..."
-            : "Buy Now"}
-        </Text>
+              ? "Updating..."
+              : isProcessingPayment
+                ? "Processing..."
+                : "Buy Now"}
+        </ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.continueButton} onPress={() => router.navigate("/carbon-credit")}>
-        <Text style={styles.continueButtonText}>Continue Shopping</Text>
+      <TouchableOpacity
+        style={[styles.continueButton, { backgroundColor }]}
+        onPress={() => router.navigate("/carbon-credit")}
+      >
+        <ThemedText style={styles.continueButtonText}>Continue Shopping</ThemedText>
       </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
-      <View>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={credits}
           renderItem={renderItem}
@@ -299,19 +312,19 @@ export default function ShoppingCartScreen() {
           contentContainerStyle={styles.flatList}
         />
       </View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   flatList: {
     paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 16,
+    flex: 1,
   },
   greenCircleLarge: {
     position: "absolute",
@@ -335,7 +348,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   footer: {
-    backgroundColor: "#eeeeee",
     padding: 24,
     borderRadius: 20,
     marginTop: "auto",
@@ -372,7 +384,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   continueButton: {
-    backgroundColor: "#fff",
     borderWidth: 2,
     borderColor: "#409858",
     borderRadius: 50,
@@ -390,7 +401,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
     marginBottom: 24,
-    backgroundColor: "#EEEEEE",
     borderRadius: 20,
   },
   itemInfo: {
@@ -461,7 +471,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
-    backgroundColor: "#eee",
     paddingVertical: 48,
     borderRadius: 20,
   },
@@ -474,7 +483,6 @@ const styles = StyleSheet.create({
   },
   emptyCartText: {
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
     paddingHorizontal: 32,
   },
