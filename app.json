@@ -21,7 +21,12 @@
         "aps-environment": "production"
       },
       "buildNumber": "2",
-      "associatedDomains": ["applinks:fg-react-app.web.app"]
+      "associatedDomains": ["applinks:fg-react-app.web.app"],
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -80,6 +85,10 @@
           "merchantIdentifier": "merchant.com.fgdevteam.fgreactapp",
           "enableGooglePay": true
         }
+      ],
+      [
+        "@config-plugins/react-native-blob-util",
+        "@config-plugins/react-native-pdf"
       ]
     ],
     "experiments": {

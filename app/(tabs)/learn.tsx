@@ -7,13 +7,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { PageHeader } from "@/components/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
-import { Book,
-  Camera,
-  Blog,
-  FastFacts,
-  Credit,
-  Newsletter,
-  Methodology,} from "@/constants/Images";
+import { Book, Camera, Blog, FastFacts, Credit, Newsletter, Methodology,} from "@/constants/Images";
+import { useRouter } from 'expo-router';
+
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -24,6 +20,7 @@ const LearnScreen = () => {
 
   const auth = getAuth();
   const user = auth.currentUser;
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -42,6 +39,10 @@ const LearnScreen = () => {
 
   const handleOpenLink = async (url: string) => {
     await WebBrowser.openBrowserAsync(url);
+  };
+
+  const handleOpenPdf = () => {
+    router.push('/pdf');
   };
 
   const handleNewsletterSubscription = async () => {
@@ -164,7 +165,7 @@ const LearnScreen = () => {
                 <Text style={styles.cardTitle}>Methodology</Text>
                 <Text style={styles.cardText}>
                   Find out how we calculate your emissions first-hand!            </Text>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                <Pressable style={styles.button} onPress={handleOpenPdf}>
                   <Text style={styles.buttonText}>Learn More</Text>
                 </Pressable>
               </View>
@@ -182,7 +183,7 @@ const LearnScreen = () => {
               <View style={styles.card}>
                 <Text style={styles.cardTitle}>Newsletter</Text>
                 <Text style={styles.cardText}>
-                Stay up to date with the latest sustainability tips and eco-friendly news!                   </Text>
+                Stay up to date with the latest sustainability tips and eco-friendly news!                  </Text>
                 <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
                   <Text style={styles.buttonText}>View</Text>
                 </Pressable>
