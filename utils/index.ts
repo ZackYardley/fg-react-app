@@ -38,6 +38,8 @@ const darkenColor = (hex: string, percent: number = 10): string => {
   // Ensure the values don't go below 0
   r = Math.max(0, r);
   g = Math.max(0, g);
+  b = Math.max(0, b);
+
   // Convert back to hex
   const darkenedHex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
 
