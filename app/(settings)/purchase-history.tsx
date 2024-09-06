@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, StyleSheet, FlatList, StatusBar } from "react-native";
 import { getRecentPayments } from "@/api/payments";
 import { fetchRecentInvoices } from "@/api/subscriptions";
 import { Payment, Invoice } from "@/types";
-import { BackButton, Loading, PageHeader } from "@/components/common";
+import { BackButton, Loading, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
 
 interface PurchaseItem {
@@ -56,45 +55,45 @@ const PurchaseHistoryScreen = () => {
     item.metadata.items ? (
       <View style={styles.paymentCard}>
         <View style={styles.paymentHeader}>
-          <Text style={styles.date}>{formatDate(item.created)}</Text>
-          <Text style={styles.amount}>{formatPrice(item.amount)}</Text>
+          <ThemedText style={styles.date}>{formatDate(item.created)}</ThemedText>
+          <ThemedText style={styles.amount}>{formatPrice(item.amount)}</ThemedText>
         </View>
         {item.metadata.items.map((credit, index) => (
           <View key={index} style={styles.creditItem}>
-            <Text style={styles.creditName}>{credit?.name || "Unknown Credit"}</Text>
-            <Text style={styles.creditQuantity}>
+            <ThemedText style={styles.creditName}>{credit?.name || "Unknown Credit"}</ThemedText>
+            <ThemedText style={styles.creditQuantity}>
               {credit.quantity} x {formatPrice(credit.price)}
-            </Text>
+            </ThemedText>
           </View>
         ))}
         <View style={styles.paymentMethodContainer}>
-          <Text style={styles.paymentMethod}>Transaction ID:</Text>
-          <Text style={styles.paymentMethod}>{item.id}</Text>
+          <ThemedText style={styles.paymentMethod}>Transaction ID:</ThemedText>
+          <ThemedText style={styles.paymentMethod}>{item.id}</ThemedText>
         </View>
       </View>
     ) : null;
 
   const renderInvoiceItem = (item: Invoice) => (
-    <View style={styles.paymentCard}>
+    <ThemedView style={styles.paymentCard}>
       <View style={styles.paymentHeader}>
-        <Text style={styles.date}>{formatDate(item.created)}</Text>
-        <Text style={styles.amount}>{formatPrice(item.total)}</Text>
+        <ThemedText style={styles.date}>{formatDate(item.created)}</ThemedText>
+        <ThemedText style={styles.amount}>{formatPrice(item.total)}</ThemedText>
       </View>
       {item.lines.data.length > 0 && (
         <View style={styles.creditItem}>
-          <Text style={styles.creditName}>{item.lines.data[0].description}</Text>
+          <ThemedText style={styles.creditName}>{item.lines.data[0].description}</ThemedText>
         </View>
       )}
       <View style={styles.paymentMethodContainer}>
-        <Text style={styles.paymentMethod}>Invoice Number:</Text>
-        <Text style={styles.paymentMethod}>{item.number}</Text>
+        <ThemedText style={styles.paymentMethod}>Invoice Number:</ThemedText>
+        <ThemedText style={styles.paymentMethod}>{item.number}</ThemedText>
       </View>
-    </View>
+    </ThemedView>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <View style={{ flexGrow: 1 }}>
         <PageHeader subtitle="Purchase History" />
         <BackButton />
@@ -106,20 +105,18 @@ const PurchaseHistoryScreen = () => {
           contentContainerStyle={styles.listContainer}
         />
       </View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   listContainer: {
     padding: 16,
   },
   paymentCard: {
-    backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
