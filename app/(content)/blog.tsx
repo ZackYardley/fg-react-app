@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   postContainer: {
-    borderBottomWidth: 1,
     borderRadius: 20,
     padding: 20,
   },

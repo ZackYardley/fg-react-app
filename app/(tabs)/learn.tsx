@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
-import { ScrollView, Text, Pressable, View, StyleSheet, StatusBar, Dimensions, Image } from "react-native";
+import { ScrollView, Pressable, View, StyleSheet, StatusBar, Dimensions, Image, Text } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { Link } from "expo-router";
-import { Book, Camera, Blog, FastFacts, Credit, Newsletter, Methodology,} from "@/constants/Images";
-import { useRouter } from 'expo-router';
+import { Book, Camera, Blog, FastFacts, Credit, Newsletter, Methodology } from "@/constants/Images";
+import { useRouter } from "expo-router";
+import { useThemeColor } from "@/hooks";
 
-
-const { width: screenWidth } = Dimensions.get('window');
-
+const { width: screenWidth } = Dimensions.get("window");
 
 const LearnScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
+  const success = useThemeColor({}, "success");
+  const onPrimary = useThemeColor({}, "onPrimary");
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -41,7 +42,7 @@ const LearnScreen = () => {
   };
 
   const handleOpenPdf = () => {
-    router.push('/pdf');
+    router.push("/pdf");
   };
 
   const handleNewsletterSubscription = async () => {
@@ -64,138 +65,145 @@ const LearnScreen = () => {
 
           <PageHeader subtitle="Learn" />
 
-          { /* Resource Guides */}
-        
+          {/* Resource Guides */}
+
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Resource Guides</Text>
-                <Text style={styles.cardText}>
-                Check out our  guides with info about how to live a sustainable lifestyle!                </Text>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Resource Guides</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Check out our guides with info about how to live a sustainable lifestyle!{" "}
+                </ThemedText>
                 <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>Explore</Text>
+                  <Text style={[styles.buttonText, { color: onPrimary }]}>Explore</Text>
                 </Pressable>
-              </View>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Book} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
 
-          { /* Course */}
-        
+          {/* Course */}
+
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Courses</Text>
-                <Text style={styles.cardText}>  
-                  Follow at your own pace: courses about sustainable living!                </Text>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Courses</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Follow at your own pace: courses about sustainable living!{" "}
+                </ThemedText>
                 <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>Explore</Text>
+                  <Text style={[styles.buttonText, { color: onPrimary }]}>Explore</Text>
                 </Pressable>
-              </View>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Camera} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
 
-          { /* Blogs */}
-        
+          {/* Blogs */}
+
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Blogs</Text>
-                <Text style={styles.cardText}>
-                Blogs about hot climate topics: easy to read and educational!
-                </Text>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>Read Now</Text>
-                </Pressable>
-              </View>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Blogs</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Blogs about hot climate topics: easy to read and educational!
+                </ThemedText>
+                <Link href="/blog" style={{ marginTop: 10 }}>
+                  <View style={[styles.button]}>
+                    <Text style={[styles.buttonText, { color: onPrimary }]}>Read Now</Text>
+                  </View>
+                </Link>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Blog} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
 
-          { /* Fast Facts */}
-        
+          {/* Fast Facts */}
+
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Fast Facts</Text>
-                <Text style={styles.cardText}>
-                  Want a quick fact about climate related topics to expand your view?                </Text>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Fast Facts</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Want a quick fact about climate related topics to expand your view?{" "}
+                </ThemedText>
                 <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>View</Text>
+                  <Text style={[styles.buttonText, { color: onPrimary }]}>View</Text>
                 </Pressable>
-              </View>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={FastFacts} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
 
-          { /* Credit */}
-        
+          {/* Credit */}
+
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Carbon Credits</Text>
-                <Text style={styles.cardText}>
-                  Learn more about Carbon Credits and what goes into our projects!            </Text>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>View</Text>
-                </Pressable>
-              </View>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Carbon Credits</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Learn more about Carbon Credits and what goes into our projects!{" "}
+                </ThemedText>
+                <Link href="/carbon-credit" style={{ marginTop: 10 }}>
+                  <View style={[styles.button]}>
+                    <Text style={[styles.buttonText, { color: onPrimary }]}>View</Text>
+                  </View>
+                </Link>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Credit} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
 
+          {/* Methodology */}
 
-          { /* Methodology */}
-        
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Methodology</Text>
-                <Text style={styles.cardText}>
-                  Find out how we calculate your emissions first-hand!            </Text>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Methodology</ThemedText>
+                <ThemedText style={styles.cardText}>Find out how we calculate your emissions first-hand! </ThemedText>
                 <Pressable style={styles.button} onPress={handleOpenPdf}>
-                  <Text style={styles.buttonText}>Learn More</Text>
+                  <Text style={[styles.buttonText, { color: onPrimary }]}>Learn More</Text>
                 </Pressable>
-              </View>
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Methodology} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
-
-          { /* Methodology */}
-
 
           <View style={styles.resource}>
             <View style={styles.cardContainer}>
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>Newsletter</Text>
-                <Text style={styles.cardText}>
-                Stay up to date with the latest sustainability tips and eco-friendly news!                  </Text>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-                  <Text style={styles.buttonText}>View</Text>
-                </Pressable>
-              </View>
+              <ThemedView style={styles.card}>
+                <ThemedText style={styles.cardTitle}>Newsletter</ThemedText>
+                <ThemedText style={styles.cardText}>
+                  Stay up to date with the latest sustainability tips and eco-friendly news!{" "}
+                </ThemedText>
+                {isNewsletterSubscribed ? (
+                  <Pressable style={styles.button} onPress={handleNewsletterSubscription}>
+                    <ThemedText style={styles.buttonText}>Subscribe</ThemedText>
+                  </Pressable>
+                ) : (
+                  <View style={{ display: "flex", flexDirection: "row", gap: 8 }}>
+                    <Ionicons name="checkmark-circle" color={success} size={24} />
+                    <ThemedText style={styles.buttonText}>Subscribed</ThemedText>
+                  </View>
+                )}
+              </ThemedView>
               <View style={styles.imageContainer}>
                 <Image source={Newsletter} style={styles.image} resizeMode="contain" />
-              </View>        
+              </View>
             </View>
           </View>
-
-          
-        
-
         </View>
       </ScrollView>
     </ThemedSafeAreaView>
@@ -244,12 +252,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    width: '80%',
-    backgroundColor: "#eeeeee",
+    width: "80%",
     padding: 16,
     borderRadius: 16,
-    marginRight: '2%',
-    alignItems: 'center',
+    marginRight: "2%",
+    alignItems: "center",
   },
   cardTitle: {
     fontSize: 30,
@@ -274,13 +281,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   buttonText: {
-    color: "white",
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
   },
   iconContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
@@ -294,18 +300,18 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   cardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   imageContainer: {
-    width: '20%',
+    width: "20%",
     aspectRatio: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
-    width: '200%',
-    height: '200%',
+    width: "200%",
+    height: "200%",
   },
 });
