@@ -5,13 +5,15 @@ import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { Href, router, useFocusEffect } from "expo-router";
 import { fetchEmissionsData } from "@/api/emissions";
 import { Image } from "expo-image";
-import { PageHeader } from "@/components/common";
+import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchSetupPaymentSheetParams } from "@/api/purchase";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription } from "@/api/products";
+import { useThemeColor } from "@/hooks";
+import { EmissionsOffset } from "@/components/home";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -23,6 +25,7 @@ interface SettingsItemProps {
 }
 
 export default function ProfileScreen() {
+  const textColor = useThemeColor({}, "text");
   const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
   const auth = getAuth();
 
@@ -193,16 +196,19 @@ export default function ProfileScreen() {
   const SettingsItem: React.FC<SettingsItemProps> = ({ title, screen, isDisabled }) => (
     <TouchableOpacity
       onPress={() => (title === "Payment Methods" ? handleUpdatePaymentMethod() : screen ? router.push(screen) : null)}
-      style={[styles.settingsItem, isDisabled && styles.disabledSettingsItem]}
       disabled={isDisabled}
     >
-      <Text style={[styles.settingsItemTitle, isDisabled && styles.disabledSettingsItemTitle]}>{title}</Text>
-      <Icon name="chevron-right" size={48} color={isDisabled ? "#999" : "#000"} />
+      <ThemedView style={[styles.settingsItem, isDisabled && styles.disabledSettingsItem]}>
+        <ThemedText style={[styles.settingsItemTitle, isDisabled && styles.disabledSettingsItemTitle]}>
+          {title}
+        </ThemedText>
+        <Icon name="chevron-right" size={48} color={isDisabled ? "#999" : textColor} />
+      </ThemedView>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["top", "left", "right"]}>
+    <ThemedSafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
@@ -226,8 +232,8 @@ export default function ProfileScreen() {
               )}
             </View>
             <View style={styles.profileTextContainer}>
-              <Text style={styles.profileName}>{user?.displayName || "Guest"}</Text>
-              <Text style={styles.profileEmail}>{user?.email || ""}</Text>
+              <ThemedText style={styles.profileName}>{user?.displayName || "Guest"}</ThemedText>
+              <ThemedText style={styles.profileEmail}>{user?.email || ""}</ThemedText>
             </View>
           </View>
 
@@ -237,38 +243,19 @@ export default function ProfileScreen() {
           <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
 
-          <View style={styles.carbonFootprint}>
-            <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint...</Text>
-            <View style={styles.carbonFootprintContent}>
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Emissions</Text>
-                <Text style={styles.emissionText}>
-                  {monthlyEmissions.toFixed(2)}
-                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
-                </Text>
-              </View>
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Offsets</Text>
-                <Text style={styles.offsetText}>
-                  {totalOffset.toFixed(2)}
-                  <Text style={styles.emissionUnit}> tons of CO₂</Text>
-                </Text>
-              </View>
-            </View>
+          <EmissionsOffset
+            monthlyEmissions={monthlyEmissions}
+            totalOffset={totalOffset}
+            isNetZero={false}
+            displayNetZeroMonths={
+              monthlyEmissions <= totalOffset ? "You are net zero this month!" : "You are not net zero this month!"
+            }
+          />
 
-            {monthlyEmissions <= totalOffset ? (
-              <Text style={styles.netZeroText}>You are net zero this month!</Text>
-            ) : (
-              <Text style={styles.netZeroText}>You are not net zero this month!</Text>
-            )}
-
-            <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
-              <Text style={styles.offsetButtonText}>Offset Now!</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
+          <TouchableOpacity onPress={handleLogout}>
+            <ThemedView style={styles.logoutButton}>
+              <ThemedText style={styles.logoutButtonText}>Logout</ThemedText>
+            </ThemedView>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.deleteAccountButton} onPress={() => setIsDeleteModalVisible(true)}>
@@ -282,16 +269,16 @@ export default function ProfileScreen() {
             onRequestClose={() => setIsDeleteModalVisible(false)}
           >
             <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Delete Account</Text>
-                <Text style={styles.modalText}>
+              <ThemedView style={styles.modalContent}>
+                <ThemedText style={styles.modalTitle}>Delete Account</ThemedText>
+                <ThemedText style={styles.modalText}>
                   Are you sure you want to delete your account? This action cannot be undone.
-                </Text>
+                </ThemedText>
                 {isGoogleUser ? (
                   <>
-                    <Text style={styles.modalText}>To confirm, please type DELETE in all caps:</Text>
+                    <ThemedText style={styles.modalText}>To confirm, please type DELETE in all caps:</ThemedText>
                     <TextInput
-                      style={styles.deleteConfirmationInput}
+                      style={[styles.deleteConfirmationInput, { color: textColor }]}
                       placeholder="Type DELETE here"
                       value={deleteConfirmation}
                       onChangeText={setDeleteConfirmation}
@@ -300,9 +287,9 @@ export default function ProfileScreen() {
                   </>
                 ) : (
                   <>
-                    <Text style={styles.modalText}>Please enter your password to confirm:</Text>
+                    <ThemedText style={styles.modalText}>Please enter your password to confirm:</ThemedText>
                     <TextInput
-                      style={styles.deleteConfirmationInput}
+                      style={[styles.deleteConfirmationInput, { color: textColor }]}
                       placeholder="Enter your password"
                       value={deleteConfirmation}
                       onChangeText={setDeleteConfirmation}
@@ -318,18 +305,18 @@ export default function ProfileScreen() {
                       setDeleteConfirmation("");
                     }}
                   >
-                    <Text style={styles.modalButtonText}>Cancel</Text>
+                    <ThemedText style={styles.modalButtonText}>Cancel</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, styles.deleteButton]} onPress={handleDeleteAccount}>
                     <Text style={styles.modalButtonText}>Delete Account</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </ThemedView>
             </View>
           </Modal>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
@@ -379,7 +366,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#e5e7eb",
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
@@ -458,7 +444,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginTop: 42,
-    backgroundColor: "#e5e7eb",
   },
   logoutButtonText: {
     textAlign: "center",
@@ -485,7 +470,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
     alignItems: "center",

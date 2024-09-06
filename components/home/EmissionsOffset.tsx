@@ -14,7 +14,7 @@ const EmissionsOffset = ({
   totalOffset: number;
   isNetZero: boolean;
   displayNetZeroMonths: string;
-  netZeroMonths: number;
+  netZeroMonths?: number;
 }) => {
   const positive = useThemeColor({}, "positive");
   const negative = useThemeColor({}, "negative");
