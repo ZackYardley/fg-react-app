@@ -3,8 +3,8 @@ import { useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useMemo } from "react";
 import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 export async function generateStaticParams(): Promise<{ post: string }[]> {
   return mdxctx
@@ -40,6 +40,7 @@ const useData = (postId: string) => {
 };
 
 export default function BlogPostPage() {
+  const textColor = useThemeColor({}, "text");
   const { post: postId } = useLocalSearchParams<{ post: string }>();
   const data = useData(postId);
 
@@ -52,19 +53,19 @@ export default function BlogPostPage() {
   const { MarkdownComponent, info } = data;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent} contentInsetAdjustmentBehavior="automatic">
         <PageHeader subtitle="Blogs" />
         <BackButton />
         <View style={styles.header}>
-          <Text style={styles.title}>{info.title}</Text>
-          <Text style={styles.subtitle}>{info.subtitle}</Text>
-          <Text style={styles.date}>{new Date(info.date).toLocaleDateString()}</Text>
+          <ThemedText style={styles.title}>{info.title}</ThemedText>
+          <ThemedText style={styles.subtitle}>{info.subtitle}</ThemedText>
+          <ThemedText style={styles.date}>{new Date(info.date).toLocaleDateString()}</ThemedText>
           {info.tags.map((tag, index) => (
-            <Text key={index} style={styles.tag}>
+            <ThemedText type="link" key={index} style={styles.tag}>
               #{tag}
-            </Text>
+            </ThemedText>
           ))}
         </View>
         <MDXStyles
@@ -74,18 +75,29 @@ export default function BlogPostPage() {
             height: 300,
             width: screenWidth - 40,
           }}
+          h1={{
+            color: textColor,
+          }}
+          h2={{
+            color: textColor,
+          }}
+          h3={{
+            color: textColor,
+          }}
+          p={{
+            color: textColor,
+          }}
         >
           <MarkdownComponent />
         </MDXStyles>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -102,17 +114,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: "#666",
     marginBottom: 8,
   },
   date: {
     fontSize: 14,
-    color: "#999",
     marginBottom: 8,
   },
   tag: {
     fontSize: 14,
-    color: "#007AFF",
     marginBottom: 8,
   },
   featuredImage: {

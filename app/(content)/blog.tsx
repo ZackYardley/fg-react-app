@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, StyleSheet, SafeAreaView, ImageSourcePropType } from "react-native";
+import { View, ScrollView, StyleSheet, ImageSourcePropType } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
 import { Href, Link } from "expo-router";
 import { Image } from "expo-image";
 
@@ -52,7 +52,7 @@ const POSTS = posts
 
 export default function ForevergreenBlogsPage() {
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         <PageHeader subtitle="Blogs" />
@@ -61,29 +61,28 @@ export default function ForevergreenBlogsPage() {
           {POSTS.map((item: DataType, index: string) => (
             <Link key={index} href={item.href as Href}>
               <Image source={item.featuredImage} style={styles.featuredImage} />
-              <View style={styles.postContainer}>
+              <ThemedView style={styles.postContainer}>
                 <Image source={item.featuredImage} style={styles.featuredImage} />
-                <Text style={styles.postTitle}>{item.title}</Text>
-                <Text style={styles.postDate}>{item.value}</Text>
-                <Text style={styles.postDescription}>{item.description}</Text>
-              </View>
+                <ThemedText style={styles.postTitle}>{item.title}</ThemedText>
+                <ThemedText style={styles.postDate}>{item.value}</ThemedText>
+                <ThemedText style={styles.postDescription}>{item.description}</ThemedText>
+              </ThemedView>
             </Link>
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   postContainer: {
-    paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderRadius: 20,
+    padding: 20,
   },
   postTitle: {
     fontSize: 20,
