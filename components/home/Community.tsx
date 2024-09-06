@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { fetchCommunityEmissionsData } from "@/api/emissions";
 import { CommunityEmissionsData } from "@/types";
+import { ThemedView, ThemedText } from "../common";
 
 const Community = () => {
   const [communityEmissions, setCommunityEmissions] = useState<CommunityEmissionsData>();
@@ -26,28 +27,28 @@ const Community = () => {
 
   return (
     <View style={styles.communitySection}>
-      <Text style={styles.sectionTitle}>Forevergreen Community</Text>
+      <ThemedText style={styles.sectionTitle}>Forevergreen Community</ThemedText>
       <View style={styles.communityStatsContainer}>
-        <View style={styles.communityStatBox}>
+        <ThemedView style={styles.communityStatBox}>
           {communityEmissions ? (
             <>
-              <Text style={styles.statLargeText}>{communityEmissions?.emissions_calculated.toFixed(0)}</Text>
-              <Text style={styles.statMediumText}>Total Emissions Calculated</Text>
+              <ThemedText style={styles.statLargeText}>{communityEmissions?.emissions_calculated.toFixed(0)}</ThemedText>
+              <ThemedText style={styles.statMediumText}>Total Emissions Calculated</ThemedText>
             </>
           ) : (
-            <Text style={styles.statMediumText}>Loading...</Text>
+            <ThemedText style={styles.statMediumText}>Loading...</ThemedText>
           )}
-        </View>
-        <View style={styles.communityStatBox}>
+        </ThemedView>
+        <ThemedView style={styles.communityStatBox}>
           {communityEmissions ? (
             <>
-              <Text style={styles.statLargeText}>{communityEmissions?.emissions_offset.toFixed(0)}</Text>
-              <Text style={styles.statMediumText}>Tons CO2 Offset</Text>
+              <ThemedText style={styles.statLargeText}>{communityEmissions?.emissions_offset.toFixed(0)}</ThemedText>
+              <ThemedText style={styles.statMediumText}>Tons CO2 Offset</ThemedText>
             </>
           ) : (
-            <Text style={styles.statMediumText}>Loading...</Text>
+            <ThemedText style={styles.statMediumText}>Loading...</ThemedText>
           )}
-        </View>
+        </ThemedView>
       </View>
     </View>
   );
@@ -71,7 +72,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   communityStatBox: {
-    backgroundColor: "#eeeeee",
     borderRadius: 16,
     width: "47%",
     height: 160,

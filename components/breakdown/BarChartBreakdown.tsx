@@ -25,9 +25,6 @@ const BarChartBreakdown = ({ names, values, colors, width }: BarChartProps) => {
   };
 
   const chartConfig = {
-    backgroundColor: backgroundColor,
-    backgroundGradientFrom: backgroundColor,
-    backgroundGradientTo: backgroundColor,
     decimalPlaces: 0,
     color: (opacity = 1) => darkenColor(textColor, 50),
     labelColor: (opacity = 1) => textColor,

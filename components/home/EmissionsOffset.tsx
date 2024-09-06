@@ -1,5 +1,7 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import { ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 const EmissionsOffset = ({
   monthlyEmissions,
@@ -14,34 +16,38 @@ const EmissionsOffset = ({
   displayNetZeroMonths: string;
   netZeroMonths: number;
 }) => {
+  const positive = useThemeColor({}, "positive");
+  const negative = useThemeColor({}, "negative");
+  const backgroundColor = useThemeColor({}, "primaryContainer");
+
   return (
-    <View style={styles.carbonFootprint}>
-      <Text style={styles.carbonFootprintTitle}>Your Carbon Footprint</Text>
+    <View style={[styles.carbonFootprint, { backgroundColor }]}>
+      <ThemedText style={styles.carbonFootprintTitle}>Your Carbon Footprint</ThemedText>
       <View style={styles.carbonFootprintContent}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Emissions</Text>
-          <Text style={styles.emissionText}>
+          <ThemedText style={styles.sectionTitle}>Emissions</ThemedText>
+          <ThemedText style={[styles.emissionText, { color: positive }]}>
             {monthlyEmissions.toFixed(2)}
-            <Text style={styles.emissionUnit}> tons of CO₂</Text>
-          </Text>
+            <ThemedText style={styles.emissionUnit}> tons of CO₂</ThemedText>
+          </ThemedText>
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Offsets</Text>
-          <Text style={styles.offsetText}>
+          <ThemedText style={styles.sectionTitle}>Offsets</ThemedText>
+          <ThemedText style={[styles.offsetText, { color: negative }]}>
             {totalOffset.toFixed(2)}
-            <Text style={styles.emissionUnit}> tons of CO₂</Text>
-          </Text>
+            <ThemedText style={styles.emissionUnit}> tons of CO₂</ThemedText>
+          </ThemedText>
         </View>
       </View>
 
-      <Text style={styles.netZeroText}>
+      <ThemedText style={styles.netZeroText}>
         {isNetZero
           ? `You are net-zero! You've been net-zero for ${displayNetZeroMonths} month${netZeroMonths !== 1 ? "s" : ""}! 😊`
           : "You are not net-zero this month! 😔"}
-      </Text>
+      </ThemedText>
 
-      <TouchableOpacity onPress={() => router.push("/offset-now")} style={styles.offsetButton}>
-        <Text style={styles.offsetButtonText}>Offset Now!</Text>
+      <TouchableOpacity onPress={() => router.navigate("/offset-now")} style={styles.offsetButton}>
+        <ThemedText style={styles.offsetButtonText}>Offset Now!</ThemedText>
       </TouchableOpacity>
     </View>
   );
@@ -55,7 +61,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     marginTop: 12,
-    backgroundColor: "#eeeeee",
   },
   carbonFootprintTitle: {
     fontSize: 20,
@@ -81,17 +86,14 @@ const styles = StyleSheet.create({
   emissionText: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#b91c1c",
   },
   emissionUnit: {
     fontSize: 16,
     fontWeight: "600",
-    color: "black",
   },
   offsetText: {
     fontSize: 24,
     fontWeight: "700",
-    color: "green",
   },
   netZeroText: {
     marginTop: 16,

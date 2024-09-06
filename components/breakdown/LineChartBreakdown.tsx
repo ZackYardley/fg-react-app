@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Dimensions, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Dimensions, View, StyleSheet, TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
-import { Loading } from "@/components/common";
+import { Loading, ThemedText } from "@/components/common";
 import { router } from "expo-router";
+import { useThemeColor } from "@/hooks";
 
 type Dataset = {
   data: number[];
@@ -26,7 +27,7 @@ const Legend: React.FC<{ datasets: Dataset[] }> = ({ datasets }) => {
       {datasets.map((dataset, index) => (
         <View key={index} style={styles.legendItem}>
           <View style={[styles.legendColor, { backgroundColor: dataset.color(1) }]} />
-          <Text style={styles.legendText}>{dataset.label}</Text>
+          <ThemedText style={styles.legendText}>{dataset.label}</ThemedText>
         </View>
       ))}
     </View>
@@ -34,6 +35,10 @@ const Legend: React.FC<{ datasets: Dataset[] }> = ({ datasets }) => {
 };
 
 const LineChartBreakdown = ({ userId }: { userId?: string }) => {
+  const positive = useThemeColor({}, "positive");
+  const negative = useThemeColor({}, "negative");
+  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const textColor = useThemeColor({}, "text");
   const [emissionsData, setEmissionsData] = useState<number[]>([]);
   const [offsetData, setOffsetData] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,19 +66,19 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
   const datasets: Dataset[] = [
     {
       data: emissionsData,
-      color: (opacity = 1) => `rgba(220, 53, 69, ${opacity})`,
+      color: (opacity = 1) => negative,
       label: "Emissions this month",
     },
     {
       data: offsetData,
-      color: (opacity = 1) => `rgba(64, 152, 88, ${opacity})`,
+      color: (opacity = 1) => positive,
       label: "Offsets this month",
     },
   ];
 
   return (
-    <View style={styles.emissionsGraph}>
-      <Text style={styles.sectionTitle}>Your net-zero journey</Text>
+    <View style={[styles.emissionsGraph, { backgroundColor }]}>
+      <ThemedText style={styles.sectionTitle}>Your net-zero journey</ThemedText>
       <View style={styles.graphContainer}>
         <View>
           <LineChart
@@ -84,11 +89,11 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
             width={screenWidth - 67}
             height={220}
             chartConfig={{
-              backgroundGradientFrom: "#eeeeee",
-              backgroundGradientTo: "#eeeeee",
+              backgroundGradientFrom: backgroundColor,
+              backgroundGradientTo: backgroundColor,
               decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(27, 117, 179, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              color: (opacity = 1) => textColor,
+              labelColor: (opacity = 1) => textColor,
               fillShadowGradientOpacity: 0,
               fillShadowGradientToOpacity: 0,
               propsForBackgroundLines: { stroke: "transparent" },
@@ -107,7 +112,7 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
           router.push("/offset-now");
         }}
       >
-        <Text style={styles.offsetButtonText}>Offset Now!</Text>
+        <ThemedText style={styles.offsetButtonText}>Offset Now!</ThemedText>
       </TouchableOpacity>
     </View>
   );
@@ -115,7 +120,6 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
 
 const styles = StyleSheet.create({
   emissionsGraph: {
-    backgroundColor: "#eeeeee",
     marginBottom: 24,
     padding: 24,
     borderRadius: 16,

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { View, Text, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -15,8 +14,9 @@ import {
   Credits,
   Tips,
 } from "@/components/home";
-import { PageHeader } from "@/components/common";
+import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { EmissionGroup, EmissionsDocument } from "@/types";
+import { useThemeColor } from "@/hooks";
 
 function getHighestEmissionGroup(emissions: EmissionsDocument): EmissionGroup {
   if (
@@ -49,6 +49,7 @@ const HomeScreen = () => {
   const [highestEmissionGroup, setHighestEmissionGroup] = useState<string>();
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
+  const backgroundColor = useThemeColor({}, "background");
 
   useEffect(() => {
     const loadData = async () => {
@@ -88,8 +89,8 @@ const HomeScreen = () => {
   const displayNetZeroMonths = netZeroMonths === 24 ? "24+" : netZeroMonths.toString();
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <StatusBar style="dark" />
+    <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
           <PageHeader />
@@ -110,10 +111,10 @@ const HomeScreen = () => {
           <Prizes isNetZero={isNetZero} displayNetZeroMonths={displayNetZeroMonths} />
 
           {/* Charts */}
-          <View style={styles.chartsSection}>
+          <ThemedView style={styles.chartsSection}>
             {/* Your Breakdown Pie Chart */}
-            <View style={styles.chartBox}>
-              <Text style={styles.chartTitle}>Your Breakdown</Text>
+            <View style={[styles.chartBox, {backgroundColor}]}>
+              <ThemedText style={styles.chartTitle}>Your Breakdown</ThemedText>
               <View style={styles.pieChartContainer}>
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
@@ -125,24 +126,24 @@ const HomeScreen = () => {
                 <View style={styles.legendContainer}>
                   <View style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
-                    <Text>Transportation</Text>
+                    <ThemedText>Transportation</ThemedText>
                   </View>
                   <View style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]} />
-                    <Text>Diet</Text>
+                    <ThemedText>Diet</ThemedText>
                   </View>
                   <View style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: "#66A570" }]} />
-                    <Text>Energy</Text>
+                    <ThemedText>Energy</ThemedText>
                   </View>
                 </View>
               </View>
             </View>
 
             {/* You vs the Average American */}
-            <View style={styles.chartBox}>
-              <Text style={styles.chartTitle}>You vs the Average American</Text>
-              <Text style={styles.chartSubtitle}>See how you rank vs the average American</Text>
+            <View style={[styles.chartBox, {backgroundColor}]}>
+              <ThemedText style={styles.chartTitle}>You vs the Average American</ThemedText>
+              <ThemedText style={styles.chartSubtitle}>See how you rank vs the average American</ThemedText>
               <BarChartBreakdown
                 names={["You", "Average American"]}
                 values={[totalEmissions - totalOffset, 21]}
@@ -152,17 +153,17 @@ const HomeScreen = () => {
             </View>
 
             {/* If everyone lived like you */}
-            <View style={styles.chartBox}>
-              <Text style={styles.chartTitle}>Earth Breakdown</Text>
+            <View style={[styles.chartBox, {backgroundColor}]}>
+              <ThemedText style={styles.chartTitle}>Earth Breakdown</ThemedText>
               <EarthBreakdown emissions={totalEmissions - totalOffset} />
             </View>
-          </View>
+          </ThemedView>
 
           {highestEmissionGroup && <Tips highestEmissionGroup={highestEmissionGroup} />}
           <Credits />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -171,10 +172,9 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   factButton: {
     justifyContent: "center", // Center the text vertically
@@ -189,13 +189,11 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
   },
   chartsSection: {
-    backgroundColor: "#eeeeee",
     padding: 24,
     borderRadius: 16,
     marginBottom: 24,
   },
   chartBox: {
-    backgroundColor: "white",
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
