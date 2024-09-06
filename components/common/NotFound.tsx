@@ -1,17 +1,19 @@
 import { router } from "expo-router";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, TouchableOpacity } from "react-native";
 import { fourofour } from "@/constants/Images";
+import ThemedSafeAreaView from "./ThemedSafeAreaView";
+import ThemedText from "./ThemedText";
 
 const NotFoundComponent = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.errorCode}>404</Text>
-      <Text style={styles.errorMessage}>Page Not Found</Text>
+    <ThemedSafeAreaView style={styles.container}>
+      <ThemedText style={styles.errorCode}>404</ThemedText>
+      <ThemedText style={styles.errorMessage}>Page Not Found</ThemedText>
       <Image source={fourofour} style={styles.image} />
       <TouchableOpacity onPress={() => router.replace("/")} style={styles.button}>
-        <Text style={styles.buttonText}>Back Home</Text>
+        <ThemedText style={styles.buttonText}>Back Home</ThemedText>
       </TouchableOpacity>
-    </View>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -23,17 +25,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#FFFFFF",
   },
   errorCode: {
     fontSize: 72,
     fontWeight: "bold",
-    color: "#6DB08B",
+    color: "#409858",
   },
   errorMessage: {
     fontSize: 24,
     fontWeight: "500",
-    color: "#000000",
     marginVertical: 10,
   },
   image: {
@@ -42,14 +42,13 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   button: {
-    backgroundColor: "#6DB08B",
+    backgroundColor: "#409858",
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 40,
     marginTop: 20,
   },
   buttonText: {
-    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
