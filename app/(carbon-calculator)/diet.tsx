@@ -5,7 +5,7 @@ import { Header, RadioButtonGroup, NextButton } from "@/components/carbon-calcul
 import { SurveyData, SurveyEmissions } from "@/types";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { router } from "expo-router";
-import { Loading } from "@/components/common";
+import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 
 export default function DietCalculator() {
   const [surveyData, setSurveyData] = useState<SurveyData>({
@@ -73,7 +73,7 @@ export default function DietCalculator() {
 
   const handleNextButton = async () => {
     await saveEmissionsData({ surveyData: { ...surveyData }, surveyEmissions: { ...surveyEmissions } });
-    router.push("/energy");
+    router.navigate("/energy");
   };
 
   if (isLoading) {
@@ -81,12 +81,14 @@ export default function DietCalculator() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <SafeAreaView>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.contentContainer}>
           {/* Header */}
           <Header progress={progress} title="Diet" />
-          <Text>Next up is your dietary emissions! These are all the emissions related to what you eat.</Text>
+          <ThemedText>
+            Next up is your dietary emissions! These are all the emissions related to what you eat.
+          </ThemedText>
 
           {/* Diet Selection */}
           <RadioButtonGroup
@@ -100,20 +102,22 @@ export default function DietCalculator() {
 
           {/* Emissions Display */}
           <View style={styles.emissionsContainer}>
-            <Text style={styles.emissionsTitle}>Your Individual Diet Emissions</Text>
+            <ThemedText style={styles.emissionsTitle}>Your Individual Diet Emissions</ThemedText>
             <View style={styles.emissionsContent}>
               <View style={styles.emissionRow}>
-                <Text>Transportation Emissions:</Text>
-                <Text>{transportationEmissions.toFixed(2)}</Text>
+                <ThemedText>Transportation Emissions:</ThemedText>
+                <ThemedText>{transportationEmissions.toFixed(2)}</ThemedText>
               </View>
               <View style={styles.emissionRow}>
-                <Text>Diet Emissions:</Text>
-                <Text>{surveyEmissions.dietEmissions?.toFixed(2)}</Text>
+                <ThemedText>Diet Emissions:</ThemedText>
+                <ThemedText>{surveyEmissions.dietEmissions?.toFixed(2)}</ThemedText>
               </View>
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total:</Text>
-                <Text>{(transportationEmissions || 0 + (surveyEmissions.dietEmissions || 0)).toFixed(2)}</Text>
-                <Text>tons CO2 per year</Text>
+                <ThemedText style={styles.totalLabel}>Total:</ThemedText>
+                <ThemedText>
+                  {(transportationEmissions || 0 + (surveyEmissions.dietEmissions || 0)).toFixed(2)}
+                </ThemedText>
+                <ThemedText>tons CO2 per year</ThemedText>
               </View>
             </View>
           </View>
@@ -121,17 +125,16 @@ export default function DietCalculator() {
 
         {/* Next Button */}
         <NextButton isFormValid={isFormValid} onPress={handleNextButton} />
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </ThemedSafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 1,
-    backgroundColor: "#fff",
   },
   contentContainer: {
-    paddingHorizontal: 48,
+    paddingHorizontal: 24,
   },
   emissionsContainer: {
     marginTop: 32,

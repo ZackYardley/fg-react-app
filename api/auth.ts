@@ -15,7 +15,7 @@ import {
   deleteUser,
   reauthenticateWithCredential,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { fetchEmissionsData } from "./emissions";
 import { sendAccountDeletionEmail, sendWelcomeEmail } from "./email";

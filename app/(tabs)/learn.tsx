@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { ScrollView, Text, Pressable, View, StyleSheet, StatusBar } from "react-native";
+import { ScrollView, Pressable, View, StyleSheet, StatusBar } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { PageHeader } from "@/components/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { Link } from "expo-router";
 
 const LearnScreen = () => {
@@ -45,7 +44,7 @@ const LearnScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
@@ -60,74 +59,74 @@ const LearnScreen = () => {
         </View> */}
           <PageHeader subtitle="Learn" />
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Resources Guides</Text>
-            <Text style={styles.cardText}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Resources Guides</ThemedText>
+            <ThemedText style={styles.cardText}>
               Check out our resources guides with tons of info about how to live a more sustainable lifestyle!
-            </Text>
+            </ThemedText>
             <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>Learn More</Text>
+              <ThemedText style={styles.buttonText}>Learn More</ThemedText>
             </Pressable>
-          </View>
+          </ThemedView>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Course</Text>
-            <Text style={styles.cardText}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Course</ThemedText>
+            <ThemedText style={styles.cardText}>
               We have created some follow at your own pace courses about sustainable living!
-            </Text>
+            </ThemedText>
             <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>Explore</Text>
+              <ThemedText style={styles.buttonText}>Explore</ThemedText>
             </Pressable>
-          </View>
+          </ThemedView>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Blogs</Text>
-            <Text style={styles.cardText}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Blogs</ThemedText>
+            <ThemedText style={styles.cardText}>
               We have tons of blogs about hot climate topics that are easy to read and educational!
-            </Text>
+            </ThemedText>
             <Link href="/blog">
               <View style={styles.button}>
-                <Text style={styles.buttonText}>Read Now</Text>
+                <ThemedText style={styles.buttonText}>Read Now</ThemedText>
               </View>
             </Link>
-          </View>
+          </ThemedView>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Fast Facts</Text>
-            <Text style={styles.cardText}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Fast Facts</ThemedText>
+            <ThemedText style={styles.cardText}>
               Want a quick fact about climate related topics to expand your view? Check out our fast facts now!
-            </Text>
+            </ThemedText>
             <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
-              <Text style={styles.buttonText}>View</Text>
+              <ThemedText style={styles.buttonText}>View</ThemedText>
             </Pressable>
-          </View>
+          </ThemedView>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Newsletter Subscription</Text>
-            <Text style={styles.cardText}>
+          <ThemedView style={styles.card}>
+            <ThemedText style={styles.cardTitle}>Newsletter Subscription</ThemedText>
+            <ThemedText style={styles.cardText}>
               By joining the newsletter you will be sent personalized info about your journey towards net-zero. This is
               a free an easy way to reduce your emissions.
-            </Text>
+            </ThemedText>
             <Pressable
               style={[styles.button, loading && styles.disabledButton]}
               onPress={() => !loading && handleNewsletterSubscription()}
               disabled={loading || isNewsletterSubscribed}
             >
               {loading ? (
-                <Text style={styles.buttonText}>Loading...</Text>
+                <ThemedText style={styles.buttonText}>Loading...</ThemedText>
               ) : isNewsletterSubscribed ? (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                   <Ionicons name="checkmark-circle" size={24} color="white" />
-                  <Text style={styles.buttonText}>Subscribed</Text>
+                  <ThemedText style={styles.buttonText}>Subscribed</ThemedText>
                 </View>
               ) : (
-                <Text style={styles.buttonText}>Subscribe</Text>
+                <ThemedText style={styles.buttonText}>Subscribe</ThemedText>
               )}
             </Pressable>
-          </View>
+          </ThemedView>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -136,7 +135,6 @@ export default LearnScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
     paddingHorizontal: 24,
@@ -172,7 +170,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor: "#eeeeee",
     marginTop: 16,
     marginBottom: 24,
     padding: 16,

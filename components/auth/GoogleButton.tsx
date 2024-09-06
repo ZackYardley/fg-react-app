@@ -1,6 +1,8 @@
 import React, { useRef, useCallback } from "react";
 import { Pressable, Text, StyleSheet, Animated, Image, View } from "react-native";
 import { GoogleLogo } from "@/constants/Images";
+import { useThemeColor } from "@/hooks";
+import { darkenColor } from "@/utils";
 
 const GoogleButton = ({
   title = "Continue with Google",
@@ -15,6 +17,10 @@ const GoogleButton = ({
   textStyle?: any;
   noLogo?: boolean;
 }) => {
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "primary");
+  const backgroundColor = useThemeColor({}, "background");
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = useCallback(() => {
@@ -34,14 +40,19 @@ const GoogleButton = ({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
-        style={({ pressed }) => [styles.button, style, pressed && styles.buttonPressed]}
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: backgroundColor, borderColor: textColor },
+          style,
+          pressed && { backgroundColor: darkenColor(backgroundColor) },
+        ]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >
         <View style={styles.contentContainer}>
           {!noLogo && <Image source={GoogleLogo} style={styles.googleIcon} />}
-          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+          <Text style={[styles.buttonText, { color: textColor }, textStyle]}>{title}</Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -50,21 +61,16 @@ const GoogleButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "white",
     borderRadius: 9999,
     padding: 16,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "black",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1,
     elevation: 2,
-  },
-  buttonPressed: {
-    backgroundColor: "#f0f0f0",
   },
   contentContainer: {
     flexDirection: "row",

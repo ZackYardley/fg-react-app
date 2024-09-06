@@ -3,8 +3,8 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect } from "react";
 import "react-native-reanimated";
-import { PaperProvider } from "react-native-paper";
-import { Linking, Platform } from "react-native";
+import { PaperProvider, TextInput as RNPTextInput } from "react-native-paper";
+import { Linking, Platform, Text, TextInput } from "react-native";
 import { StripeProvider, useStripe } from "@/utils/stripe";
 import { initializeFirebase } from "@/utils/firebaseConfig";
 import { Notifications } from "../api/notifications"; // Import the new module
@@ -16,6 +16,13 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  // Disable font scaling
+  //@ts-ignore
+  Text.defaultProps = { allowFontScaling: false };
+  RNPTextInput.defaultProps = { allowFontScaling: false };
+  //@ts-ignore
+  TextInput.defaultProps = { allowFontScaling: false };
 
   useEffect(() => {
     if (loaded) {

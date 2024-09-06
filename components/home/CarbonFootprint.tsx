@@ -1,6 +1,9 @@
 import { router } from "expo-router";
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { useThemeColor } from "@/hooks";
+import { ThemedText } from "../common";
+import { useTheme } from "react-native-paper";
 
 const CarbonFootprintSection = ({
   monthlyEmissions,
@@ -14,35 +17,39 @@ const CarbonFootprintSection = ({
 
   const TextButton = ({ label, style }: { label: string; style: object }) => (
     <View style={[styles.textButton, style]}>
-      <Text style={styles.textButtonLabel}>{label}</Text>
+      <ThemedText style={styles.textButtonLabel}>{label}</ThemedText>
     </View>
   );
+
+  const positive = useThemeColor({}, "positive");
+  const negative = useThemeColor({}, "negative");
+  const backgroundColor = useThemeColor({}, "primaryContainer");
 
   return (
     <View style={styles.footprintContainer}>
       <TouchableOpacity
         onPress={() => router.navigate("/user-breakdown")}
-        style={[styles.footprintBox, isPositiveImpact ? styles.positiveImpact : styles.negativeImpact]}
+        style={[styles.footprintBox, isPositiveImpact ? { backgroundColor: positive } : { backgroundColor: negative }]}
       >
-        <Text style={styles.boxTitle}>Your Monthly Emissions</Text>
-        <Text style={styles.footprintText}>
+        <ThemedText style={styles.boxTitle}>Your Monthly Emissions</ThemedText>
+        <ThemedText style={styles.footprintText}>
           {monthlyEmissions.toFixed(1)}
-          <Text style={styles.footprintUnit}> Tons of CO2</Text>
-        </Text>
-        <Text style={styles.offsetTitle}>Your Monthly Offsets</Text>
-        <Text style={styles.footprintText}>
+          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+        </ThemedText>
+        <ThemedText style={styles.offsetTitle}>Your Monthly Offsets</ThemedText>
+        <ThemedText style={styles.footprintText}>
           {totalOffset.toFixed(1)}
-          <Text style={styles.footprintUnit}> Tons of CO2</Text>
-        </Text>
-        <Text style={styles.offsetTitle}>Net Impact</Text>
-        <Text style={styles.footprintText}>
+          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+        </ThemedText>
+        <ThemedText style={styles.offsetTitle}>Net Impact</ThemedText>
+        <ThemedText style={styles.footprintText}>
           {netImpact.toFixed(1)}
-          <Text style={styles.footprintUnit}> Tons of CO2</Text>
-        </Text>
-        <Text style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</Text>
+          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+        </ThemedText>
+        <ThemedText style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.calculatorBox} onPress={() => router.push("/pre-survey")}>
-        <Text style={styles.boxTitle}>Calculate your impact</Text>
+      <TouchableOpacity style={[styles.calculatorBox, { backgroundColor }]} onPress={() => router.push("/pre-survey")}>
+        <ThemedText style={styles.boxTitle}>Calculate your impact</ThemedText>
         <View style={styles.calculator}>
           {/* Calculator buttons */}
           <>
@@ -89,13 +96,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   footprintBox: {
-    backgroundColor: "#f5f5f5",
     borderRadius: 16,
     width: "47%",
     padding: 16,
   },
   calculatorBox: {
-    backgroundColor: "#f5f5f5",
     borderRadius: 16,
     width: "47%",
     padding: 16,
@@ -161,12 +166,6 @@ const styles = StyleSheet.create({
   textButtonLabel: {
     color: "white",
     fontSize: 16,
-  },
-  positiveImpact: {
-    backgroundColor: "#d4edda", // Light green for positive impact
-  },
-  negativeImpact: {
-    backgroundColor: "#f8d7da", // Light red for negative impact
   },
   netZeroCheck: {
     fontSize: 12,

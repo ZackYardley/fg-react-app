@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { ThemedSafeAreaView, ThemedText } from "../common";
 
 const icons = ["hourglass-start", "hourglass-half", "hourglass-end"];
 
@@ -16,23 +17,23 @@ const CalculatingScreen = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
 
       <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>
+        <ThemedText style={styles.titleText}>
           Forever<Text style={styles.titleHighlight}>green</Text>
-        </Text>
+        </ThemedText>
       </View>
 
       <View style={styles.resultContainer}>
-        <Text style={styles.resultText}>Calculating your result</Text>
+        <ThemedText style={styles.resultText}>Calculating your result</ThemedText>
         <View style={styles.iconContainer}>
           <Icon name={icons[iconIndex]} size={100} color="#409858" />
         </View>
       </View>
-    </View>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -42,7 +43,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: "white",
   },
   greenCircleLarge: {
     position: "absolute",

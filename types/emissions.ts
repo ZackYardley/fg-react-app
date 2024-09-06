@@ -62,4 +62,12 @@ interface EmissionsDocument {
   lastUpdated: Timestamp;
 }
 
-export { StateData, SurveyEmissions, SurveyData, EmissionsDocument };
+interface CommunityEmissionsData {
+  emissions_calculated: number;
+  emissions_offset: number;
+  last_updated: Date;
+}
+
+type EmissionGroup = "Transportation" | "Diet" | "Energy";
+
+export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData, EmissionGroup };

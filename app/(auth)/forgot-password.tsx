@@ -1,28 +1,20 @@
 import { useState } from "react";
-import { View, Text, Image, KeyboardAvoidingView, ScrollView, StyleSheet, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, KeyboardAvoidingView, ScrollView, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { handleResetPassword } from "@/api/auth";
-import { TreeLogo } from "@/constants/Images";
-import { GreenButton, CustomTextInput, GoogleButton, OrLine } from "@/components/auth";
+import { GreenButton, CustomTextInput, GoogleButton, OrLine, TitleWithLogo } from "@/components/auth";
+import { ThemedSafeAreaView, ThemedText } from "@/components/common";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {/* Header */}
-          <Text style={styles.header}>
-            Reset <Text style={styles.headerHighlight}>Password</Text>
-          </Text>
-
-          {/* Logo */}
-          <View style={styles.logoContainer}>
-            <Image style={styles.logo} source={TreeLogo} />
-          </View>
+          <TitleWithLogo title="Reset" titleAlt="Password" />
 
           {/* Form */}
           <View style={styles.formContainer}>
@@ -39,10 +31,10 @@ export default function ForgotPasswordScreen() {
 
             {/* Info */}
             <View style={styles.infoContainer}>
-              <Text style={styles.infoText}>
+              <ThemedText style={styles.infoText}>
                 By clicking the "Reset Password" button you'll receive an email with a link to create a new password.
                 This helps to ensure your account remains secure and accessible to you.
-              </Text>
+              </ThemedText>
             </View>
           </View>
 
@@ -70,34 +62,16 @@ export default function ForgotPasswordScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   scrollViewContent: {
     flexGrow: 1,
-    marginHorizontal: 24,
-  },
-  header: {
-    fontSize: 48,
-    fontWeight: "bold",
-    textAlign: "center",
-    letterSpacing: -1,
-    marginVertical: 40,
-  },
-  headerHighlight: {
-    color: "#409858",
-  },
-  logoContainer: {
-    alignItems: "center",
-  },
-  logo: {
-    width: 250,
-    height: 125,
+    marginHorizontal: 20,
   },
   formContainer: {
     rowGap: 16,
@@ -159,16 +133,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 9999,
+    borderRadius: 50,
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.18,
-    shadowRadius: 1.0,
-    elevation: 1,
   },
   backToLoginText: {
     textAlign: "center",

@@ -13,22 +13,22 @@ const memberTagsWatchConfig = {
     "respondedToSurvey",
     "customSubscriptions",
     "contactsContactedMe",
-    "customAppWaitlist",
+    "customAppWaitlist"
   ],
-  "subscriberEmail": "emailAddress",
+  "subscriberEmail": "emailAddress"
 }
 
 const mergeFieldsWatchPath = "users";
-const mergeFieldsWatchConfig = {
-  "mergeFields": {
-    "firstName": "FNAME",
-    "lastName": "LNAME",
-  },
-  "statusField": {
-    "documentPath": "isSubscribed",
-    "statusFormat": "boolean",
-  },
-  "subscriberEmail": "emailAddress",
+const mergeFieldsWatchConfig = {   
+  "mergeFields": {     
+    "firstName": "FNAME",     
+    "lastName": "LNAME"   
+  },   
+    "statusField": {     
+      "documentPath": "isSubscribed",     
+      "statusFormat": "boolean"   
+    },   
+    "subscriberEmail": "emailAddress" 
 }
 
 const memberEventsWatchPath = "users";

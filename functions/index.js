@@ -99,14 +99,17 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
 
         const simplifiedItems = [];
 
+        const communityEmissionsRef = db.collection("community").doc("emissions_stats");
+
         await db.runTransaction(async (transaction) => {
           // Perform all reads
           const carbonCreditsDoc = await transaction.get(carbonCreditsRef);
           const emissionsDoc = await transaction.get(emissionsRef);
-
           const carbonCredits = carbonCreditsDoc.exists ? carbonCreditsDoc.data() : {};
-          let totalPurchasedCredits = 0;
 
+          const communityEmissionsDoc = await transaction.get(communityEmissionsRef);
+
+          let totalPurchasedCredits = 0;
           for (let i = 0; i < request.items.length; i++) {
             const item = request.items[i];
             const product = stripeProducts[i];
@@ -166,6 +169,18 @@ exports.handleCarbonCreditOneTimePurchase = functions.firestore
           transaction.update(paymentRef, {
             metadata: {items: simplifiedItems},
           });
+
+          if (communityEmissionsDoc.exists) {
+            transaction.update(communityEmissionsRef, {
+              emissions_offset: admin.firestore.FieldValue.increment(totalPurchasedCredits),
+              last_updated: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          } else {
+            transaction.set(communityEmissionsRef, {
+              emissions_offset: totalPurchasedCredits,
+              last_updated: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          }
         });
 
         // Update Stripe products outside the transaction
@@ -250,10 +265,13 @@ exports.handleCarbonCreditSubscriptionPayment = functions.firestore
         const emissionsDocId = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}`;
         const emissionsRef = db.collection("users").doc(userId).collection("emissions").doc(emissionsDocId);
 
+        const communityEmissionsRef = db.collection("community").doc("emissions_stats");
+
         await db.runTransaction(async (transaction) => {
           // Perform reads
           const carbonCreditsDoc = await transaction.get(carbonCreditsRef);
           const emissionsDoc = await transaction.get(emissionsRef);
+          const communityEmissionsDoc = await transaction.get(communityEmissionsRef);
 
           // Update carbon credits
           const currentCredits = carbonCreditsDoc.exists ? carbonCreditsDoc.data() : {};
@@ -285,6 +303,19 @@ exports.handleCarbonCreditSubscriptionPayment = functions.firestore
           } else {
             transaction.set(emissionsRef, {
               totalOffset: creditsPurchased,
+            });
+          }
+
+          // Update community emissions
+          if (communityEmissionsDoc.exists) {
+            transaction.update(communityEmissionsRef, {
+              emissions_offset: admin.firestore.FieldValue.increment(creditsPurchased),
+              last_updated: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          } else {
+            transaction.set(communityEmissionsRef, {
+              emissions_offset: creditsPurchased,
+              last_updated: admin.firestore.FieldValue.serverTimestamp(),
             });
           }
         });

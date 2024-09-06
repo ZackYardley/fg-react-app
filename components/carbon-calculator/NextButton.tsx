@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useThemeColor } from "@/hooks";
 
 // todo: animating this would be cool
 const NextButton = ({ isFormValid, onPress }: { isFormValid: boolean; onPress: () => void }) => {
@@ -9,6 +10,7 @@ const NextButton = ({ isFormValid, onPress }: { isFormValid: boolean; onPress: (
       onPress();
     }
   };
+  const textColor = useThemeColor({}, "text");
 
   return (
     <View style={styles.container}>

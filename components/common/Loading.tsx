@@ -1,6 +1,8 @@
+import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import { Text } from "react-native-paper";
+import { StyleSheet } from "react-native";
+import ThemedSafeAreaView from "./ThemedSafeAreaView";
+import ThemedText from "./ThemedText";
 
 const Loading = () => {
   const [dotCount, setDotCount] = useState(1);
@@ -16,9 +18,10 @@ const Loading = () => {
   const dots = ".".repeat(dotCount);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.loadingText}>Loading{dots}</Text>
-    </View>
+    <ThemedSafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <ThemedText type="title" style={styles.loadingText}>Loading{dots}</ThemedText>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -31,7 +34,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#409858",
   },
   testing: {},
 });
