@@ -1,12 +1,14 @@
 import { incrementUserReferrals, sendReferralEmail } from "@/api/referral";
-import { BackButton, PageHeader } from "@/components/common";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 import { router } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const ReferralForm = () => {
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
   const auth = getAuth();
   const [friendName, setFriendName] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
@@ -51,7 +53,7 @@ const ReferralForm = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
@@ -60,12 +62,12 @@ const ReferralForm = () => {
 
             <PageHeader subtitle="Refer a Friend" description="Help the Cause Today by Referring a Friend" />
             <BackButton />
-            <View style={styles.formContainer}>
-              <Text style={styles.formTitle}>Refer a Friend</Text>
+            <ThemedView style={styles.formContainer}>
+              <ThemedText style={styles.formTitle}>Refer a Friend</ThemedText>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Enter Your Friend's Name Below:</Text>
+                <ThemedText style={styles.inputLabel}>Enter Your Friend's Name Below:</ThemedText>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor, color: textColor }]}
                   placeholder="Your Answer"
                   value={friendName}
                   onChangeText={setFriendName}
@@ -73,9 +75,9 @@ const ReferralForm = () => {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Enter Your Friend's Email Address Below:</Text>
+                <ThemedText style={styles.inputLabel}>Enter Your Friend's Email Address Below:</ThemedText>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor, color: textColor }]}
                   placeholder="Your Answer"
                   value={friendEmail}
                   onChangeText={(text) => {
@@ -84,12 +86,12 @@ const ReferralForm = () => {
                   }}
                   placeholderTextColor={emailError ? "red" : "#B6ABAB"}
                 />
-                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+                {emailError ? <ThemedText style={styles.errorText}>{emailError}</ThemedText> : null}
               </View>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Enter a Note or Leave Blank:</Text>
+                <ThemedText style={styles.inputLabel}>Enter a Note or Leave Blank:</ThemedText>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor, color: textColor }]}
                   placeholder="Your Answer"
                   value={note}
                   onChangeText={setNote}
@@ -99,11 +101,11 @@ const ReferralForm = () => {
               <Pressable style={styles.submitButton} onPress={handleReferral}>
                 <Text style={styles.submitButtonText}>Submit</Text>
               </Pressable>
-            </View>
+            </ThemedView>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
@@ -138,7 +140,6 @@ const styles = StyleSheet.create({
     right: 300,
   },
   formContainer: {
-    backgroundColor: "#eeeeee",
     marginTop: 32,
     padding: 16,
     borderRadius: 24,
@@ -156,13 +157,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 16,
     padding: 16,
-    backgroundColor: "white",
     borderRadius: 24,
   },
   inputLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "black",
     marginBottom: 16,
   },
   input: {
