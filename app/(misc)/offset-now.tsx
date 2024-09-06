@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Pressable } from "react-native";
+import { View, TouchableOpacity, ScrollView, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
-import { BackButton, PageHeader } from "@/components/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
@@ -40,7 +39,7 @@ export default function OffsetNowScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <ThemedSafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Offset your Emissions!" description="Reduce your climate impact in a few clicks" />
         <BackButton />
@@ -62,30 +61,30 @@ export default function OffsetNowScreen() {
           </View>
         </View> */}
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Carbon Credit Subscription</Text>
-            <Text style={styles.sectionText}>
+          <ThemedView style={styles.section}>
+            <ThemedText style={styles.sectionTitle}>Carbon Credit Subscription</ThemedText>
+            <ThemedText style={styles.sectionText}>
               The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
               credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the
               planet and support awesome climate projects!
-            </Text>
+            </ThemedText>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button} onPress={() => router.navigate("/carbon-credit")}>
-                <Text style={styles.buttonText}>Buy a credit</Text>
+                <ThemedText style={styles.buttonText}>Buy a credit</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity style={styles.button} onPress={() => router.navigate("/carbon-credit-sub")}>
-                <Text style={styles.buttonText}>Carbon Credit Subscription</Text>
+                <ThemedText style={styles.buttonText}>Carbon Credit Subscription</ThemedText>
               </TouchableOpacity>
             </View>
-          </View>
+          </ThemedView>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Reduce with Habitual Changes</Text>
-            <Text style={styles.sectionText}>
+          <ThemedView style={styles.section}>
+            <ThemedText style={styles.sectionTitle}>Reduce with Habitual Changes</ThemedText>
+            <ThemedText style={styles.sectionText}>
               If you want to reduce your emissions with habitual changes, subscribe to our newsletter to learn about
               habitual changes. This is a free and easy way to make small changes that can have massive impacts over
               time.
-            </Text>
+            </ThemedText>
             <View style={styles.centeredButtonContainer}>
               <Pressable
                 style={[styles.button, loading && styles.disabledButton]}
@@ -93,34 +92,32 @@ export default function OffsetNowScreen() {
                 disabled={loading || isNewsletterSubscribed}
               >
                 {loading ? (
-                  <Text style={styles.buttonText}>Loading...</Text>
+                  <ThemedText style={styles.buttonText}>Loading...</ThemedText>
                 ) : isNewsletterSubscribed ? (
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                     <Ionicons name="checkmark-circle" size={24} color="white" />
-                    <Text style={styles.buttonText}>Subscribed</Text>
+                    <ThemedText style={styles.buttonText}>Subscribed</ThemedText>
                   </View>
                 ) : (
-                  <Text style={styles.buttonText}>Subscribe</Text>
+                  <ThemedText style={styles.buttonText}>Subscribe</ThemedText>
                 )}
               </Pressable>
             </View>
-          </View>
+          </ThemedView>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   content: {
     padding: 24,
   },
   section: {
-    backgroundColor: "#EEEEEE",
     borderRadius: 12,
     padding: 16,
     marginVertical: 24,
