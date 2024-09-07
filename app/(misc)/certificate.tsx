@@ -1,39 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Dimensions, Image, TouchableOpacity, Modal } from 'react-native';
-import { PageHeader, BackButton } from '@/components/common';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Modal } from "react-native";
+import { PageHeader, BackButton, ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
+import { router } from "expo-router";
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+// Add print and stuff
+import { printToFileAsync } from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
+export default function Certificate() {
+  let [name, setName] = useState('');
 
-const pdf: React.FC = () => {
-    const onlineSource = { uri: '', cache: true };
+  const html = `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+          }
+          h1 {
+            color: #333;
+          }
+          img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 16px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Congratulations!</h1>
+        <p>You have successfully completed the course.</p>
+        <img src="https://i.imgur.com/2wTbL6U.png" alt="Certificate" />
+        <p>Issued to: ${name}</p>
+      </body>
+    </html>
+  `;
+
+  let generatePdf = async () => {
+    const file = await printToFileAsync({ 
+      html: html,
+      base64: false
+    });
+    await shareAsync(file.uri);
+  };
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <PageHeader title="Forever" titleAlt="green" subtitle="Certificate print" description="Lets test if we can print a certificate" />
+        <PageHeader subtitle="rick" description="Build a sustainable future by living net-zero" />
         <BackButton />
-        
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => {
-            console.log('Print certificate');
-          }}
-          >
-            
-          </TouchableOpacity>
 
-        </ScrollView>
-      
-    </SafeAreaView>
+        <View style={styles.mainContent}>
+          <TouchableOpacity style={styles.factButton} onPress={() => {generatePdf()}}></TouchableOpacity>
+        </View>
+      </ScrollView>
+    </ThemedSafeAreaView>
   );
-};
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -41,124 +72,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   mainContent: {
-    flexDirection: 'row',
+    flexDirection: "row",
     flex: 2,
     marginTop: 16,
   },
-  progressBarContainer: {
-    width: 30,
-    marginRight: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  progressBar: {
-    transform: [{ rotate: '90deg' }],
-  },
-  prizesContainer: {
-    flex: 1,
-    marginLeft: 36,
-  },
-  prizeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingRight: 16, // Add some padding to the right for the text
-  },
-  card: {
+  factButton: {
+    justifyContent: "center", // Center the text vertically
+    alignItems: "center",
+    marginTop: 16,
     backgroundColor: "#22C55E",
-    padding: 12,
-    borderRadius: 16,
-    height: 100,
-    width: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  grayCard: {
-    backgroundColor: "#A0A0A0",
-    padding: 12,
-    borderRadius: 16,
-    height: 100,
-    width: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  cardImage: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    height: 76,
-    width: 76,
+    borderRadius: 50,
+    height: 40,
+    width: 150,
+    paddingVertical: 4,
+    paddingHorizontal: 16,
+    marginHorizontal: "auto",
   },
   
-  boxText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  netZeroMonthsText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  modalBody: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  modalImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-  },
-  modalTextContainer: {
-    flex: 1,
-  },
-  modalDescription: {
-    fontSize: 16,
-  },
-  closeButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#22C55E',
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  pdf: {
-    flex:1,
-    alignSelf:'stretch',
-
-    }
 });
-
-export default pdf;

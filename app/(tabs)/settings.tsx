@@ -241,6 +241,8 @@ export default function ProfileScreen() {
           <SettingsItem title="Purchase History" screen="/purchase-history" />
           <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
+          <SettingsItem title="Certificates" screen="/certificate" />
+
 
           <EmissionsOffset
             monthlyEmissions={monthlyEmissions}
