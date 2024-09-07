@@ -5,6 +5,7 @@ import { PageHeader, BackButton, ThemedSafeAreaView, ThemedText } from "@/compon
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
 import { fetchEmissionsData } from "@/api/emissions"; // Assume this function exists to fetch user data
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 const prizeImages = [Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck];
 
@@ -95,6 +96,7 @@ const Journey: React.FC = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <PageHeader subtitle="Sustainability Journey" description="Build a sustainable future by living net-zero" />
         <BackButton />
@@ -105,7 +107,7 @@ const Journey: React.FC = () => {
               progress={progress}
               width={totalHeight}
               height={20}
-              color="#409858"
+              color="#22C55E"
               unfilledColor="#FFF"
               borderColor="#000"
               borderWidth={1.5}
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     paddingRight: 16, // Add some padding to the right for the text
   },
   card: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     padding: 12,
     borderRadius: 16,
     height: 100,
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 5,
   },
   closeButtonText: {

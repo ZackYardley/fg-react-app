@@ -147,7 +147,7 @@ const HomeScreen = () => {
               <BarChartBreakdown
                 names={["You", "Average American"]}
                 values={[totalEmissions - totalOffset, 21]}
-                colors={["#44945F", "#A9A9A9"]}
+                colors={["#22C55E", "#A9A9A9"]}
                 width={width - 128}
                 backgroundColor={backgroundColor}
               />
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // Center the text vertically
     alignItems: "center",
     marginTop: 16,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     height: 40,
     width: 150,

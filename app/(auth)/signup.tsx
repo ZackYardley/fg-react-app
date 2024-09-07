@@ -5,6 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "expo-router";
 import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
 import { GreenButton, TitleWithLogo, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
+import { StatusBar } from "expo-status-bar";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ export default function SignupScreen() {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <KeyboardAvoidingView style={styles.safeArea}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
           <View style={[styles.contentContainer, { minHeight: height }]}>
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   titleHighlight: {
-    color: "#409858",
+    color: "#22C55E",
   },
   logoContainer: {
     alignItems: "center",
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   createAccountButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
     padding: 16,
     marginTop: 32,
@@ -172,7 +174,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   createAccountButtonText: {
-    color: "#fff",
     textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",

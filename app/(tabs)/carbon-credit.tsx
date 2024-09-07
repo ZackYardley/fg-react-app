@@ -13,6 +13,7 @@ import { darkenColor, formatPrice } from "@/utils";
 import { CarbonCredit, CartItem } from "@/types";
 import { ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 export default function CarbonCreditScreen() {
   const [selectedProject, setSelectedProject] = useState<CarbonCredit | null>(null);
@@ -21,7 +22,7 @@ export default function CarbonCreditScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const card = useThemeColor({}, "card");
 
   useEffect(() => {
     const initializeData = async () => {
@@ -101,7 +102,7 @@ export default function CarbonCreditScreen() {
       name={null}
       price={null}
       image={null}
-      colors={[primaryContainer, darkenColor(primaryContainer, 0.1), darkenColor(primaryContainer, 0.2)]}
+      colors={[card, darkenColor(card, 0.1), darkenColor(card, 0.2)]}
       onPress={() => {}}
       isSkeleton={true}
     />
@@ -118,7 +119,7 @@ export default function CarbonCreditScreen() {
     <>
       <View style={styles.projectContainer}>
         {loading ? (
-          <View style={[styles.skeletonCard, { height: 200, backgroundColor: primaryContainer }]} />
+          <View style={[styles.skeletonCard, { height: 200, backgroundColor: card }]} />
         ) : (
           selectedProject && <ProjectCard project={selectedProject} />
         )}
@@ -177,6 +178,7 @@ export default function CarbonCreditScreen() {
 
   return (
     <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <StatusBar />
       <View style={{ flexGrow: 1 }}>{renderContent()}</View>
     </ThemedSafeAreaView>
   );
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   button: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     padding: 16,
     marginHorizontal: "auto",
     borderRadius: 9999,

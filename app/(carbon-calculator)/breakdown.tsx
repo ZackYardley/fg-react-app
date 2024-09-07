@@ -12,6 +12,7 @@ import { BackButton, Loading, PageHeader, ThemedSafeAreaView, ThemedText, Themed
 import { useThemeColor } from "@/hooks";
 import { useLocalSearchParams } from "expo-router";
 import dayjs from "dayjs";
+import { StatusBar } from "expo-status-bar";
 
 const Breakdown = () => {
   const { from } = useLocalSearchParams<{ from: string }>();
@@ -30,7 +31,7 @@ const Breakdown = () => {
   const backgroundColor = useThemeColor({}, "background");
   const onPrimary = useThemeColor({}, "onPrimary");
   const primary = useThemeColor({}, "primary");
-  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const card = useThemeColor({}, "card");
 
   const explosionRef = useRef<ConfettiCannon>(null);
 
@@ -80,7 +81,6 @@ const Breakdown = () => {
   }
 
   const netImpact = monthlyEmissions - totalOffset;
-  const isPositiveImpact = netImpact <= 0;
 
   // Generate a list of 6 months ago to now
   const months = [];
@@ -91,6 +91,7 @@ const Breakdown = () => {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <ScrollView style={styles.scrollView}>
         <PageHeader
           title="Forever"
@@ -221,7 +222,7 @@ const Breakdown = () => {
                   values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
                   colors={["#44945F", "#A9A9A9"]}
                   width={width - 104}
-                  backgroundColor={primaryContainer}
+                  backgroundColor={card}
                 />
               </View>
             </ThemedView>
@@ -440,7 +441,7 @@ const styles = StyleSheet.create({
     height: 64,
     width: 64,
     borderColor: "black",
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     justifyContent: "center",
     alignItems: "center",
   },

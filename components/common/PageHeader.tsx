@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     maxWidth: 256,
   },
   titleGreen: {
-    color: "#409858",
+    color: "#22C55E",
   },
   subtitle: {
     fontSize: 24,

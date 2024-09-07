@@ -8,6 +8,7 @@ import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText } from "@/compon
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 export default function ProfileSettings() {
   const textColor = useThemeColor({}, "text");
@@ -75,6 +76,7 @@ export default function ProfileSettings() {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Profile Settings" />
         <BackButton />
@@ -157,7 +159,7 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     marginTop: 10,
-    color: "#409858",
+    color: "#22C55E",
     fontSize: 18,
     fontWeight: "500",
   },
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 30,
     padding: 10,
     alignItems: "center",

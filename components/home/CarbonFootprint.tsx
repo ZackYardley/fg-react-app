@@ -23,7 +23,7 @@ const CarbonFootprintSection = ({
 
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
-  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const backgroundColor = useThemeColor({}, "card");
 
   return (
     <View style={styles.footprintContainer}>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     width: "22%",
   },
   greenButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     width: "22%",
   },
   wideButton: {

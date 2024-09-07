@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   referButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     marginLeft: 5,
     borderRadius: 50,
     alignItems: "center",

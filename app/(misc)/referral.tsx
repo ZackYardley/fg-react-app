@@ -2,6 +2,7 @@ import { incrementUserReferrals, sendReferralEmail } from "@/api/referral";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, Alert } from "react-native";
@@ -54,6 +55,7 @@ const ReferralForm = () => {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
     top: 200,
     left: 200,
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 200,
     height: 200,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 100,
     bottom: 100,
     right: 300,
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 90,
     paddingVertical: 12,
     paddingHorizontal: 32,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
   },
   submitButtonText: {

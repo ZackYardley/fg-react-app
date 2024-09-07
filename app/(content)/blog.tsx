@@ -53,7 +53,7 @@ const POSTS = posts
 export default function ForevergreenBlogsPage() {
   return (
     <ThemedSafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         <PageHeader subtitle="Blogs" />
         <BackButton />

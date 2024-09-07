@@ -38,12 +38,12 @@ const sendWelcomeEmail = async (email: string, name: string): Promise<void> => {
     </ul>
     <h3>Getting Started:</h3>
     <ol>
-      <li><strong>Log In:</strong> Visit our platform [here] and log in using the credentials you used to sign up.</li>
+      <li><strong>Log In:</strong> Visit our platform <a href="https://fg-react-app.web.app/">here</a> and log in using the credentials you used to sign up.</li>
       <li><strong>Complete Your Profile:</strong> Tell us more about yourself and your sustainability goals.</li>
       <li><strong>Calculate Your Footprint:</strong> Use our carbon calculator to get started on your sustainability journey.</li>
       <li><strong>Explore:</strong> Discover the various actions you can take to reduce your carbon footprint, from everyday changes to larger commitments.</li>
     </ol>
-    <p>We’re here to support you every step of the way. If you have any questions or need assistance, don’t hesitate to reach out to our support team at info@forevergreen.earth or check out our [Help Center/FAQ page].</p>
+    <p>We’re here to support you every step of the way. If you have any questions or need assistance, don’t hesitate to reach out to our support team at info@forevergreen.earth or check out our <a href="https://www.forevergreen.earth/about">Help Center/FAQ page</a>.</p>
     <p>Thank you for joining Forevergreen—together, we can create a greener, more sustainable world!</p>
   `;
 

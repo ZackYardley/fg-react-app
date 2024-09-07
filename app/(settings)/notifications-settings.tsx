@@ -4,6 +4,7 @@ import messaging from "@react-native-firebase/messaging";
 import { Notifications } from "@/api/notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
+import { StatusBar } from "expo-status-bar";
 
 const NotificationSettingsScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -40,7 +41,7 @@ const NotificationSettingsScreen = () => {
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: "#767577", true: "#409858" }}
+        trackColor={{ false: "#767577", true: "#22C55E" }}
         thumbColor={value ? "#f4f3f4" : "#f4f3f4"}
       />
     </ThemedView>
@@ -48,6 +49,7 @@ const NotificationSettingsScreen = () => {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <View style={[styles.circle, styles.topLeftCircle]} />
         <View style={[styles.circle, styles.bottomRightCircle]} />
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
   },
   topLeftCircle: {

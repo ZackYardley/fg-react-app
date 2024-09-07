@@ -12,6 +12,7 @@ import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { SurveyData, SurveyEmissions } from "@/types";
 import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function TransportationCalculator() {
   const [surveyData, setSurveyData] = useState<SurveyData>({
@@ -159,6 +160,7 @@ export default function TransportationCalculator() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.contentContainer}>

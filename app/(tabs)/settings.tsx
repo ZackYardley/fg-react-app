@@ -8,7 +8,6 @@ import { Image } from "expo-image";
 import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchSetupPaymentSheetParams } from "@/api/purchase";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription } from "@/api/products";
@@ -209,7 +208,7 @@ export default function ProfileScreen() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
@@ -426,7 +425,7 @@ const styles = StyleSheet.create({
     color: "black",
   },
   offsetButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 999, // Slightly rounded corners
     paddingHorizontal: 28,
     paddingVertical: 12,

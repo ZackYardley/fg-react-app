@@ -243,8 +243,8 @@ export default function EnergyCalculator() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <StatusBar />
         <View style={styles.contentContainer}>
           <Header progress={progress} title="Energy" />
           <ThemedText>
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   locationButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 50,

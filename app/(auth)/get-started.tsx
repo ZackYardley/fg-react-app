@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, StatusBar, Image, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
@@ -17,22 +17,28 @@ export default function GetStartedScreen() {
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = APP_URL;
-      if (window.location.href === APP_URL) {
-        window.location.reload();
-      } else {
-        setError("Looks like you don't have the app installed. Please download it from the app store.");
+      if (!(window.location.href === APP_URL)) {
+        setError(
+          "Looks like you don't have the app installed or your platform does not support it. Download it from the App Store or Google Play Store today!"
+        );
       }
     } else {
       Linking.openURL(APP_URL);
     }
   };
 
+  useEffect(() => {
+    if (Platform.OS === "web" && window.location.href !== APP_URL) {
+      window.location.href = APP_URL;
+    }
+  }, []);
+
   if (Platform.OS === "web") {
     return (
       <ScrollView style={styles.webContainer}>
         <View style={styles.webContent}>
           <Text style={styles.webTitle}>
-            Forever<Text style={styles.webTitleGreen}>green</Text>
+            Forever<Text style={{ color: primaryColor }}>green</Text>
           </Text>
           <View style={styles.centeredContent}>
             <Text style={styles.description}>
@@ -156,6 +162,7 @@ const styles = StyleSheet.create({
   },
   webContainer: {
     flex: 1,
+    paddingVertical: 20,
     backgroundColor: "#f0f4f0",
   },
   webContent: {
@@ -170,9 +177,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 40,
     color: "#333",
-  },
-  webTitleGreen: {
-    color: "#409858",
   },
   centeredContent: {
     backgroundColor: "white",
@@ -199,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "#409858",
+    color: "#22C55E",
     textDecorationLine: "underline",
   },
   feature: {
@@ -213,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   webButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     paddingHorizontal: 40,
     borderWidth: 0,

@@ -5,6 +5,7 @@ import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } fr
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
 
 export default function OffsetNowScreen() {
   const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
@@ -40,6 +41,7 @@ export default function OffsetNowScreen() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Offset your Emissions!" description="Reduce your climate impact in a few clicks" />
         <BackButton />
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   button: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     padding: 16,
     borderRadius: 9999,
   },

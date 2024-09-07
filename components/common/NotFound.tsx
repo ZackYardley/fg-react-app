@@ -4,11 +4,13 @@ import { fourofour } from "@/constants/Images";
 import ThemedSafeAreaView from "./ThemedSafeAreaView";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 const NotFoundComponent = () => {
   const onPrimary = useThemeColor({}, "onPrimary");
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ThemedText style={styles.errorCode}>404</ThemedText>
       <ThemedText style={styles.errorMessage}>Page Not Found</ThemedText>
       <Image source={fourofour} style={styles.image} />
@@ -31,7 +33,7 @@ const styles = StyleSheet.create({
   errorCode: {
     fontSize: 72,
     fontWeight: "bold",
-    color: "#409858",
+    color: "#22C55E",
   },
   errorMessage: {
     fontSize: 24,
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   button: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 40,

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     top: 16,
     right: 16,
     padding: 10,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
   },
   badge: {

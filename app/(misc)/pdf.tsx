@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     paddingRight: 16, // Add some padding to the right for the text
   },
   card: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     padding: 12,
     borderRadius: 16,
     height: 100,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#409858',
+    backgroundColor: '#22C55E',
     borderRadius: 5,
   },
   closeButtonText: {

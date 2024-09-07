@@ -199,23 +199,23 @@ const CarbonCreditSubscriptionScreen = () => {
             </ThemedText>
             <ThemedText style={styles.cardDescription}>Offset your calculated carbon emissions</ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#409858" />
+              <Icon name="check" size={24} color="#22C55E" />
               <Text style={{ fontWeight: "bold" }}>Purchase of Carbon Credits: </Text>
               Includes buying the nearest whole number of carbon credits to ensure you are net zero.
             </ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#409858" />
+              <Icon name="check" size={24} color="#22C55E" />
               <Text style={{ fontWeight: "bold" }}>Hassle-Free: </Text>
               Easy way to reduce your environmental impact.
             </ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#409858" />
+              <Icon name="check" size={24} color="#22C55E" />
               <Text style={{ fontWeight: "bold" }}>Support Climate Projects: </Text>
               Contributes to awesome climate initiatives.
             </ThemedText>
             {isSubscribed ? (
               <View style={styles.subscribedContainer}>
-                <Ionicons name="checkmark-circle" size={24} color="#409858" />
+                <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
                 <ThemedText style={styles.subscribedText}>Subscribed</ThemedText>
               </View>
             ) : (
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
     bottom: "15%",
     right: "-35%",
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
     top: "25%",
     left: "-25%",
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subscribeButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   subscribedText: {
     marginLeft: 5,
-    color: "#409858",
+    color: "#22C55E",
     fontWeight: "bold",
   },
   sectionTitle: {

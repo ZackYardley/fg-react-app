@@ -14,6 +14,7 @@ import {
 } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { ActivityIndicator } from "react-native-paper";
+import { StatusBar } from "expo-status-bar";
 
 const ForevergreenSubscriptions = () => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
@@ -87,6 +88,7 @@ const ForevergreenSubscriptions = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={styles.scrollView}>
         <View style={styles.greenCircleLarge} />
         <View style={styles.greenCircleSmall} />
@@ -139,7 +141,7 @@ const ForevergreenSubscriptions = () => {
                 </View> */}
                 <View style={styles.subscriptionItem}>
                   {loading ? (
-                    <ActivityIndicator size="small" color="#409858" />
+                    <ActivityIndicator size="small" color="#22C55E" />
                   ) : isSubscribed ? (
                     <Ionicons name="checkmark" size={18} color="green" />
                   ) : (
@@ -149,7 +151,7 @@ const ForevergreenSubscriptions = () => {
                 </View>
                 <View style={styles.subscriptionItem}>
                   {loading ? (
-                    <ActivityIndicator size="small" color="#409858" />
+                    <ActivityIndicator size="small" color="#22C55E" />
                   ) : isNewsletterSubscribed ? (
                     <Ionicons name="checkmark" size={18} color="green" />
                   ) : (
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
     bottom: "15%",
     right: "-35%",
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
     top: "25%",
     left: "-25%",
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 24,

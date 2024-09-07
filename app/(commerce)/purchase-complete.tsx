@@ -17,6 +17,7 @@ import { darkenColor, formatPrice } from "@/utils";
 import { fetchCreditRequestByPaymentId } from "@/api/purchase";
 import { ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 interface CreditWithQuantity extends CarbonCredit {
   quantity: number;
@@ -47,7 +48,7 @@ const PurchaseCompleteScreen = () => {
   const [credits, setCredits] = useState<CreditWithQuantity[]>([]);
   const [totalCO2Offset, setTotalCO2Offset] = useState(0);
   const [loading, setLoading] = useState(true);
-  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const card = useThemeColor({}, "card");
   const textColor = useThemeColor({}, "text");
 
   useEffect(() => {
@@ -221,6 +222,7 @@ const PurchaseCompleteScreen = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={{ flexGrow: 1 }}>
         <PageHeader
           title="Thank you for your "
@@ -229,7 +231,7 @@ const PurchaseCompleteScreen = () => {
         <View style={{ paddingHorizontal: 16 }}>
           <LinearGradient
             style={styles.card}
-            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
+            colors={[card, darkenColor(card, 10)]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >
@@ -238,7 +240,7 @@ const PurchaseCompleteScreen = () => {
 
           <LinearGradient
             style={styles.infoContainer}
-            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
+            colors={[card, darkenColor(card, 10)]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >
@@ -266,7 +268,7 @@ const PurchaseCompleteScreen = () => {
             ) : (
               <ThemedText style={styles.infoTitle}>
                 You will be receiving an email with more
-                <Text style={{ color: "#409858" }}> information shortly!</Text>
+                <Text style={{ color: "#22C55E" }}> information shortly!</Text>
               </ThemedText>
             )}
             <Image source={Pamona} style={styles.infoImage} />
@@ -274,7 +276,7 @@ const PurchaseCompleteScreen = () => {
               <TouchableOpacity onPress={() => router.push("/home")} style={styles.button}>
                 <LinearGradient
                   style={styles.buttonGradient}
-                  colors={["#409858", "#B1E8C0"]}
+                  colors={["#22C55E", "#B1E8C0"]}
                   start={{ x: 0.4, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
                 >

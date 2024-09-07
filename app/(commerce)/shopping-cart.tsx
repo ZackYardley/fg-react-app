@@ -251,11 +251,11 @@ export default function ShoppingCartScreen() {
   const ListEmptyComponent = () =>
     loading ? (
       <View style={[styles.centered, { marginBottom: 16 }]}>
-        <ActivityIndicator size="large" color="#409858" />
+        <ActivityIndicator size="large" color="#22C55E" />
       </View>
     ) : (
       <ThemedView style={styles.emptyCartContainer}>
-        <Ionicons name="cart" size={64} color="#409858" />
+        <Ionicons name="cart" size={64} color="#22C55E" />
         <ThemedText style={styles.emptyCartTitle}>Your cart is empty</ThemedText>
         <ThemedText style={styles.emptyCartText}>
           Start adding carbon credits to make a positive impact on the environment!
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
     bottom: "15%",
     right: "-35%",
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
     top: "25%",
     left: "-25%",
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   purchaseButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     padding: 16,
     alignItems: "center",
@@ -385,13 +385,13 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     borderWidth: 2,
-    borderColor: "#409858",
+    borderColor: "#22C55E",
     borderRadius: 50,
     padding: 16,
     alignItems: "center",
   },
   continueButtonText: {
-    color: "#409858",
+    color: "#22C55E",
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   emptyCartTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#409858",
+    color: "#22C55E",
     marginTop: 16,
     marginBottom: 8,
   },

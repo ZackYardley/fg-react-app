@@ -5,9 +5,11 @@ import { StatusBar } from "expo-status-bar";
 import { handleResetPassword } from "@/api/auth";
 import { GreenButton, CustomTextInput, GoogleButton, OrLine, TitleWithLogo } from "@/components/auth";
 import { ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { useThemeColor } from "@/hooks";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
+  const primary = useThemeColor({}, "primary");
 
   return (
     <ThemedSafeAreaView style={styles.container}>
@@ -97,7 +99,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   resetButton: {
-    backgroundColor: "#409858",
     borderRadius: 9999,
     padding: 16,
     marginTop: 16,
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   resetButtonText: {
-    color: "#FFF",
     textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",

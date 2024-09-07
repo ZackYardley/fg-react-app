@@ -20,8 +20,10 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "buildNumber": "2",
-      "associatedDomains": ["applinks:fg-react-app.web.app"],
+      "buildNumber": "5",
+      "associatedDomains": [
+        "applinks:fg-react-app.web.app"
+      ],
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -46,7 +48,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -79,6 +84,8 @@
       ],
       "@react-native-google-signin/google-signin",
       "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
       [
         "@stripe/stripe-react-native",
         {

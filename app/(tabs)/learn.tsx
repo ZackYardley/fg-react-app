@@ -60,7 +60,7 @@ const LearnScreen = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
           <View style={[styles.circle, styles.topLeftCircle]} />
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
   },
   topLeftCircle: {
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   greenText: {
-    color: "#409858",
+    color: "#22C55E",
   },
   subtitleText: {
     fontSize: 30,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 10,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",

@@ -18,7 +18,7 @@ const EmissionsOffset = ({
 }) => {
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
-  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const backgroundColor = useThemeColor({}, "card");
 
   return (
     <View style={[styles.carbonFootprint, { backgroundColor }]}>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   offsetButton: {
     marginTop: 10,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     alignItems: "center",
     alignSelf: "center",

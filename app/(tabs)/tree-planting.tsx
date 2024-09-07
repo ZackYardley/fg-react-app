@@ -7,6 +7,7 @@ import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/compon
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 export default function TreePlantingScreen() {
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -88,6 +89,7 @@ export default function TreePlantingScreen() {
 
   return (
     <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <Overlay
           isVisible={overlayVisible}
@@ -280,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   subscriptionButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     padding: 16,
     borderRadius: 24,
   },
@@ -310,7 +312,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 9999,
   },
   overlayNoButton: {

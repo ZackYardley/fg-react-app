@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // Initialize debugMode with useState
 export default function Index() {
-  const [debugMode, setDebugMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [hasCalculatedEmissions, setHasCalculatedEmissions] = useState(false);
@@ -41,8 +40,6 @@ export default function Index() {
           setUser(null);
           setIsAnonymous(false);
         }
-
-        setDebugMode(!!process.env.EXPO_PUBLIC_APP_ENV);
       } catch {
         setUser(null);
         setIsAnonymous(false);
@@ -60,7 +57,7 @@ export default function Index() {
     return <Loading />;
   }
 
-  if (debugMode) {
+  if (process.env.EXPO_PUBLIC_APP_ENV === "development") {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
         <ScrollView contentContainerStyle={styles.container}>
@@ -77,7 +74,24 @@ export default function Index() {
           </View>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => setDebugMode(false)} // Update debugMode state
+            onPress={() => {
+              if (!user) {
+                return <Redirect href="/get-started" />;
+              } else if (isAnonymous) {
+                if (!hasCalculatedEmissions) {
+                  return <Redirect href="/pre-survey" />;
+                } else {
+                  return <Redirect href="/signup" />;
+                }
+              } else {
+                // Regular user
+                if (!hasCalculatedEmissions) {
+                  return <Redirect href="/pre-survey" />;
+                } else {
+                  return <Redirect href="/home" />;
+                }
+              }
+            }}
           >
             <View style={styles.buttonContent}>
               <View style={styles.buttonLabel}>

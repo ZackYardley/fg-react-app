@@ -37,7 +37,7 @@ const Legend: React.FC<{ datasets: Dataset[] }> = ({ datasets }) => {
 const LineChartBreakdown = ({ userId }: { userId?: string }) => {
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
-  const backgroundColor = useThemeColor({}, "primaryContainer");
+  const backgroundColor = useThemeColor({}, "card");
   const textColor = useThemeColor({}, "text");
   const [emissionsData, setEmissionsData] = useState<number[]>([]);
   const [offsetData, setOffsetData] = useState<number[]>([]);
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   offsetButton: {
     marginTop: 10,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     alignItems: "center",
     alignSelf: "center",

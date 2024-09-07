@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // Center the text vertically
     alignItems: "center",
     marginTop: 16,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     height: 40,
     width: 150,

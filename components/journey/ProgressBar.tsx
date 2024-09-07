@@ -19,7 +19,7 @@ const Header = ({ progress, title }: any) => {
           <Progress.Bar
             progress={progress}
             width={null}
-            color="#409858"
+            color="#22C55E"
             unfilledColor="#FFF"
             borderColor="#000"
             borderWidth={1.5}

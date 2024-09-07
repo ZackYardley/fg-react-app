@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { ThemedSafeAreaView, ThemedText } from "../common";
+import { StatusBar } from "expo-status-bar";
 
 const icons = ["hourglass-start", "hourglass-half", "hourglass-end"];
 
@@ -18,6 +19,7 @@ const CalculatingScreen = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <View style={styles.greenCircleLarge} />
       <View style={styles.greenCircleSmall} />
 
@@ -30,7 +32,7 @@ const CalculatingScreen = () => {
       <View style={styles.resultContainer}>
         <ThemedText style={styles.resultText}>Calculating your result</ThemedText>
         <View style={styles.iconContainer}>
-          <Icon name={icons[iconIndex]} size={100} color="#409858" />
+          <Icon name={icons[iconIndex]} size={100} color="#22C55E" />
         </View>
       </View>
     </ThemedSafeAreaView>
@@ -48,7 +50,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 150,
     bottom: -8,
     right: "-25%",
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 200,
     height: 200,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 100,
     top: -32,
     left: "-25%",
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   titleHighlight: {
-    color: "#409858", // Assuming this is your primary color
+    color: "#22C55E", // Assuming this is your primary color
   },
   resultContainer: {
     marginTop: 160,
