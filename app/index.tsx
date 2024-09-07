@@ -42,7 +42,8 @@ export default function Index() {
           setIsAnonymous(false);
         }
 
-        setDebugMode(!!process.env.EXPO_PUBLIC_APP_ENV);
+       // setDebugMode(!!process.env.EXPO_PUBLIC_APP_ENV);
+        setDebugMode(true);
       } catch {
         setUser(null);
         setIsAnonymous(false);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { getAuth, updateProfile } from "firebase/auth";
+import { getAuth, updateProfile, sendEmailVerification } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText } from "@/components/common";
@@ -17,12 +17,15 @@ export default function ProfileSettings() {
   const [user, setUser] = useState(auth.currentUser);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [profileImage, setProfileImage] = useState(user?.photoURL || null);
+  const [isEmailVerified, setIsEmailVerified] = useState(user?.emailVerified || false);
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       setDisplayName(user?.displayName || "");
       setProfileImage(user?.photoURL || null);
+      setIsEmailVerified(user?.emailVerified || false);
     });
 
     return () => unsubscribe();
@@ -73,6 +76,18 @@ export default function ProfileSettings() {
     }
   };
 
+  const sendVerificationEmail = async () => {
+    if (user && !user.emailVerified) {
+      try {
+        await sendEmailVerification(user);
+        Alert.alert("Success", "Verification email sent. Please check your inbox.");
+      } catch (error) {
+        console.error("Error sending verification email: ", error);
+        Alert.alert("Error", "Failed to send verification email. Please try again.");
+      }
+    }
+  };
+
   return (
     <ThemedSafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
@@ -109,6 +124,17 @@ export default function ProfileSettings() {
 
             <ThemedText style={styles.label}>Email</ThemedText>
             <ThemedText style={styles.emailText}>{user?.email}</ThemedText>
+
+            <View style={styles.verificationContainer}>
+              <ThemedText style={styles.verificationText}>
+                Email Verification Status: {isEmailVerified ? "Verified" : "Not Verified"}
+              </ThemedText>
+              {!isEmailVerified && (
+                <TouchableOpacity style={styles.verifyButton} onPress={sendVerificationEmail}>
+                  <ThemedText style={styles.verifyButtonText}>Send Verification Email</ThemedText>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
@@ -193,6 +219,25 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "#fff",
     fontSize: 24,
+    fontWeight: "600",
+  },
+  verificationContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  verificationText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  verifyButton: {
+    backgroundColor: "#409858",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "600",
   },
 });

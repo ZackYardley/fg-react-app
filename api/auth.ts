@@ -14,6 +14,7 @@ import {
   signInWithEmailAndPassword,
   deleteUser,
   reauthenticateWithCredential,
+  sendEmailVerification,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -81,8 +82,13 @@ const handleUserRedirection = async () => {
 };
 
 /* Function to sign up the user with the email and password */
-const onSignup = async (email: string, password: string, name: string) => {
+const onSignup = async (email: string, password: string, confirmPassword: string, name: string) => {
   const auth = getAuth();
+
+  if (password !== confirmPassword) {
+    Alert.alert("Error", "Passwords do not match");
+    return;
+  }
 
   try {
     if (auth.currentUser && auth.currentUser.isAnonymous) {
@@ -106,8 +112,11 @@ const onSignup = async (email: string, password: string, name: string) => {
         email,
         isAnonymous: false,
       });
+
+      await sendEmailVerification(auth.currentUser!);
     }
 
+    Alert.alert("Success", "Account created successfully. Please check your email for verification.");
     await handleUserRedirection();
   } catch (error: any) {
     Alert.alert("Error", `Code: ${error.code}\nMessage: ${error.message}`);
@@ -203,6 +212,18 @@ const onGoogleLogin = async () => {
   }
 };
 
+const checkEmailVerification = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    await user.reload();
+    return user.emailVerified;
+  }
+
+  return false;
+};
+
 const logout = async () => {
   const auth = getAuth();
   try {
@@ -279,4 +300,5 @@ export {
   logout,
   handleResetPassword,
   deleteUserAccount,
+  checkEmailVerification,
 };
