@@ -3,15 +3,16 @@ import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Modal } from "re
 import * as Progress from "react-native-progress";
 import { PageHeader, BackButton, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck } from "@/constants/Images";
-import { fetchEmissionsData } from "@/api/emissions"; // Assume this function exists to fetch user data
+import { fetchJourneyData } from "@/api/journey"; // Updated import
 import { useThemeColor } from "@/hooks";
 import { StatusBar } from "expo-status-bar";
+import { JourneyDocument } from "@/types";
 
 const prizeImages = [Sticker, Tote, Shirt, WaterBottle, CuttingBoard, Crewneck];
 
 const prizeNames = ["Sticker", "Tote Bag", "T-Shirt", "Water Bottle", "Cutting Board", "Crewneck Sweater"];
 
-const prizeMonths = [1, 3, 6, 12, 18, 24];
+const prizeMonths = ["1 Month", "3 Months", "6 Months", "12 Months", "18 Months","24 Months"];
 
 const prizeDescriptions = [
   "Welcome to the club! Enjoy this cool sticker to rep your new net-zero status 😎",
@@ -33,11 +34,12 @@ const lockedPrizeDescriptions = [
 
 const Journey: React.FC = () => {
   const [selectedPrize, setSelectedPrize] = useState<number | null>(null);
+  const [journeyData, setJourneyData] = useState<JourneyDocument | null>(null);
+  const [progress, setProgress] = useState(0);
+
   const cardHeight = 100;
   const cardGap = 16;
   const totalHeight = 6 * cardHeight + 5 * cardGap + 30;
-  const [netZeroMonths, setNetZeroMonths] = useState(0);
-  const [progress, setProgress] = useState(0);
 
   const backgroundColor = useThemeColor({}, "background");
 
@@ -68,18 +70,16 @@ const Journey: React.FC = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchEmissionsData();
-      if (data !== null) {
-        const netZero = data.totalOffset >= data.monthlyEmissions;
-        if (netZero && data.monthlyEmissions > 0) {
-          const months = Math.floor(data.totalOffset - data.monthlyEmissions);
-          const cappedMonths = Math.min(24, Math.max(0, months));
-          setNetZeroMonths(cappedMonths);
+      try {
+        const data = await fetchJourneyData();
+        if (data) {
+          setJourneyData(data);
+          const cappedMonths = Math.min(24, Math.max(0, data.netZeroMonths));
           setProgress(cappedMonths / 24); // 24 months is the maximum
-        } else {
-          setNetZeroMonths(0);
-          setProgress(0);
         }
+      } catch (error) {
+        console.error('Error loading journey data:', error);
+        // Handle error (e.g., show an error message to the user)
       }
     };
 
@@ -87,6 +87,7 @@ const Journey: React.FC = () => {
   }, []);
 
   const getPrizeDescription = (index: number) => {
+    const netZeroMonths = journeyData?.netZeroMonths || 0;
     if (netZeroMonths >= prizeMonths[index]) {
       return prizeDescriptions[index];
     } else {
@@ -118,7 +119,7 @@ const Journey: React.FC = () => {
           <View style={styles.prizesContainer}>
             {prizeImages.map((image, index) => (
               <TouchableOpacity key={index} style={styles.prizeRow} onPress={() => setSelectedPrize(index)}>
-                <View style={netZeroMonths >= prizeMonths[index] ? styles.card : styles.grayCard}>
+                <View style={(journeyData?.netZeroMonths || 0) >= prizeMonths[index] ? styles.card : styles.grayCard}>
                   <Image source={image} style={styles.cardImage} />
                 </View>
                 <ThemedText style={styles.boxText}>{prizeMonths[index]}</ThemedText>

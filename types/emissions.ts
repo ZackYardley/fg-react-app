@@ -70,4 +70,10 @@ interface CommunityEmissionsData {
 
 type EmissionGroup = "Transportation" | "Diet" | "Energy";
 
-export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData, EmissionGroup };
+interface JourneyDocument {
+  netZeroMonths: number;
+  lastUpdated: Date;
+  // Add any other relevant fields
+}
+
+export { StateData, SurveyEmissions, SurveyData, EmissionsDocument, CommunityEmissionsData, EmissionGroup, JourneyDocument };

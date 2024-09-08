@@ -334,3 +334,36 @@ exports.handleCarbonCreditSubscriptionPayment = functions.firestore
         return null;
       }
     });
+
+    exports.updateNetZeroProgress = functions.pubsub.schedule('0 0 1 * *').onRun(async (context) => {
+      const db = admin.firestore();
+      const now = new Date();
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const lastMonthId = `${lastMonth.getFullYear()}-${(lastMonth.getMonth() + 1).toString().padStart(2, '0')}`;
+    
+      const usersRef = db.collection('users');
+      const userSnapshot = await usersRef.get();
+    
+      const batch = db.batch();
+    
+      for (const userDoc of userSnapshot.docs) {
+        const userId = userDoc.id;
+        const emissionsRef = usersRef.doc(userId).collection('emissions').doc(lastMonthId);
+        const journeyRef = usersRef.doc(userId).collection('journey').doc('progress');
+    
+        const emissionsDoc = await emissionsRef.get();
+    
+        if (emissionsDoc.exists) {
+          const emissions = emissionsDoc.data();
+          if (emissions.totalOffset >= emissions.totalEmissions) {
+            batch.set(journeyRef, {
+              netZeroMonths: admin.firestore.FieldValue.increment(1),
+              lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          }
+        }
+      }
+    
+      await batch.commit();
+      console.log('Net-zero progress updated for all users');
+    });
