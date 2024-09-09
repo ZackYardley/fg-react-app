@@ -76,19 +76,19 @@ export default function Index() {
             style={styles.button}
             onPress={() => {
               if (!user) {
-                return <Redirect href="/get-started" />;
+                router.navigate("/get-started");
               } else if (isAnonymous) {
                 if (!hasCalculatedEmissions) {
-                  return <Redirect href="/pre-survey" />;
+                  router.navigate("/pre-survey");
                 } else {
-                  return <Redirect href="/signup" />;
+                  router.navigate("/signup");
                 }
               } else {
                 // Regular user
                 if (!hasCalculatedEmissions) {
-                  return <Redirect href="/pre-survey" />;
+                  router.navigate("/pre-survey");
                 } else {
-                  return <Redirect href="/home" />;
+                  router.navigate("/home");
                 }
               }
             }}
