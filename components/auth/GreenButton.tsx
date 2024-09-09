@@ -16,7 +16,6 @@ const GreenButton = ({
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const primaryColor = useThemeColor({}, "primary");
-  const textColor = useThemeColor({}, "text");
   const onPrimary = useThemeColor({}, "onPrimary");
 
   const handlePressIn = useCallback(() => {
@@ -58,8 +57,6 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#000",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

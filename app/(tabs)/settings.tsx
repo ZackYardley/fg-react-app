@@ -8,12 +8,12 @@ import { Image } from "expo-image";
 import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { logout, deleteUserAccount } from "@/api/auth";
 import { useStripe } from "@/utils/stripe";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchSetupPaymentSheetParams } from "@/api/purchase";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { useThemeColor } from "@/hooks";
 import { EmissionsOffset } from "@/components/home";
+import Switch from "expo-dark-mode-switch";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -26,6 +26,7 @@ interface SettingsItemProps {
 
 export default function ProfileScreen() {
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
   const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
   const auth = getAuth();
 
@@ -38,6 +39,7 @@ export default function ProfileScreen() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
+  const [value, setValue] = React.useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -209,12 +211,12 @@ export default function ProfileScreen() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
-            <View style={styles.profileImageBG}>
+            <View style={[styles.profileImageBG, { backgroundColor: primary }]}>
               {profilePicture ? (
                 <Image
                   style={styles.profileImage}
@@ -237,11 +239,12 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          <SettingsItem title="General Settings" screen="/general-settings" />
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
           <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
-          <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
+          <SettingsItem title="Certificates" screen="/certificate" />
 
           <EmissionsOffset
             monthlyEmissions={monthlyEmissions}
@@ -342,7 +345,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   profileImageBG: {
-    backgroundColor: "#337946",
     width: 110,
     height: 110,
     borderRadius: 60,
@@ -426,7 +428,7 @@ const styles = StyleSheet.create({
     color: "black",
   },
   offsetButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 999, // Slightly rounded corners
     paddingHorizontal: 28,
     paddingVertical: 12,

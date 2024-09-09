@@ -6,6 +6,7 @@ import { SurveyData, SurveyEmissions } from "@/types";
 import { fetchEmissionsData, saveEmissionsData } from "@/api/emissions";
 import { router } from "expo-router";
 import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
+import { StatusBar } from "expo-status-bar";
 
 export default function DietCalculator() {
   const [surveyData, setSurveyData] = useState<SurveyData>({
@@ -82,6 +83,7 @@ export default function DietCalculator() {
 
   return (
     <ThemedSafeAreaView style={{ flex: 1 }}>
+      <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.contentContainer}>
           {/* Header */}

@@ -2,6 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
 
 const RadioButtonGroup = ({
   question,
@@ -14,22 +15,20 @@ const RadioButtonGroup = ({
   value: string;
   onChange: (value: string) => void;
 }) => {
+  const primaryColor = useThemeColor({}, "primary");
+
   return (
     <View style={styles.container}>
       <ThemedText style={styles.questionText}>{question}</ThemedText>
       <View style={styles.optionsContainer}>
         {options.map((item) => (
-          <TouchableOpacity
-            key={item}
-            onPress={() => onChange(item)}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity key={item} onPress={() => onChange(item)} activeOpacity={0.7}>
             <View style={styles.optionRow}>
               <RadioButton.Android
                 value={item}
                 status={value === item ? "checked" : "unchecked"}
                 onPress={() => onChange(item)}
-                color="#44945F"
+                color={primaryColor}
                 uncheckedColor="#808080"
               />
               <ThemedText style={styles.optionText}>{item}</ThemedText>

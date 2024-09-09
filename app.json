@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "com.fgdevteam.fgreactapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -20,8 +20,15 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "buildNumber": "2",
-      "associatedDomains": ["applinks:fg-react-app.web.app"]
+      "buildNumber": "6",
+      "associatedDomains": [
+        "applinks:fg-react-app.web.app"
+      ],
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -41,7 +48,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -74,12 +84,18 @@
       ],
       "@react-native-google-signin/google-signin",
       "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
       [
         "@stripe/stripe-react-native",
         {
           "merchantIdentifier": "merchant.com.fgdevteam.fgreactapp",
           "enableGooglePay": true
         }
+      ],
+      [
+        "@config-plugins/react-native-blob-util",
+        "@config-plugins/react-native-pdf"
       ]
     ],
     "experiments": {

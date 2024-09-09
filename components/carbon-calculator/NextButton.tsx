@@ -4,19 +4,25 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { useThemeColor } from "@/hooks";
 
 // todo: animating this would be cool
-const NextButton = ({ isFormValid, onPress }: { isFormValid: boolean; onPress: () => void }) => {
+const NextButton = ({ isFormValid = true, onPress }: { isFormValid?: boolean; onPress: () => void }) => {
   const handlePress = async () => {
     if (isFormValid) {
       onPress();
     }
   };
+  const primaryColor = useThemeColor({}, "primary");
   const textColor = useThemeColor({}, "text");
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePress}>
-        <View style={[styles.button, isFormValid ? styles.validButton : styles.invalidButton]}>
-          <Icon name="arrow-right" size={30} color={isFormValid ? "#000" : "#AAA"} />
+        <View
+          style={[
+            styles.button,
+            isFormValid ? [styles.validButton, { backgroundColor: primaryColor }] : styles.invalidButton,
+          ]}
+        >
+          <Icon name="arrow-right" size={30} color={isFormValid ? textColor : "#AAA"} />
         </View>
       </TouchableOpacity>
     </View>
@@ -35,7 +41,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 12,
     borderRadius: 9999, // Very large number to ensure circular shape
-    borderWidth: 2,
+    borderWidth: 1,
     height: 64,
     width: 64,
     alignItems: "center",
@@ -43,7 +49,6 @@ const styles = StyleSheet.create({
   },
   validButton: {
     borderColor: "black",
-    backgroundColor: "#409858",
   },
   invalidButton: {
     borderColor: "#D1D5DB", // Equivalent to Tailwind's gray-300

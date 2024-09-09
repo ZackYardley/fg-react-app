@@ -1,4 +1,9 @@
-import { fetchCarbonCreditProducts, fetchSpecificCarbonCreditProduct, fetchCarbonCreditSubscription } from "./products";
+import {
+  fetchCarbonCreditProducts,
+  fetchSpecificCarbonCreditProduct,
+  fetchCarbonCreditSubscription,
+  fetchCarbonCreditsByPaymentId,
+} from "./products";
 
 // Test function to print out the data
 const testFetchCarbonCreditProducts = async () => {
@@ -30,6 +35,14 @@ const testFetchCarbonCreditProducts = async () => {
       console.log(`  Color 0: ${product.stripe_metadata_color_0}`);
       console.log(`  Color 1: ${product.stripe_metadata_color_1}`);
       console.log(`  Color 2: ${product.stripe_metadata_color_2}`);
+      console.log(`  Project Name: ${product.stripe_metadata_project_name}`);
+      console.log(`  Certificate Title: ${product.stripe_metadata_certificate_title}`);
+      console.log(`  Retirement Reason: ${product.stripe_metadata_retirement_reason}`);
+      console.log(`  Serial Number: ${product.stripe_metadata_serial_number}`);
+      console.log(`  FG Logo: ${product.stripe_metadata_fg_logo}`);
+      console.log(`  Standard: ${product.stripe_metadata_standard_logo}`);
+      console.log(`  Mini Standard: ${product.stripe_metadata_mini_standard}`);
+
       console.log("Prices:");
       product.prices.forEach((price, priceIndex) => {
         console.log(`  Price ${priceIndex + 1}:`);
@@ -133,4 +146,76 @@ const testFetchCarbonCreditSubscription = async () => {
   }
 };
 
-export { testFetchCarbonCreditProducts, testFetchSpecificCarbonCreditProduct, testFetchCarbonCreditSubscription };
+const testFetchCarbonCreditsByPaymentId = async (paymentId: string) => {
+  try {
+    console.log(`Testing fetchCarbonCreditsByPaymentId with payment ID: ${paymentId}`);
+
+    const carbonCredits = await fetchCarbonCreditsByPaymentId(paymentId);
+
+    if (carbonCredits.length > 0) {
+      console.log(`Found ${carbonCredits.length} Carbon Credit(s):`);
+      
+      carbonCredits.forEach((carbonCredit, creditIndex) => {
+        console.log(`\nCarbon Credit ${creditIndex + 1}:`);
+        console.log(`ID: ${carbonCredit.id}`);
+        console.log(`Name: ${carbonCredit.name}`);
+        console.log(`Description: ${carbonCredit.description}`);
+        console.log(`Active: ${carbonCredit.active}`);
+        console.log(`Images: ${carbonCredit.images.join(", ")}`);
+        console.log(`Role: ${carbonCredit.role}`);
+        console.log(`Tax Code: ${carbonCredit.tax_code}`);
+
+        console.log("Metadata:");
+        Object.entries(carbonCredit.metadata).forEach(([key, value]) => {
+          console.log(`  ${key}: ${value}`);
+        });
+
+        console.log("Stripe Metadata:");
+        console.log(`  CTA: ${carbonCredit.stripe_metadata_cta}`);
+        console.log(`  Key Features: ${carbonCredit.stripe_metadata_key_features}`);
+        console.log(`  Product Type: ${carbonCredit.stripe_metadata_product_type}`);
+        console.log(`  Project Overview: ${carbonCredit.stripe_metadata_project_overview}`);
+        console.log(`  Registry Link: ${carbonCredit.stripe_metadata_registry_link}`);
+        console.log(`  Registry Title: ${carbonCredit.stripe_metadata_registry_title}`);
+        console.log(`  Your Purchase: ${carbonCredit.stripe_metadata_your_purchase}`);
+        console.log(`  Color 0: ${carbonCredit.stripe_metadata_color_0}`);
+        console.log(`  Color 1: ${carbonCredit.stripe_metadata_color_1}`);
+        console.log(`  Color 2: ${carbonCredit.stripe_metadata_color_2}`);
+        console.log(`  Project Name: ${carbonCredit.stripe_metadata_project_name}`);
+        console.log(`  Certificate Title: ${carbonCredit.stripe_metadata_certificate_title}`);
+        console.log(`  Retirement Reason: ${carbonCredit.stripe_metadata_retirement_reason}`);
+        console.log(`  Serial Number: ${carbonCredit.stripe_metadata_serial_number}`);
+        console.log(`  FG Logo: ${carbonCredit.stripe_metadata_fg_logo}`);
+        console.log(`  Standard: ${carbonCredit.stripe_metadata_standard_logo}`);
+        console.log(`  Mini Standard: ${carbonCredit.stripe_metadata_mini_standard}`);
+
+        console.log("Prices:");
+        carbonCredit.prices.forEach((price, index) => {
+          console.log(`  Price ${index + 1}:`);
+          console.log(`    ID: ${price.id}`);
+          console.log(`    Active: ${price.active}`);
+          console.log(`    Billing Scheme: ${price.billing_scheme}`);
+          console.log(`    Currency: ${price.currency}`);
+          console.log(`    Unit Amount: ${price.unit_amount}`);
+          if (price.recurring) {
+            console.log(`    Recurring:`);
+            console.log(`      Interval: ${price.recurring.interval}`);
+            console.log(`      Interval Count: ${price.recurring.interval_count}`);
+          }
+        });
+      });
+    } else {
+      console.log(`No carbon credits found for payment ID: ${paymentId}`);
+    }
+  } catch (error) {
+    console.error("Error in test function:", error);
+  }
+};
+
+
+export {
+  testFetchCarbonCreditProducts,
+  testFetchSpecificCarbonCreditProduct,
+  testFetchCarbonCreditSubscription,
+  testFetchCarbonCreditsByPaymentId,
+};

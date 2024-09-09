@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { getAuth, updateProfile } from "firebase/auth";
+import { getAuth, updateProfile, sendEmailVerification } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
+import { GreenButton } from "@/components/auth";
 
 export default function ProfileSettings() {
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
+  const borderColor = useThemeColor({}, "border");
+
   const auth = getAuth();
   const storage = getStorage();
 
   const [user, setUser] = useState(auth.currentUser);
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [profileImage, setProfileImage] = useState(user?.photoURL || null);
+  const [isEmailVerified, setIsEmailVerified] = useState(user?.emailVerified || false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       setDisplayName(user?.displayName || "");
       setProfileImage(user?.photoURL || null);
+      setIsEmailVerified(user?.emailVerified || false);
     });
 
     return () => unsubscribe();
@@ -73,15 +80,28 @@ export default function ProfileSettings() {
     }
   };
 
+  const sendVerificationEmail = async () => {
+    if (user && !user.emailVerified) {
+      try {
+        await sendEmailVerification(user);
+        Alert.alert("Success", "Verification email sent. Please check your inbox.");
+      } catch (error) {
+        console.error("Error sending verification email: ", error);
+        Alert.alert("Error", "Failed to send verification email. Please try again.");
+      }
+    }
+  };
+
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={styles.container}>
         <PageHeader subtitle="Profile Settings" />
         <BackButton />
 
         <View style={{ paddingHorizontal: 20 }}>
-          <View style={styles.profileImageContainer}>
-            <TouchableOpacity style={styles.profileImageButton} onPress={pickImage}>
+          <View style={[styles.profileImageContainer, { borderColor: primary }]}>
+            <TouchableOpacity style={[styles.profileImageButton, { backgroundColor: primary }]} onPress={pickImage}>
               {profileImage ? (
                 <>
                   <Image style={styles.profileImage} source={{ uri: profileImage }} contentFit="cover" />
@@ -91,8 +111,8 @@ export default function ProfileSettings() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.profileImageText}>+</Text>
-                  <Text style={styles.uploadText}>Upload a profile picture!</Text>
+                  <ThemedText style={styles.profileImageText}>+</ThemedText>
+                  <ThemedText style={styles.uploadText}>Upload a profile picture!</ThemedText>
                 </>
               )}
             </TouchableOpacity>
@@ -101,7 +121,7 @@ export default function ProfileSettings() {
           <View style={styles.form}>
             <ThemedText style={styles.label}>Display Name</ThemedText>
             <TextInput
-              style={[styles.input, { color: textColor }]}
+              style={[styles.input, { color: textColor, borderColor }]}
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Enter your name"
@@ -109,11 +129,20 @@ export default function ProfileSettings() {
 
             <ThemedText style={styles.label}>Email</ThemedText>
             <ThemedText style={styles.emailText}>{user?.email}</ThemedText>
+
+            <View style={styles.verificationContainer}>
+              <ThemedText style={styles.verificationText}>
+                Email Verification Status: {isEmailVerified ? "Verified" : "Not Verified"}
+              </ThemedText>
+              {!isEmailVerified && (
+                <TouchableOpacity style={styles.verifyButton} onPress={sendVerificationEmail}>
+                  <ThemedText style={styles.verifyButtonText}>Send Verification Email</ThemedText>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
-          <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
-            <ThemedText style={styles.saveButtonText}>Save</ThemedText>
-          </TouchableOpacity>
+          <GreenButton title="Save Profile" onPress={saveProfile} />
         </View>
       </ScrollView>
     </ThemedSafeAreaView>
@@ -127,12 +156,17 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: "center",
     marginBottom: 30,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderStyle: "dashed",
+    padding: 10,
+    borderRadius: 9999,
+    marginHorizontal: "auto",
   },
   profileImageButton: {
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: "#337946",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -157,7 +191,6 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     marginTop: 10,
-    color: "#409858",
     fontSize: 18,
     fontWeight: "500",
   },
@@ -183,7 +216,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: "#409858",
     borderRadius: 30,
     padding: 10,
     alignItems: "center",
@@ -193,6 +225,25 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "#fff",
     fontSize: 24,
+    fontWeight: "600",
+  },
+  verificationContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  verificationText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  verifyButton: {
+    backgroundColor: "#409858",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "600",
   },
 });

@@ -1,5 +1,6 @@
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "firebase/firestore";
-import { CarbonCredit, CarbonCreditSubscription, Price } from "@/types";
+import { CarbonCredit, CarbonCreditSubscription, Payment, Price } from "@/types";
+import { getAuth } from "firebase/auth";
 
 // Fetch prices for a specific product
 const fetchPricesForProduct = async (productId: string): Promise<Price[]> => {
@@ -115,7 +116,7 @@ const fetchCarbonCreditSubscription = async (
     // Fetch prices for this product
     const pricesCollection = collection(db, "products", product.id, "prices");
     const pricesSnapshot = await getDocs(pricesCollection);
-    product.prices = pricesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Price));
+    product.prices = pricesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as Price);
 
     // Calculate the recommended price based on emissions
     const targetEmissions = 16;
@@ -142,10 +143,60 @@ const fetchCarbonCreditSubscription = async (
   }
 };
 
+const fetchCarbonCreditsByPaymentId = async (paymentId: string): Promise<CarbonCredit[]> => {
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+
+  if (!userId) {
+    throw new Error("User is not authenticated");
+  }
+
+  const db = getFirestore();
+
+  try {
+    // Step 1: Fetch the payment details
+    const paymentRef = doc(db, "users", userId, "payments", paymentId);
+    const paymentDoc = await getDoc(paymentRef);
+
+    if (!paymentDoc.exists()) {
+      console.log(`Payment with ID ${paymentId} not found`);
+      return [];
+    }
+
+    const paymentData = paymentDoc.data() as Payment;
+
+    // Step 2: Extract the product IDs from the payment
+    const productIds = paymentData.metadata.items?.map(item => item.id).filter(Boolean) || [];
+
+    if (productIds.length === 0) {
+      console.log(`No product IDs found for payment ${paymentId}`);
+      return [];
+    }
+
+    // Step 3: Fetch the carbon credit products using the existing function
+    const carbonCreditsPromises = productIds.map(productId => fetchSpecificCarbonCreditProduct(productId));
+    const carbonCredits = await Promise.all(carbonCreditsPromises);
+
+    // Filter out any null results
+    const validCarbonCredits = carbonCredits.filter((credit): credit is CarbonCredit => credit !== null);
+
+    if (validCarbonCredits.length === 0) {
+      console.log(`No carbon credit products found for payment ${paymentId}`);
+      return [];
+    }
+
+    return validCarbonCredits;
+  } catch (error) {
+    console.error(`Error fetching carbon credits for payment ${paymentId}:`, error);
+    throw error;
+  }
+};
+
 export {
   fetchPricesForProduct,
   fetchCarbonCreditProducts,
   fetchSpecificCarbonCreditProduct,
   fetchCarbonCreditSubscription,
   fetchPricesForSubscription,
+  fetchCarbonCreditsByPaymentId,
 };

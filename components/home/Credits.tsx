@@ -5,9 +5,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { fetchCarbonCreditProducts } from "@/api/products";
 import { CarbonCredit } from "@/types";
 import { ThemedView, ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
+import { ActivityIndicator } from "react-native-paper";
 
-const Credits = () => {
+const Credits = ({ justCredits }: { justCredits?: boolean }) => {
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
+  const onPrimary = useThemeColor({}, "onPrimary");
 
   useEffect(() => {
     const loadData = async () => {
@@ -39,10 +42,23 @@ const Credits = () => {
       >
         <Image source={{ uri: credit.images[0] }} style={styles.creditIcon} />
       </LinearGradient>
-      <ThemedText style={styles.creditName}>{credit.name}</ThemedText>
+      <ThemedText style={justCredits ? [styles.creditName, { color: onPrimary }] : styles.creditName}>
+        {credit.name}
+      </ThemedText>
     </View>
   );
 
+  if (justCredits) {
+    return (
+      <View style={styles.creditsContainer}>
+        {carbonCredits.length > 0 ? (
+          carbonCredits.map((credit, index) => renderCreditItem(credit, index))
+        ) : (
+          <ActivityIndicator color={onPrimary} size={"large"} />
+        )}
+      </View>
+    );
+  }
   return (
     <TouchableOpacity onPress={() => router.navigate("/carbon-credit")}>
       <ThemedView style={styles.creditBox}>
@@ -89,6 +105,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-evenly",
     gap: 16,
+    marginBottom: 16,
   },
   creditItem: {
     maxWidth: 120,

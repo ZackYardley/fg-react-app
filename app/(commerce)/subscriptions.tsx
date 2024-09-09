@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { BackButton, GreenCircles, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { router } from "expo-router";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -14,12 +13,15 @@ import {
 } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { ActivityIndicator } from "react-native-paper";
+import { StatusBar } from "expo-status-bar";
+import { useThemeColor } from "@/hooks";
 
 const ForevergreenSubscriptions = () => {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
+  const primary = useThemeColor({}, "primary");
 
   const user = getAuth().currentUser;
 
@@ -77,7 +79,7 @@ const ForevergreenSubscriptions = () => {
     <ThemedView style={styles.card}>
       <ThemedText style={styles.cardTitle}>{title}</ThemedText>
       <ThemedText style={styles.cardDescription}>{description}</ThemedText>
-      <TouchableOpacity style={styles.button} onPress={onPress}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: primary }]} onPress={onPress}>
         <ThemedText style={styles.buttonText}>
           {loading ? "Loading..." : isSubscribed ? "Manage Subscription" : price}
         </ThemedText>
@@ -87,9 +89,9 @@ const ForevergreenSubscriptions = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={styles.scrollView}>
-        <View style={styles.greenCircleLarge} />
-        <View style={styles.greenCircleSmall} />
+        <GreenCircles />
         <PageHeader subtitle="Subscriptions" description="Choose a subscription to reduce your environmental impact" />
         <BackButton />
 
@@ -124,7 +126,10 @@ const ForevergreenSubscriptions = () => {
                 By joining the newsletter you will be sent personalized info about your journey towards net-zero. This
                 is a free an easy way to reduce your emissions.
               </ThemedText>
-              <TouchableOpacity style={styles.button} onPress={handleNewsletterSubscribption}>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: primary }]}
+                onPress={handleNewsletterSubscribption}
+              >
                 <ThemedText style={styles.buttonText}>
                   {loading ? "Loading..." : isNewsletterSubscribed ? "Unsubscribe" : "Subscribe"}
                 </ThemedText>
@@ -139,9 +144,9 @@ const ForevergreenSubscriptions = () => {
                 </View> */}
                 <View style={styles.subscriptionItem}>
                   {loading ? (
-                    <ActivityIndicator size="small" color="#409858" />
+                    <ActivityIndicator size="small" color={primary} />
                   ) : isSubscribed ? (
-                    <Ionicons name="checkmark" size={18} color="green" />
+                    <Ionicons name="checkmark" size={18} color={primary} />
                   ) : (
                     <Ionicons name="close" size={18} color="red" />
                   )}
@@ -149,9 +154,9 @@ const ForevergreenSubscriptions = () => {
                 </View>
                 <View style={styles.subscriptionItem}>
                   {loading ? (
-                    <ActivityIndicator size="small" color="#409858" />
+                    <ActivityIndicator size="small" color={primary} />
                   ) : isNewsletterSubscribed ? (
-                    <Ionicons name="checkmark" size={18} color="green" />
+                    <Ionicons name="checkmark" size={18} color={primary} />
                   ) : (
                     <Ionicons name="close" size={18} color="red" />
                   )}
@@ -173,24 +178,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  greenCircleLarge: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    backgroundColor: "#409858",
-    borderRadius: 150,
-    bottom: "15%",
-    right: "-35%",
-  },
-  greenCircleSmall: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    backgroundColor: "#409858",
-    borderRadius: 9999,
-    top: "25%",
-    left: "-25%",
-  },
   card: {
     borderRadius: 10,
     padding: 15,
@@ -208,7 +195,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#409858",
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 24,

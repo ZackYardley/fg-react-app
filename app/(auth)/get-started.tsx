@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { View, Text, StatusBar, Image, ScrollView, Platform, TouchableOpacity } from "react-native";
 import { Link, router } from "expo-router";
 import * as Linking from "expo-linking";
@@ -11,21 +12,33 @@ import { useThemeColor } from "@/hooks";
 export default function GetStartedScreen() {
   const textColor = useThemeColor({}, "text");
   const primaryColor = useThemeColor({}, "primary");
+  const [error, setError] = useState<string | null>(null);
 
   const handleOpenApp = () => {
     if (Platform.OS === "web") {
       window.location.href = APP_URL;
+      if (!(window.location.href === APP_URL)) {
+        setError(
+          "Looks like you don't have the app installed or your platform does not support it. Download it from the App Store or Google Play Store today!"
+        );
+      }
     } else {
       Linking.openURL(APP_URL);
     }
   };
+
+  useEffect(() => {
+    if (Platform.OS === "web" && window.location.href !== APP_URL) {
+      window.location.href = APP_URL;
+    }
+  }, []);
 
   if (Platform.OS === "web") {
     return (
       <ScrollView style={styles.webContainer}>
         <View style={styles.webContent}>
           <Text style={styles.webTitle}>
-            Forever<Text style={styles.webTitleGreen}>green</Text>
+            Forever<Text style={{ color: primaryColor }}>green</Text>
           </Text>
           <View style={styles.centeredContent}>
             <Text style={styles.description}>
@@ -47,6 +60,7 @@ export default function GetStartedScreen() {
               style={styles.webButton}
               textStyle={styles.webButtonText}
             />
+            <Text style={styles.errorText}>{error}</Text>
             <Text style={styles.orText}>or</Text>
             <View style={styles.storeButtonsContainer}>
               <TouchableOpacity onPress={() => Linking.openURL(APP_STORE_URL)}>
@@ -70,10 +84,10 @@ export default function GetStartedScreen() {
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.contentContainer}>
-          <Text style={[styles.title, { color: textColor }]}>
+          <ThemedText style={styles.title}>
             Forever<Text style={{ color: primaryColor }}>green</Text>
-          </Text>
-          <Image style={styles.logo} source={TreeLogo} />
+          </ThemedText>
+          <Image style={styles.logo} source={TreeLogo} tintColor={primaryColor} />
         </View>
         <View style={styles.buttonContainer}>
           <GreenButton
@@ -138,8 +152,8 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 20,
+    fontWeight: "bold",
     textAlign: "center",
-    fontWeight: "800",
   },
   loginLinkText: {
     fontWeight: "800",
@@ -148,6 +162,7 @@ const styles = StyleSheet.create({
   },
   webContainer: {
     flex: 1,
+    paddingVertical: 20,
     backgroundColor: "#f0f4f0",
   },
   webContent: {
@@ -157,14 +172,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   webTitle: {
-    fontSize: 64,
+    fontSize: 48,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 40,
     color: "#333",
-  },
-  webTitleGreen: {
-    color: "#409858",
   },
   centeredContent: {
     backgroundColor: "white",
@@ -191,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "#409858",
+    color: "#16A34A",
     textDecorationLine: "underline",
   },
   feature: {
@@ -205,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   webButton: {
-    backgroundColor: "#409858",
+    backgroundColor: "#16A34A",
     borderRadius: 50,
     paddingHorizontal: 40,
     borderWidth: 0,
@@ -222,6 +234,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
   },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: "center",
+  },
   orText: {
     fontSize: 28,
     marginVertical: 20,
@@ -230,6 +248,8 @@ const styles = StyleSheet.create({
   },
   storeButtonsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 20,
     justifyContent: "center",
     alignItems: "center",
   },

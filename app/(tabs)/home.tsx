@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
+import { View, useWindowDimensions, ScrollView, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import dayjs from "dayjs";
 import { fetchEmissionsData } from "@/api/emissions";
@@ -17,6 +17,7 @@ import {
 import { PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { EmissionGroup, EmissionsDocument } from "@/types";
 import { useThemeColor } from "@/hooks";
+import { darkenColor } from "@/utils";
 
 function getHighestEmissionGroup(emissions: EmissionsDocument): EmissionGroup {
   if (
@@ -50,6 +51,7 @@ const HomeScreen = () => {
   const [isNetZero, setIsNetZero] = useState(false);
   const [netZeroMonths, setNetZeroMonths] = useState(0);
   const backgroundColor = useThemeColor({}, "background");
+  const primary = useThemeColor({}, "primary");
 
   useEffect(() => {
     const loadData = async () => {
@@ -108,7 +110,7 @@ const HomeScreen = () => {
 
           <Community />
           <CommunityLeaders />
-          <Prizes isNetZero={isNetZero} displayNetZeroMonths={displayNetZeroMonths} />
+          <Prizes />
 
           {/* Charts */}
           <ThemedView style={styles.chartsSection}>
@@ -119,21 +121,21 @@ const HomeScreen = () => {
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
                   values={[transportationEmissions, dietEmissions, energyEmissions]}
-                  colors={["#44945F", "#AEDCA7", "#66A570"]}
+                  colors={[darkenColor(primary, 0), darkenColor(primary, 20), darkenColor(primary, 40)]}
                   width={Math.round(width / 3)}
                   height={100}
                 />
                 <View style={styles.legendContainer}>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
+                    <View style={[styles.legendColor, { backgroundColor: darkenColor(primary, 0) }]} />
                     <ThemedText>Transportation</ThemedText>
                   </View>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: "#AEDCA7" }]} />
+                    <View style={[styles.legendColor, { backgroundColor: darkenColor(primary, 20) }]} />
                     <ThemedText>Diet</ThemedText>
                   </View>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: "#66A570" }]} />
+                    <View style={[styles.legendColor, { backgroundColor: darkenColor(primary, 40) }]} />
                     <ThemedText>Energy</ThemedText>
                   </View>
                 </View>
@@ -147,7 +149,7 @@ const HomeScreen = () => {
               <BarChartBreakdown
                 names={["You", "Average American"]}
                 values={[totalEmissions - totalOffset, 21]}
-                colors={["#44945F", "#A9A9A9"]}
+                colors={[primary, "#A9A9A9"]}
                 width={width - 128}
                 backgroundColor={backgroundColor}
               />
@@ -156,7 +158,7 @@ const HomeScreen = () => {
             {/* If everyone lived like you */}
             <View style={[styles.chartBox, { backgroundColor }]}>
               <ThemedText style={styles.chartTitle}>Earth Breakdown</ThemedText>
-              <EarthBreakdown emissions={totalEmissions - totalOffset} />
+              <EarthBreakdown emissions={totalEmissions / 12 - totalOffset} />
             </View>
           </ThemedView>
 
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // Center the text vertically
     alignItems: "center",
     marginTop: 16,
-    backgroundColor: "#409858",
+    backgroundColor: "#22C55E",
     borderRadius: 50,
     height: 40,
     width: 150,

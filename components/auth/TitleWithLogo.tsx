@@ -1,6 +1,7 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { TreeLogo } from "@/constants/Images";
 import { useThemeColor } from "@/hooks";
+import { Image } from "expo-image";
 
 const TitleWithLogo = ({ title, titleAlt }: { title: string; titleAlt: string }) => {
   const textColor = useThemeColor({}, "text");
@@ -12,7 +13,7 @@ const TitleWithLogo = ({ title, titleAlt }: { title: string; titleAlt: string })
         {title} <Text style={[{ color: primaryColor }]}>{titleAlt}</Text>
       </Text>
       <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={TreeLogo} resizeMode="contain" />
+        <Image style={styles.logo} source={TreeLogo} contentFit="contain" tintColor={primaryColor} />
       </View>
     </View>
   );

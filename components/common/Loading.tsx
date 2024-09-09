@@ -19,7 +19,7 @@ const Loading = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar />
       <ThemedText type="title" style={styles.loadingText}>Loading{dots}</ThemedText>
     </ThemedSafeAreaView>
   );

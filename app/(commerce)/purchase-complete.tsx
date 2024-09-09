@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,6 +16,7 @@ import { darkenColor, formatPrice } from "@/utils";
 import { fetchCreditRequestByPaymentId } from "@/api/purchase";
 import { ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
+import { StatusBar } from "expo-status-bar";
 
 interface CreditWithQuantity extends CarbonCredit {
   quantity: number;
@@ -47,8 +47,10 @@ const PurchaseCompleteScreen = () => {
   const [credits, setCredits] = useState<CreditWithQuantity[]>([]);
   const [totalCO2Offset, setTotalCO2Offset] = useState(0);
   const [loading, setLoading] = useState(true);
-  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const card = useThemeColor({}, "card");
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
+  const accent = useThemeColor({}, "accent");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -221,24 +223,20 @@ const PurchaseCompleteScreen = () => {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <ScrollView style={{ flexGrow: 1 }}>
         <PageHeader
           title="Thank you for your "
           titleAlt={productType === "subscription" ? "subscription!" : "purchase!"}
         />
         <View style={{ paddingHorizontal: 16 }}>
-          <LinearGradient
-            style={styles.card}
-            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          >
+          <LinearGradient style={styles.card} colors={[card, accent]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}>
             {productType === "subscription" ? renderSubscriptionContent() : renderOneTimePurchaseContent()}
           </LinearGradient>
 
           <LinearGradient
             style={styles.infoContainer}
-            colors={[primaryContainer, darkenColor(primaryContainer, 10)]}
+            colors={[card, accent]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >
@@ -266,7 +264,7 @@ const PurchaseCompleteScreen = () => {
             ) : (
               <ThemedText style={styles.infoTitle}>
                 You will be receiving an email with more
-                <Text style={{ color: "#409858" }}> information shortly!</Text>
+                <Text style={{ color: primary }}> information shortly!</Text>
               </ThemedText>
             )}
             <Image source={Pamona} style={styles.infoImage} />
@@ -274,7 +272,7 @@ const PurchaseCompleteScreen = () => {
               <TouchableOpacity onPress={() => router.push("/home")} style={styles.button}>
                 <LinearGradient
                   style={styles.buttonGradient}
-                  colors={["#409858", "#B1E8C0"]}
+                  colors={[primary, darkenColor(primary, 10)]}
                   start={{ x: 0.4, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
                 >

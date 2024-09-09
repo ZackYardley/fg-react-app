@@ -99,7 +99,7 @@
 //     fontWeight: "bold",
 //   },
 //   greenText: {
-//     color: "#409858",
+//     color: "#22C55E",
 //   },
 //   subtitle: {
 //     fontSize: 30,

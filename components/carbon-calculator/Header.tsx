@@ -8,23 +8,20 @@ import { ThemedText } from "../common";
 
 const Header = ({ progress, title }: any) => {
   const textColor = useThemeColor({}, "text");
+  const border = useThemeColor({}, "border");
+  const primaryColor = useThemeColor({}, "primary");
+
   return (
     <>
       <View style={styles.container}>
-        <Icon
-          name="arrow-left"
-          size={24}
-          color={textColor}
-          onPress={() => router.back()}
-          style={styles.backButton}
-        />
+        <Icon name="arrow-left" size={24} color={textColor} onPress={() => router.back()} style={styles.backButton} />
         <View style={styles.progressBarContainer}>
           <Progress.Bar
             progress={progress}
             width={null}
-            color="#409858"
+            color={primaryColor}
             unfilledColor="#FFF"
-            borderColor="#000"
+            borderColor={border}
             borderWidth={1.5}
             height={15}
             borderRadius={9999}

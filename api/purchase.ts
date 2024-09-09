@@ -2,70 +2,6 @@ import { getFirestore, collection, getDoc, addDoc, serverTimestamp, query, getDo
 import { TransactionItem } from "@/types";
 import { getAuth } from "firebase/auth";
 
-// const purchaseCarbonCredits = async (
-//   userId: string,
-//   items: TransactionItem[],
-//   paymentIntentId: string
-// ): Promise<{ success: boolean; error?: string }> => {
-//   const db = getFirestore();
-//   const userRef = doc(db, "users", userId);
-
-//   try {
-//     let newTotalOffset = 0;
-
-//     // Use a transaction to ensure data consistency
-//     await runTransaction(db, async (transaction) => {
-//       const userDoc = await transaction.get(userRef);
-//       if (!userDoc.exists()) {
-//         throw new Error("User document does not exist!");
-//       }
-
-//       // Update user's carbon credits
-//       const existingCredits = userDoc.data().carbonCredits || [];
-//       const updatedCredits = items.map((item) => {
-//         const existingCredit = existingCredits.find((credit: TransactionItem) => credit.id === item.id);
-//         newTotalOffset += item.quantity; // Accumulate total offset
-//         if (existingCredit) {
-//           // If the credit already exists, update the quantity
-//           return { id: item.id, quantity: existingCredit.quantity + item.quantity };
-//         } else {
-//           // If it's a new credit, add it to the array
-//           return item;
-//         }
-//       });
-
-//       // Merge the updated credits with the existing ones
-//       const finalCredits = existingCredits
-//         .filter((credit: TransactionItem) => !updatedCredits.some((uc) => uc.id === credit.id))
-//         .concat(updatedCredits);
-
-//       transaction.update(userRef, { carbonCredits: finalCredits });
-//     });
-
-//     const paymentRef = doc(db, "users", userId, "payments", paymentIntentId);
-
-//     // Prepare simplified cart items for metadata
-//     const simplifiedItems = items.map((item) => ({
-//       id: item.id,
-//       name: item.name,
-//       productType: "carbon_credit",
-//       quantity: item.quantity,
-//       price: item.price,
-//     }));
-
-//     const updateData = { metadata: { items: simplifiedItems } };
-//     await updateDoc(paymentRef, updateData);
-
-//     return { success: true };
-//   } catch (error) {
-//     console.error("Error in purchaseCarbonCredits:", error);
-//     return {
-//       success: false,
-//       error: error instanceof Error ? error.message : "An unknown error occurred",
-//     };
-//   }
-// };
-
 const fetchOneTimePaymentSheetParams = async (
   amount: number,
   uid: string
@@ -204,6 +140,33 @@ const fetchSetupPaymentSheetParams = async (
   }
 };
 
+const validateRequestData = (data: any): boolean => {
+  const requiredFields = ["type", "items", "paymentIntentId", "status"];
+  for (const field of requiredFields) {
+    if (!data[field]) {
+      console.error(`Missing required field: ${field}`);
+      return false;
+    }
+  }
+
+  if (!Array.isArray(data.items) || data.items.length === 0) {
+    console.error("Items must be a non-empty array");
+    return false;
+  }
+
+  for (const item of data.items) {
+    const itemFields = ["id", "name", "productType", "quantity"];
+    for (const field of itemFields) {
+      if (item[field] === undefined) {
+        console.error(`Missing required field in item: ${field}`);
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
 const requestCarbonCredits = async (
   userId: string,
   items: TransactionItem[],
@@ -220,18 +183,14 @@ const requestCarbonCredits = async (
         name: item.name,
         productType: item.productType,
         quantity: item.quantity,
-        price: item.price,
       })),
       paymentIntentId,
       status: "pending",
       createdAt: serverTimestamp(),
     };
 
-    // Check for any undefined values
-    for (const [key, value] of Object.entries(docData)) {
-      if (value === undefined) {
-        throw new Error(`Undefined value for field: ${key}`);
-      }
+    if (!validateRequestData(docData)) {
+      throw new Error("Invalid request data");
     }
 
     await addDoc(requestsRef, docData);

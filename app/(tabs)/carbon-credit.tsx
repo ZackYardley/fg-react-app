@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
-import { View, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { View, TouchableOpacity, FlatList, StyleSheet, Animated } from "react-native";
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { fetchEmissionsData } from "@/api/emissions";
 import { fetchCarbonCreditProducts, fetchCarbonCreditSubscription } from "@/api/products";
 import { subscribeToCart } from "@/api/cart";
 import { fetchSubscriptionStatus } from "@/api/subscriptions";
-import { PageHeader, ThemedSafeAreaView, ThemedView } from "@/components/common";
-import CreditItem from "@/components/carbon-credit/CreditItem";
-import ProjectCard from "@/components/carbon-credit/ProjectCard";
-import { ShoppingCartBtn } from "@/components/ShoppingCartBtn";
+import { PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
+import { CreditItem, ProjectCard, ShoppingCartBtn } from "@/components/commerce";
 import { darkenColor, formatPrice } from "@/utils";
 import { CarbonCredit, CartItem } from "@/types";
-import { ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
 
 export default function CarbonCreditScreen() {
@@ -21,7 +19,11 @@ export default function CarbonCreditScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const primaryContainer = useThemeColor({}, "primaryContainer");
+  const [showToast, setShowToast] = useState(false);
+  const slideAnim = useState(new Animated.Value(-100))[0];
+
+  const primary = useThemeColor({}, "primary");
+  const borderColor = useThemeColor({}, "border");
 
   useEffect(() => {
     const initializeData = async () => {
@@ -85,6 +87,25 @@ export default function CarbonCreditScreen() {
 
   const numItems = cartItems ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
 
+  const handleAddToCart = useCallback(() => {
+    setShowToast(true);
+    Animated.sequence([
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(slideAnim, {
+        toValue: -100,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => setShowToast(false), 100);
+    });
+  }, [slideAnim]);
+
   const renderCreditItem = ({ item }: { item: CarbonCredit }) => (
     <CreditItem
       name={item.name}
@@ -101,7 +122,7 @@ export default function CarbonCreditScreen() {
       name={null}
       price={null}
       image={null}
-      colors={[primaryContainer, darkenColor(primaryContainer, 0.1), darkenColor(primaryContainer, 0.2)]}
+      colors={[borderColor, darkenColor(borderColor, 0.1), darkenColor(borderColor, 0.2)]}
       onPress={() => {}}
       isSkeleton={true}
     />
@@ -110,38 +131,6 @@ export default function CarbonCreditScreen() {
   const renderHeader = () => (
     <>
       <PageHeader subtitle="Carbon Credits" description="Click on a project to learn more or purchase" />
-      <ShoppingCartBtn numItems={numItems} />
-    </>
-  );
-
-  const renderFooter = () => (
-    <>
-      <View style={styles.projectContainer}>
-        {loading ? (
-          <View style={[styles.skeletonCard, { height: 200, backgroundColor: primaryContainer }]} />
-        ) : (
-          selectedProject && <ProjectCard project={selectedProject} />
-        )}
-      </View>
-      <ThemedView style={styles.footer}>
-        <ThemedText style={styles.footerTitle}>Carbon Credit Subscription</ThemedText>
-        <ThemedText style={styles.footerText}>
-          The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
-          credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
-          and support awesome climate projects!
-        </ThemedText>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/carbon-credit-sub")}>
-          <ThemedText style={styles.buttonText}>
-            {loading
-              ? "Loading..."
-              : isSubscribed
-                ? "Manage Subscription"
-                : subscriptionPrice
-                  ? `${formatPrice(subscriptionPrice)}/Month`
-                  : "Subscription Unavailable"}
-          </ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
     </>
   );
 
@@ -162,21 +151,72 @@ export default function CarbonCreditScreen() {
     }
 
     return (
-      <FlatList
-        ListHeaderComponent={renderHeader}
-        data={credits}
-        renderItem={renderCreditItem}
-        keyExtractor={(item, index) => item.name + index}
-        numColumns={3}
-        columnWrapperStyle={styles.columnWrapper}
-        style={styles.flatList}
-        ListFooterComponent={renderFooter}
-      />
+      <>
+        <ShoppingCartBtn numItems={numItems} />
+        {showToast && (
+          <Animated.View
+            style={[
+              styles.toastMessage,
+              {
+                transform: [{ translateY: slideAnim }],
+                backgroundColor: primary,
+              },
+            ]}
+          >
+            <ThemedText style={styles.toastText}>Added to Cart</ThemedText>
+          </Animated.View>
+        )}
+        <FlatList
+          ListHeaderComponent={renderHeader}
+          data={credits}
+          renderItem={renderCreditItem}
+          keyExtractor={(item, index) => item.name + index}
+          numColumns={3}
+          columnWrapperStyle={styles.columnWrapper}
+          style={styles.flatList}
+          ListFooterComponent={renderFooter}
+        />
+      </>
     );
   };
 
+  const renderFooter = () => (
+    <>
+      <View style={styles.projectContainer}>
+        {loading ? (
+          <View style={[styles.skeletonCard, { height: 200, backgroundColor: borderColor }]} />
+        ) : (
+          selectedProject && <ProjectCard project={selectedProject} onAddToCart={handleAddToCart} />
+        )}
+      </View>
+      <ThemedView style={styles.footer}>
+        <ThemedText style={styles.footerTitle}>Carbon Credit Subscription</ThemedText>
+        <ThemedText style={styles.footerText}>
+          The Forevergreen carbon credit subscription includes the purchase of the nearest whole number of carbon
+          credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
+          and support awesome climate projects!
+        </ThemedText>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: primary }]}
+          onPress={() => router.push("/carbon-credit-sub")}
+        >
+          <ThemedText style={styles.buttonText}>
+            {loading
+              ? "Loading..."
+              : isSubscribed
+                ? "Manage Subscription"
+                : subscriptionPrice
+                  ? `${formatPrice(subscriptionPrice)}/Month`
+                  : "Subscription Unavailable"}
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+    </>
+  );
+
   return (
-    <ThemedSafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <StatusBar />
       <View style={{ flexGrow: 1 }}>{renderContent()}</View>
     </ThemedSafeAreaView>
   );
@@ -208,7 +248,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   button: {
-    backgroundColor: "#409858",
     padding: 16,
     marginHorizontal: "auto",
     borderRadius: 9999,
@@ -231,5 +270,29 @@ const styles = StyleSheet.create({
   },
   skeletonCard: {
     borderRadius: 8,
+  },
+  toastMessage: {
+    position: "absolute",
+    top: 60, // Adjusted to account for safe area and header
+    left: 16,
+    right: 16,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  toastText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

@@ -1,33 +1,50 @@
 import { useState, useEffect } from "react";
-import { View, KeyboardAvoidingView, ScrollView, useWindowDimensions, StyleSheet } from "react-native";
+import { View, KeyboardAvoidingView, ScrollView, useWindowDimensions, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import { ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "expo-router";
-import { onSignup, onGoogleSignUp, onContinueAnonymously } from "@/api/auth";
+import { onSignup, onGoogleSignUp, onContinueAnonymously, checkEmailVerification } from "@/api/auth";
 import { GreenButton, TitleWithLogo, GoogleButton, CustomTextInput, OrLine } from "@/components/auth";
+import { StatusBar } from "expo-status-bar";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [showPasswordMismatchModal, setShowPasswordMismatchModal] = useState(false);
 
   const { height } = useWindowDimensions();
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAnonymous(user.isAnonymous);
+        const verified = await checkEmailVerification();
+        setIsEmailVerified(verified);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
+  const handleSignup = async () => {
+    if (password !== confirmPassword) {
+      setShowPasswordMismatchModal(true);
+      return;
+    }
+    await onSignup(email, password, confirmPassword, name);
+  };
+
+
   return (
     <ThemedSafeAreaView style={styles.container}>
+      <StatusBar />
       <KeyboardAvoidingView style={styles.safeArea}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
           <View style={[styles.contentContainer, { minHeight: height }]}>
@@ -60,10 +77,20 @@ export default function SignupScreen() {
                 rightIcon={showPassword ? "eye-off" : "eye"}
                 onRightIconPress={() => setShowPassword(!showPassword)}
               />
+              <CustomTextInput
+                label="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder="Confirm Your Password"
+                secureTextEntry={!showConfirmPassword}
+                leftIcon="lock"
+                rightIcon={showConfirmPassword ? "eye-off" : "eye"}
+                onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
 
               <GreenButton
                 title="Create Account"
-                onPress={() => onSignup(email, password, name)}
+                onPress={handleSignup}
                 style={styles.createAccountButton}
                 textStyle={styles.createAccountButtonText}
               />
@@ -102,6 +129,25 @@ export default function SignupScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showPasswordMismatchModal}
+        onRequestClose={() => setShowPasswordMismatchModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <ThemedText style={styles.modalText}>Passwords do not match</ThemedText>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowPasswordMismatchModal(false)}
+            >
+              <ThemedText style={styles.modalButtonText}>OK</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ThemedSafeAreaView>
   );
 }
@@ -135,9 +181,6 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginBottom: 20,
   },
-  titleHighlight: {
-    color: "#409858",
-  },
   logoContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -159,20 +202,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   createAccountButton: {
-    backgroundColor: "#409858",
     borderRadius: 9999,
     padding: 16,
     marginTop: 32,
     borderWidth: 1,
-    borderColor: "#000",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
     elevation: 2,
   },
   createAccountButtonText: {
-    color: "#fff",
     textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",
@@ -226,5 +262,39 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     fontSize: 20,
     fontWeight: "bold",
+  },
+  verificationStatus: {
+    marginTop: 8,
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#409858',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

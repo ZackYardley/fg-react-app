@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { ThemedSafeAreaView, ThemedText } from "../common";
-
-const icons = ["hourglass-start", "hourglass-half", "hourglass-end"];
+import { StatusBar } from "expo-status-bar";
+import { useThemeColor } from "@/hooks";
 
 const CalculatingScreen = () => {
   const [iconIndex, setIconIndex] = useState(0);
+  const icons = ["hourglass-start", "hourglass-half", "hourglass-end"];
+  const primaryColor = useThemeColor({}, "primary");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -14,23 +16,24 @@ const CalculatingScreen = () => {
     }, 1000); // Change icon every 1 second
 
     return () => clearInterval(interval);
-  }, []);
+  }, [icons.length]);
 
   return (
     <ThemedSafeAreaView style={styles.container}>
-      <View style={styles.greenCircleLarge} />
-      <View style={styles.greenCircleSmall} />
+      <StatusBar />
+      <View style={[styles.greenCircleLarge, { backgroundColor: primaryColor }]} />
+      <View style={[styles.greenCircleSmall, { backgroundColor: primaryColor }]} />
 
       <View style={styles.titleContainer}>
         <ThemedText style={styles.titleText}>
-          Forever<Text style={styles.titleHighlight}>green</Text>
+          Forever<Text style={{ color: primaryColor }}>green</Text>
         </ThemedText>
       </View>
 
       <View style={styles.resultContainer}>
         <ThemedText style={styles.resultText}>Calculating your result</ThemedText>
         <View style={styles.iconContainer}>
-          <Icon name={icons[iconIndex]} size={100} color="#409858" />
+          <Icon name={icons[iconIndex]} size={100} color={primaryColor} />
         </View>
       </View>
     </ThemedSafeAreaView>
@@ -48,7 +51,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
     borderRadius: 150,
     bottom: -8,
     right: "-25%",
@@ -57,7 +59,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 200,
     height: 200,
-    backgroundColor: "#409858",
     borderRadius: 100,
     top: -32,
     left: "-25%",
@@ -70,9 +71,6 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "bold",
     marginVertical: 8,
-  },
-  titleHighlight: {
-    color: "#409858", // Assuming this is your primary color
   },
   resultContainer: {
     marginTop: 160,

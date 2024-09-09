@@ -22,7 +22,7 @@ const UnderConstructionScreen = () => {
         <Progress.Bar
           progress={0.5}
           width={null}
-          color="#409858"
+          color="#22C55E"
           unfilledColor="#C7C7E0"
           borderWidth={0}
           height={15}

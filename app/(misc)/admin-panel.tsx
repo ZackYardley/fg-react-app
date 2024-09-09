@@ -124,7 +124,7 @@
 //         textAlignVertical: 'top',
 //     },
 //     button: {
-//         backgroundColor: '#409858',
+//         backgroundColor: '#22C55E',
 //         padding: 15,
 //         borderRadius: 5,
 //         alignItems: 'center',

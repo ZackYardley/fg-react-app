@@ -3,20 +3,25 @@ import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { GreenButton } from "@/components/auth";
+import { useThemeColor } from "@/hooks";
 
 const PreSurveyScreen = () => {
   const { fromIndex } = useLocalSearchParams<{ fromIndex: string }>();
+  const primaryColor = useThemeColor({}, "primary");
 
   return (
     <ThemedSafeAreaView style={styles.container}>
       <StatusBar />
-      <View style={styles.circleBottom} />
-      <View style={styles.circleTop} />
+      <View style={[styles.circleBottom, { backgroundColor: primaryColor }]} />
+      <View style={[styles.circleTop, { backgroundColor: primaryColor }]} />
       <ScrollView style={{ marginHorizontal: 20 }}>
         <PageHeader />
 
         <ThemedView style={styles.contentContainer}>
-          <ThemedText type="title" style={styles.contentTitle}>Welcome!</ThemedText>
+          <ThemedText type="title" style={styles.contentTitle}>
+            Welcome!
+          </ThemedText>
           {fromIndex ? (
             <ThemedText style={styles.contentText}>
               It looks like it's been a while since we last checked your emissions. Let's start with a few questions to
@@ -30,13 +35,7 @@ const PreSurveyScreen = () => {
             </ThemedText>
           )}
 
-          <TouchableOpacity
-            onPress={() => router.navigate("/transportation")}
-            style={styles.button}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>Begin Survey</Text>
-          </TouchableOpacity>
+          <GreenButton title="Begin Survey" onPress={() => router.navigate("/transportation")} style={styles.button} />
         </ThemedView>
       </ScrollView>
     </ThemedSafeAreaView>
@@ -53,7 +52,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#409858",
     borderRadius: 9999,
     bottom: "-12%",
     left: "-30%",
@@ -62,7 +60,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 200,
     height: 200,
-    backgroundColor: "#409858",
     borderRadius: 9999,
     top: "16%",
     right: "-30%",
@@ -88,7 +85,6 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingVertical: 16,
     paddingHorizontal: 32,
-    backgroundColor: "#409858",
     borderRadius: 9999,
     alignSelf: "center",
   },
