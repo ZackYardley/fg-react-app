@@ -7,7 +7,7 @@ import { getAuth } from "firebase/auth";
 import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
 import { TransactionItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
-import { PageHeader, BackButton, ThemedSafeAreaView, ThemedView } from "@/components/common";
+import { PageHeader, BackButton, ThemedSafeAreaView, ThemedView, GreenCircles } from "@/components/common";
 import { fetchOneTimePaymentSheetParams, requestCarbonCredits } from "@/api/purchase";
 import { formatPrice } from "@/utils";
 import { fetchSpecificCarbonCreditProduct } from "@/api/products";
@@ -22,6 +22,7 @@ interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 export default function ShoppingCartScreen() {
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
+  const primary = useThemeColor({}, "primary");
 
   const auth = getAuth();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -251,12 +252,12 @@ export default function ShoppingCartScreen() {
   const ListEmptyComponent = () =>
     loading ? (
       <View style={[styles.centered, { marginBottom: 16 }]}>
-        <ActivityIndicator size="large" color="#22C55E" />
+        <ActivityIndicator size="large" color={primary} />
       </View>
     ) : (
       <ThemedView style={styles.emptyCartContainer}>
-        <Ionicons name="cart" size={64} color="#22C55E" />
-        <ThemedText style={styles.emptyCartTitle}>Your cart is empty</ThemedText>
+        <Ionicons name="cart" size={64} color={primary} />
+        <ThemedText style={[styles.emptyCartTitle, { color: primary }]}>Your cart is empty</ThemedText>
         <ThemedText style={styles.emptyCartText}>
           Start adding carbon credits to make a positive impact on the environment!
         </ThemedText>
@@ -272,6 +273,7 @@ export default function ShoppingCartScreen() {
       <TouchableOpacity
         style={[
           styles.purchaseButton,
+          { backgroundColor: primary },
           (credits.length === 0 || isUpdatingQuantity || isProcessingPayment) && styles.disabledButton,
         ]}
         onPress={openPaymentSheet}
@@ -288,10 +290,10 @@ export default function ShoppingCartScreen() {
         </ThemedText>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.continueButton, { backgroundColor }]}
+        style={[styles.continueButton, { backgroundColor, borderColor: primary }]}
         onPress={() => router.navigate("/carbon-credit")}
       >
-        <ThemedText style={styles.continueButtonText}>Continue Shopping</ThemedText>
+        <ThemedText style={[styles.continueButtonText, { color: primary }]}>Continue Shopping</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );
@@ -299,8 +301,7 @@ export default function ShoppingCartScreen() {
   return (
     <ThemedSafeAreaView style={styles.container}>
       <StatusBar />
-      <View style={styles.greenCircleLarge} />
-      <View style={styles.greenCircleSmall} />
+      <GreenCircles />
       <View style={{ flex: 1 }}>
         <FlatList
           data={credits}
@@ -325,24 +326,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     flex: 1,
-  },
-  greenCircleLarge: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    backgroundColor: "#22C55E",
-    borderRadius: 150,
-    bottom: "15%",
-    right: "-35%",
-  },
-  greenCircleSmall: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    backgroundColor: "#22C55E",
-    borderRadius: 9999,
-    top: "25%",
-    left: "-25%",
   },
   creditList: {
     marginBottom: 24,
@@ -372,7 +355,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   purchaseButton: {
-    backgroundColor: "#22C55E",
     borderRadius: 50,
     padding: 16,
     alignItems: "center",
@@ -385,13 +367,11 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     borderWidth: 2,
-    borderColor: "#22C55E",
     borderRadius: 50,
     padding: 16,
     alignItems: "center",
   },
   continueButtonText: {
-    color: "#22C55E",
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -477,7 +457,6 @@ const styles = StyleSheet.create({
   emptyCartTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#22C55E",
     marginTop: 16,
     marginBottom: 8,
   },

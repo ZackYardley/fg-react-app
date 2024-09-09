@@ -28,6 +28,7 @@ const { height } = Dimensions.get("window");
 
 const CarbonCreditSubscriptionScreen = () => {
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
   const auth = getAuth();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -199,28 +200,32 @@ const CarbonCreditSubscriptionScreen = () => {
             </ThemedText>
             <ThemedText style={styles.cardDescription}>Offset your calculated carbon emissions</ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#22C55E" />
+              <Icon name="check" size={24} color={primary} />
               <Text style={{ fontWeight: "bold" }}>Purchase of Carbon Credits: </Text>
               Includes buying the nearest whole number of carbon credits to ensure you are net zero.
             </ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#22C55E" />
+              <Icon name="check" size={24} color={primary} />
               <Text style={{ fontWeight: "bold" }}>Hassle-Free: </Text>
               Easy way to reduce your environmental impact.
             </ThemedText>
             <ThemedText style={styles.cardDescription}>
-              <Icon name="check" size={24} color="#22C55E" />
+              <Icon name="check" size={24} color={primary} />
               <Text style={{ fontWeight: "bold" }}>Support Climate Projects: </Text>
               Contributes to awesome climate initiatives.
             </ThemedText>
             {isSubscribed ? (
               <View style={styles.subscribedContainer}>
-                <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
-                <ThemedText style={styles.subscribedText}>Subscribed</ThemedText>
+                <Ionicons name="checkmark-circle" size={24} color={primary} />
+                <ThemedText style={[styles.subscribedText, { color: primary }]}>Subscribed</ThemedText>
               </View>
             ) : (
               <TouchableOpacity
-                style={[styles.subscribeButton, isProcessingPayment && styles.disabledButton]}
+                style={[
+                  styles.subscribeButton,
+                  { backgroundColor: primary },
+                  isProcessingPayment && styles.disabledButton,
+                ]}
                 onPress={openPaymentSheet}
                 disabled={isProcessingPayment}
               >
@@ -251,8 +256,8 @@ const CarbonCreditSubscriptionScreen = () => {
     <ThemedSafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.greenCircleLarge} />
-        <View style={styles.greenCircleSmall} />
+        <View style={[styles.greenCircleLarge, { backgroundColor: primary }]} />
+        <View style={[styles.greenCircleSmall, { backgroundColor: primary }]} />
         <View style={styles.contentWrapper}>
           <PageHeader
             subtitle="Carbon Credit Subscription"
@@ -291,7 +296,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#22C55E",
     borderRadius: 150,
     bottom: "15%",
     right: "-35%",
@@ -300,7 +304,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 300,
     height: 300,
-    backgroundColor: "#22C55E",
     borderRadius: 9999,
     top: "25%",
     left: "-25%",
@@ -320,7 +323,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subscribeButton: {
-    backgroundColor: "#22C55E",
     borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -343,7 +345,6 @@ const styles = StyleSheet.create({
   },
   subscribedText: {
     marginLeft: 5,
-    color: "#22C55E",
     fontWeight: "bold",
   },
   sectionTitle: {

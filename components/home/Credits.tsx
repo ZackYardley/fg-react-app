@@ -6,7 +6,7 @@ import { fetchCarbonCreditProducts } from "@/api/products";
 import { CarbonCredit } from "@/types";
 import { ThemedView, ThemedText } from "../common";
 
-const Credits = () => {
+const Credits = ({ justCredits }: { justCredits?: boolean }) => {
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
 
   useEffect(() => {
@@ -43,6 +43,17 @@ const Credits = () => {
     </View>
   );
 
+  if (justCredits) {
+    return (
+      <View style={styles.creditsContainer}>
+        {carbonCredits.length > 0 ? (
+          carbonCredits.map((credit, index) => renderCreditItem(credit, index))
+        ) : (
+          <ThemedText>Loading carbon credits...</ThemedText>
+        )}
+      </View>
+    );
+  }
   return (
     <TouchableOpacity onPress={() => router.navigate("/carbon-credit")}>
       <ThemedView style={styles.creditBox}>

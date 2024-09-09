@@ -14,7 +14,7 @@ const NotFoundComponent = () => {
       <ThemedText style={styles.errorCode}>404</ThemedText>
       <ThemedText style={styles.errorMessage}>Page Not Found</ThemedText>
       <Image source={fourofour} style={styles.image} />
-      <TouchableOpacity onPress={() => router.replace("/")} style={styles.button}>
+      <TouchableOpacity onPress={() => router.replace("/blog/clean-oceans-safe-seas")} style={styles.button}>
         <Text style={[styles.buttonText, { color: onPrimary }]}>Back Home</Text>
       </TouchableOpacity>
     </ThemedSafeAreaView>

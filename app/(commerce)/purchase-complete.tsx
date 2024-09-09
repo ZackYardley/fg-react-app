@@ -50,6 +50,7 @@ const PurchaseCompleteScreen = () => {
   const [loading, setLoading] = useState(true);
   const card = useThemeColor({}, "card");
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -268,7 +269,7 @@ const PurchaseCompleteScreen = () => {
             ) : (
               <ThemedText style={styles.infoTitle}>
                 You will be receiving an email with more
-                <Text style={{ color: "#22C55E" }}> information shortly!</Text>
+                <Text style={{ color: primary }}> information shortly!</Text>
               </ThemedText>
             )}
             <Image source={Pamona} style={styles.infoImage} />
@@ -276,7 +277,7 @@ const PurchaseCompleteScreen = () => {
               <TouchableOpacity onPress={() => router.push("/home")} style={styles.button}>
                 <LinearGradient
                   style={styles.buttonGradient}
-                  colors={["#22C55E", "#B1E8C0"]}
+                  colors={[primary, darkenColor(primary, 10)]}
                   start={{ x: 0.4, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
                 >

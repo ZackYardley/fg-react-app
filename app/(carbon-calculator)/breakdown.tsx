@@ -13,6 +13,8 @@ import { useThemeColor } from "@/hooks";
 import { useLocalSearchParams } from "expo-router";
 import dayjs from "dayjs";
 import { StatusBar } from "expo-status-bar";
+import { darkenColor } from "@/utils";
+import { NextButton } from "@/components/carbon-calculator";
 
 const Breakdown = () => {
   const { from } = useLocalSearchParams<{ from: string }>();
@@ -104,55 +106,6 @@ const Breakdown = () => {
         <View style={styles.contentContainer}>
           <View style={styles.container}>
             {from !== "survey" && (
-              // <>
-              //   {/* Annual Footprint */}
-              //   <View style={styles.card}>
-              //     <ThemedText style={styles.cardTitle}>Annual Footprint</ThemedText>
-              //     <ThemedText>Your total emissions this year:</ThemedText>
-              //     <ThemedText style={styles.emissionsStat}>{totalEmissions.toFixed(1)}</ThemedText>
-              //     <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
-              //   </View>
-
-              //   {/* Monthly Carbon Emissions */}
-              //   <View style={styles.cardSideBySide}>
-              //     <View style={styles.communityStatsContainer}>
-              //       <View style={[styles.communityStatBox, { backgroundColor }]}>
-              //         <ThemedText style={styles.cardTitle}>Monthly Carbon Emissions</ThemedText>
-              //         <ThemedText style={styles.emissionsStat}>{monthlyEmissions.toFixed(1)}</ThemedText>
-              //         <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
-              //       </View>
-              //     </View>
-              //   </View>
-
-              //   {/* Monthly Carbon Offsets */}
-              //   <View style={styles.cardSideBySide}>
-              //     <View style={styles.communityStatsContainer}>
-              //       <View style={[styles.communityStatBox, { backgroundColor }]}>
-              //         <ThemedText style={styles.cardTitle}>Monthly Carbon Offsets</ThemedText>
-              //         <ThemedText style={styles.emissionsStat}>{totalOffset.toFixed(1)}</ThemedText>
-              //         <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
-              //       </View>
-              //     </View>
-              //   </View>
-
-              //   <View style={[styles.separator, { backgroundColor: textColor }]} />
-
-              //   {/* Net Impact */}
-              //   <View
-              //     style={[
-              //       styles.card,
-              //       isPositiveImpact ? styles.positiveImpact : styles.negativeImpact,
-              //       { backgroundColor },
-              //     ]}
-              //   >
-              //     <ThemedText style={styles.cardTitle}>Net Impact this month</ThemedText>
-              //     <ThemedText style={styles.emissionsStat}>{Math.abs(netImpact).toFixed(1)}</ThemedText>
-              //     <ThemedText style={styles.emissionsLabel}>tons of CO2</ThemedText>
-              //     <ThemedText style={styles.emissionsLabel}>
-              //       {isPositiveImpact ? "You are net Net-Zero! 😊" : "You are not Net-Zero 😥"}
-              //     </ThemedText>
-              //   </View>
-              // </>
               <StyledEmissions
                 monthlyEmissions={monthlyEmissions}
                 totalEmissions={totalEmissions}
@@ -165,9 +118,13 @@ const Breakdown = () => {
             <ThemedView style={styles.card}>
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>Your Carbon Footprint</ThemedText>
               <ThemedText>Your total emissions are:</ThemedText>
-              <ThemedText style={styles.greenText}>{totalEmissions.toFixed(2)} tons co2/year</ThemedText>
+              <ThemedText style={[styles.greenText, { color: primary }]}>
+                {totalEmissions.toFixed(2)} tons co2/year
+              </ThemedText>
               <ThemedText>Your total monthly emissions are:</ThemedText>
-              <ThemedText style={styles.greenText}>{monthlyEmissions.toFixed(2)} tons co2/month</ThemedText>
+              <ThemedText style={[styles.greenText, { color: primary }]}>
+                {monthlyEmissions.toFixed(2)} tons co2/month
+              </ThemedText>
             </ThemedView>
 
             {/* Emission Breakdown */}
@@ -177,16 +134,16 @@ const Breakdown = () => {
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
                   values={[transportationEmissions, dietEmissions, energyEmissions]}
-                  colors={["#22C55E", "#AEDCA7", "#66A570"]}
+                  colors={[darkenColor(primary, 0), darkenColor(primary, 20), darkenColor(primary, 40)]}
                   height={220}
                   width={width}
                 />
               </View>
               <View style={styles.legendContainer}>
                 {[
-                  { name: "Transportation", color: "#22C55E" },
-                  { name: "Diet", color: "#AEDCA7" },
-                  { name: "Energy", color: "#66A570" },
+                  { name: "Transportation", color: darkenColor(primary, 0) },
+                  { name: "Diet", color: darkenColor(primary, 20) },
+                  { name: "Energy", color: darkenColor(primary, 40) },
                 ].map((item, index) => (
                   <View key={index} style={styles.legendItem}>
                     <View style={[styles.legendColor, { backgroundColor: item.color }]} />
@@ -201,7 +158,7 @@ const Breakdown = () => {
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</ThemedText>
               <View style={styles.legendContainer}>
                 {[
-                  { name: "You", color: "#22C55E" },
+                  { name: "You", color: primary },
                   { name: "Average American", color: "#A9A9A9" },
                 ].map((item, index) => (
                   <View key={index} style={styles.legendItem}>
@@ -220,7 +177,7 @@ const Breakdown = () => {
                 <BarChartBreakdown
                   names={["You", "Average American"]}
                   values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
-                  colors={["#22C55E", "#A9A9A9"]}
+                  colors={[primary, "#A9A9A9"]}
                   width={width - 104}
                   backgroundColor={card}
                 />
@@ -272,25 +229,19 @@ const Breakdown = () => {
           </View>
         </View>
         {/* Next Button */}
-        <View style={styles.nextButton}>
-          <TouchableOpacity
-            onPress={() => {
-              if (isAnonymous) {
-                router.navigate("/signup");
+        <NextButton
+          onPress={() => {
+            if (isAnonymous) {
+              router.navigate("/signup");
+            } else {
+              if (from === "survey") {
+                router.replace("/home");
               } else {
-                if (from === "survey") {
-                  router.replace("/home");
-                } else {
-                  router.navigate("/home");
-                }
+                router.navigate("/home");
               }
-            }}
-          >
-            <View style={styles.nextButtonInner}>
-              <Icon name="arrow-right" size={30} color={"#000"} />
-            </View>
-          </TouchableOpacity>
-        </View>
+            }
+          }}
+        />
       </ScrollView>
       <View style={styles.confettiContainer} pointerEvents="none">
         <ConfettiCannon
@@ -378,7 +329,6 @@ const styles = StyleSheet.create({
   },
 
   greenText: {
-    color: "#16a34a",
     fontSize: 20,
     marginBottom: 8,
   },
@@ -427,23 +377,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
-  },
-  nextButton: {
-    alignItems: "flex-end",
-    marginBottom: 40,
-    marginRight: 40,
-  },
-  nextButtonInner: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 9999,
-    borderWidth: 2,
-    height: 64,
-    width: 64,
-    borderColor: "black",
-    backgroundColor: "#22C55E",
-    justifyContent: "center",
-    alignItems: "center",
   },
   confettiContainer: {
     ...StyleSheet.absoluteFillObject,
