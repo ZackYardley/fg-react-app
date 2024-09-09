@@ -41,7 +41,6 @@
     "expo-build-properties": "~0.12.5",
     "expo-clipboard": "^6.0.3",
     "expo-constants": "^16.0.2",
-    "expo-dark-mode-switch": "^0.0.2",
     "expo-dev-client": "~4.0.25",
     "expo-font": "^12.0.8",
     "expo-image": "~1.12.13",
