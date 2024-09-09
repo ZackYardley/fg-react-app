@@ -3,19 +3,18 @@ import { View, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar } from "
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Feather";
-import { getAuth } from "firebase/auth";
-import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
-import { TransactionItem, CarbonCredit } from "@/types";
 import { router } from "expo-router";
-import { PageHeader, BackButton, ThemedSafeAreaView, ThemedView, GreenCircles } from "@/components/common";
-import { fetchOneTimePaymentSheetParams, requestCarbonCredits } from "@/api/purchase";
-import { formatPrice } from "@/utils";
-import { fetchSpecificCarbonCreditProduct } from "@/api/products";
-import { useStripe } from "@/utils/stripe";
 import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "firebase/auth";
+import { useStripe } from "@/utils/stripe";
 import { ActivityIndicator } from "react-native-paper";
-import { ThemedText } from "@/components/common";
+import { incrementQuantity, decrementQuantity, getCart, clearCart } from "@/api/cart";
+import { PageHeader, BackButton, ThemedSafeAreaView, ThemedView, GreenCircles, ThemedText } from "@/components/common";
+import { fetchOneTimePaymentSheetParams, requestCarbonCredits } from "@/api/purchase";
+import { fetchSpecificCarbonCreditProduct } from "@/api/products";
 import { useThemeColor } from "@/hooks";
+import { formatPrice } from "@/utils";
+import { TransactionItem, CarbonCredit } from "@/types";
 
 interface CartCarbonCredits extends TransactionItem, CarbonCredit {}
 
@@ -23,13 +22,16 @@ export default function ShoppingCartScreen() {
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
   const primary = useThemeColor({}, "primary");
+  const error = useThemeColor({}, "error");
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const auth = getAuth();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
   const [credits, setCredits] = useState<CartCarbonCredits[]>([]);
   const [loading, setLoading] = useState(true);
   const [isUpdatingQuantity, setIsUpdatingQuantity] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
   const paymentIntentIdRef = useRef<string | null>(null);
 
   // Function to calculate cart total
@@ -204,6 +206,20 @@ export default function ShoppingCartScreen() {
     }
   };
 
+  const handleClearCart = async () => {
+    try {
+      setLoading(true);
+      await clearCart();
+      setCredits([]);
+      Alert.alert("Cart Cleared", "All items have been removed from your cart.");
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      Alert.alert("Error", "Failed to clear the cart. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Render cart items
   const renderItem = ({ item }: { item: CartCarbonCredits }) => (
     <ThemedView style={styles.itemContainer}>
@@ -248,7 +264,6 @@ export default function ShoppingCartScreen() {
     </View>
   );
 
-  // TODO: This needs some flair
   const ListEmptyComponent = () =>
     loading ? (
       <View style={[styles.centered, { marginBottom: 16 }]}>
@@ -295,6 +310,13 @@ export default function ShoppingCartScreen() {
       >
         <ThemedText style={[styles.continueButtonText, { color: primary }]}>Continue Shopping</ThemedText>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.clearCartButton, { backgroundColor, borderColor: error }]}
+        onPress={handleClearCart}
+        disabled={credits.length === 0 || loading}
+      >
+        <ThemedText style={[styles.clearCartButtonText, { color: error }]}>Clear Cart</ThemedText>
+      </TouchableOpacity>
     </ThemedView>
   );
 
@@ -302,17 +324,15 @@ export default function ShoppingCartScreen() {
     <ThemedSafeAreaView style={styles.container}>
       <StatusBar />
       <GreenCircles />
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={credits}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={ListHeaderComponent}
-          ListEmptyComponent={ListEmptyComponent}
-          ListFooterComponent={ListFooterComponent}
-          contentContainerStyle={styles.flatList}
-        />
-      </View>
+      <FlatList
+        data={credits}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={ListHeaderComponent}
+        ListEmptyComponent={ListEmptyComponent}
+        ListFooterComponent={ListFooterComponent}
+        contentContainerStyle={styles.flatList}
+      />
     </ThemedSafeAreaView>
   );
 }
@@ -322,10 +342,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flatList: {
+    flexGrow: 1,
     paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 16,
-    flex: 1,
   },
   creditList: {
     marginBottom: 24,
@@ -372,6 +392,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   continueButtonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  clearCartButton: {
+    borderWidth: 2,
+    borderRadius: 50,
+    padding: 16,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  clearCartButtonText: {
     fontSize: 20,
     fontWeight: "bold",
   },

@@ -10,7 +10,7 @@ export default function SettingsLayout() {
     >
       <Stack.Screen name="profile-settings" />
       <Stack.Screen name="purchase-history" />
-      {/*<Stack.Screen name="notifications-settings" />*/}
+      <Stack.Screen name="general-settings" />
     </Stack>
   );
 }

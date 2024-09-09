@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet, Switch } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import messaging from "@react-native-firebase/messaging";
 import { Notifications } from "@/api/notifications";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { StatusBar } from "expo-status-bar";
+import { useTheme } from "@/contexts/ThemeContext";
 
-const NotificationSettingsScreen = () => {
+const THEME_STORAGE_KEY = "@app_theme";
+
+const GeneralSettingsScreen = () => {
+  const { theme, toggleTheme } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(theme === "dark");
 
   useEffect(() => {
     checkNotificationPermission();
@@ -23,6 +29,16 @@ const NotificationSettingsScreen = () => {
       if (permissionGranted) {
         setNotificationsEnabled(true);
       }
+    }
+  };
+
+  const handleThemeToggle = async (value: boolean) => {
+    setDarkModeEnabled(value);
+    toggleTheme();
+    try {
+      await AsyncStorage.setItem(THEME_STORAGE_KEY, value ? "dark" : "light");
+    } catch (error) {
+      console.error("Failed to save theme preference", error);
     }
   };
 
@@ -52,10 +68,11 @@ const NotificationSettingsScreen = () => {
       <ScrollView style={styles.container}>
         <View style={[styles.circle, styles.topLeftCircle]} />
         <View style={[styles.circle, styles.bottomRightCircle]} />
-        <PageHeader subtitle="Notification Settings" />
+        <PageHeader subtitle="General Settings" />
         <BackButton />
         <View style={styles.content}>
           <SettingItem title="Enable Notifications" value={notificationsEnabled} onValueChange={toggleNotifications} />
+          <SettingItem title="Dark Mode" value={darkModeEnabled} onValueChange={handleThemeToggle} />
         </View>
       </ScrollView>
     </ThemedSafeAreaView>
@@ -99,7 +116,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NotificationSettingsScreen;
+export default GeneralSettingsScreen;
 
 /*
   Log in to the Firebase Console (https://console.firebase.google.com/).

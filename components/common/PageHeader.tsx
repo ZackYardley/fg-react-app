@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet } from "react-native";
-import { ThemedText } from "@/components/common";
 import { useThemeColor } from "@/hooks";
 
 const PageHeader = ({
@@ -14,16 +13,17 @@ const PageHeader = ({
   description?: string;
 }) => {
   const primaryColor = useThemeColor({}, "primary");
+  const textColor = useThemeColor({}, "text");
 
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
-        <ThemedText style={styles.title}>
+        <Text style={[styles.title, { color: textColor }]}>
           {title}
           <Text style={{ color: primaryColor }}>{titleAlt}</Text>
-        </ThemedText>
-        <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
-        {description && <ThemedText style={styles.description}>{description}</ThemedText>}
+        </Text>
+        <Text style={[styles.subtitle, { color: textColor }]}>{subtitle}</Text>
+        {description && <Text style={[styles.description, { color: textColor }]}>{description}</Text>}
       </View>
     </View>
   );

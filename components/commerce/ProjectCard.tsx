@@ -8,10 +8,16 @@ import { formatPrice } from "@/utils";
 import { ThemedText, ThemedView } from "@/components/common";
 import { useThemeColor } from "@/hooks";
 
-const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
+interface ProjectCardProps {
+  project: CarbonCredit;
+  onAddToCart: () => void;
+}
+
+const ProjectCard = ({ project, onAddToCart }: ProjectCardProps) => {
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
   const primary = useThemeColor({}, "primary");
+  const onPrimary = useThemeColor({}, "onPrimary");
 
   const [quantity, setQuantity] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
@@ -47,7 +53,8 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
   const handleAddToCart = useCallback(() => {
     addToCart(project.id, project.name, "carbon_credit", quantity);
     setQuantity(1);
-  }, [project, quantity]);
+    onAddToCart(); // Emit event to parent
+  }, [project, quantity, onAddToCart]);
 
   if (!project) return null;
 
@@ -109,7 +116,7 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
           <ThemedText style={styles.totalPriceText}>{formatPrice(project.prices[0].unit_amount * quantity)}</ThemedText>
         </View>
         <TouchableOpacity style={[styles.addToCartButton, { backgroundColor: primary }]} onPress={handleAddToCart}>
-          <Icon name="shopping-cart" size={18} color="#fff" style={styles.cartIcon} />
+          <Icon name="shopping-cart" size={18} color={onPrimary} style={styles.cartIcon} />
           <ThemedText style={styles.addToCartText}>Add to Cart</ThemedText>
         </TouchableOpacity>
       </View>
@@ -206,8 +213,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 32,
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
   },
   totalText: {
     fontSize: 30,

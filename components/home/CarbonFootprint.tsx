@@ -24,6 +24,7 @@ const CarbonFootprintSection = ({
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
   const primary = useThemeColor({}, "primary");
+  const onPrimary = useThemeColor({}, "onPrimary");
 
   return (
     <View style={styles.footprintContainer}>
@@ -31,22 +32,22 @@ const CarbonFootprintSection = ({
         onPress={() => router.navigate("/breakdown")}
         style={[styles.footprintBox, isPositiveImpact ? { backgroundColor: positive } : { backgroundColor: negative }]}
       >
-        <ThemedText style={styles.boxTitle}>Your Monthly Emissions</ThemedText>
-        <ThemedText style={styles.footprintText}>
+        <ThemedText style={[styles.boxTitle, { color: onPrimary }]}>Your Monthly Emissions</ThemedText>
+        <ThemedText style={[styles.footprintText, { color: onPrimary }]}>
           {monthlyEmissions.toFixed(1)}
-          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+          <ThemedText style={[styles.footprintUnit, { color: onPrimary }]}> Tons of CO2</ThemedText>
         </ThemedText>
-        <ThemedText style={styles.offsetTitle}>Your Monthly Offsets</ThemedText>
-        <ThemedText style={styles.footprintText}>
+        <ThemedText style={[styles.offsetTitle, { color: onPrimary }]}>Your Monthly Offsets</ThemedText>
+        <ThemedText style={[styles.footprintText, { color: onPrimary }]}>
           {totalOffset.toFixed(1)}
-          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+          <ThemedText style={[styles.footprintUnit, { color: onPrimary }]}> Tons of CO2</ThemedText>
         </ThemedText>
-        <ThemedText style={styles.offsetTitle}>Net Impact</ThemedText>
-        <ThemedText style={styles.footprintText}>
+        <ThemedText style={[styles.offsetTitle, { color: onPrimary }]}>Net Impact</ThemedText>
+        <ThemedText style={[styles.footprintText, { color: onPrimary }]}>
           {netImpact.toFixed(1)}
-          <ThemedText style={styles.footprintUnit}> Tons of CO2</ThemedText>
+          <ThemedText style={[styles.footprintUnit, { color: onPrimary }]}> Tons of CO2</ThemedText>
         </ThemedText>
-        <ThemedText style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</ThemedText>
+        <ThemedText style={[styles.netZeroCheck, { color: onPrimary }]}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</ThemedText>
       </TouchableOpacity>
       <ThemedView style={{ width: "47%", borderRadius: 16, alignContent: "center", justifyContent: "center" }}>
         <TouchableOpacity onPress={() => router.push("/pre-survey")} style={styles.calculatorBox}>

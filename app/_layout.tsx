@@ -1,14 +1,15 @@
+import { useCallback, useEffect } from "react";
+import { Linking, Platform, Text, TextInput } from "react-native";
+import "react-native-reanimated";
+import { PaperProvider, TextInput as RNPTextInput } from "react-native-paper";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useEffect } from "react";
-import "react-native-reanimated";
-import { PaperProvider, TextInput as RNPTextInput } from "react-native-paper";
-import { Linking, Platform, Text, TextInput } from "react-native";
-import { StripeProvider, useStripe } from "@/utils/stripe";
 import { initializeFirebase } from "@/utils/firebaseConfig";
-import { Notifications } from "../api/notifications"; // Import the new module
+import { StripeProvider, useStripe } from "@/utils/stripe";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Notifications } from "@/api/notifications"; // Import the new module
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export default function RootLayout() {
   initializeFirebase();
@@ -16,7 +17,6 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-
   // Disable font scaling
   //@ts-ignore
   Text.defaultProps = { allowFontScaling: false };
@@ -81,19 +81,21 @@ export default function RootLayout() {
 
   return (
     <PaperProvider>
-      <StripeProvider
-        publishableKey="pk_test_51Pch2uJNQHxtxrkGVjNCflMy3L4mKNxA76N3W7vyowpCgVtKsisTowCdORHOZjBYsPYhuukodKiGF6FBRpj6FJPD00H3lUT9fK"
-        merchantIdentifier="merchant.com.fgdevteam.fgreactapp"
-      >
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
+      <ThemeProvider>
+        <StripeProvider
+          publishableKey="pk_test_51Pch2uJNQHxtxrkGVjNCflMy3L4mKNxA76N3W7vyowpCgVtKsisTowCdORHOZjBYsPYhuukodKiGF6FBRpj6FJPD00H3lUT9fK"
+          merchantIdentifier="merchant.com.fgdevteam.fgreactapp"
         >
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="index" />
-        </Stack>
-      </StripeProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="index" />
+          </Stack>
+        </StripeProvider>
+      </ThemeProvider>
     </PaperProvider>
   );
 }

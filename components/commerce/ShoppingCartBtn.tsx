@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { router } from "expo-router";
 import { useThemeColor } from "@/hooks";
-export const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
+const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
   const primary = useThemeColor({}, "primary");
 
   return (
@@ -19,6 +19,8 @@ export const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
     </TouchableOpacity>
   );
 };
+
+export default ShoppingCartBtn;
 
 const styles = StyleSheet.create({
   cartContainer: {

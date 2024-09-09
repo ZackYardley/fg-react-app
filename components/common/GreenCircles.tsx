@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 9999,
-    top: "15%",
+    top: "25%",
     left: "-25%",
   },
 });

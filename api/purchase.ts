@@ -140,6 +140,33 @@ const fetchSetupPaymentSheetParams = async (
   }
 };
 
+const validateRequestData = (data: any): boolean => {
+  const requiredFields = ["type", "items", "paymentIntentId", "status"];
+  for (const field of requiredFields) {
+    if (!data[field]) {
+      console.error(`Missing required field: ${field}`);
+      return false;
+    }
+  }
+
+  if (!Array.isArray(data.items) || data.items.length === 0) {
+    console.error("Items must be a non-empty array");
+    return false;
+  }
+
+  for (const item of data.items) {
+    const itemFields = ["id", "name", "productType", "quantity"];
+    for (const field of itemFields) {
+      if (item[field] === undefined) {
+        console.error(`Missing required field in item: ${field}`);
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
 const requestCarbonCredits = async (
   userId: string,
   items: TransactionItem[],
@@ -156,18 +183,14 @@ const requestCarbonCredits = async (
         name: item.name,
         productType: item.productType,
         quantity: item.quantity,
-        price: item.price,
       })),
       paymentIntentId,
       status: "pending",
       createdAt: serverTimestamp(),
     };
 
-    // Check for any undefined values
-    for (const [key, value] of Object.entries(docData)) {
-      if (value === undefined) {
-        throw new Error(`Undefined value for field: ${key}`);
-      }
+    if (!validateRequestData(docData)) {
+      throw new Error("Invalid request data");
     }
 
     await addDoc(requestsRef, docData);

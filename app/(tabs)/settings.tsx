@@ -13,6 +13,7 @@ import { fetchSubscriptionStatus } from "@/api/subscriptions";
 import { fetchCarbonCreditSubscription } from "@/api/products";
 import { useThemeColor } from "@/hooks";
 import { EmissionsOffset } from "@/components/home";
+import Switch from "expo-dark-mode-switch";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -38,6 +39,7 @@ export default function ProfileScreen() {
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [totalOffset, setTotalOffset] = useState(0);
+  const [value, setValue] = React.useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -214,7 +216,7 @@ export default function ProfileScreen() {
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
-            <View style={[styles.profileImageBG, {backgroundColor: primary}]}>
+            <View style={[styles.profileImageBG, { backgroundColor: primary }]}>
               {profilePicture ? (
                 <Image
                   style={styles.profileImage}
@@ -237,13 +239,12 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          <SettingsItem title="General Settings" screen="/general-settings" />
           <SettingsItem title="Profile Settings" screen="/profile-settings" />
           <SettingsItem title="Payment Methods" isDisabled={isUpdatingPaymentMethod} />
           <SettingsItem title="Purchase History" screen="/purchase-history" />
-          <SettingsItem title="Notifications" screen="/notifications-settings" />
           <SettingsItem title="Manage Subscriptions" screen="/subscriptions" />
           <SettingsItem title="Certificates" screen="/certificate" />
-
 
           <EmissionsOffset
             monthlyEmissions={monthlyEmissions}

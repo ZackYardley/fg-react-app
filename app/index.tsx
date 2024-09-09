@@ -1,17 +1,21 @@
-import { useRootNavigationState, Redirect, router } from "expo-router";
-import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect, useRef } from "react";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { fetchEmissionsData } from "@/api/emissions";
-import dayjs from "dayjs";
-import { Loading } from "@/components/common";
-import ConfettiCannon from "react-native-confetti-cannon";
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { testFetchCarbonCreditProducts, testFetchCarbonCreditsByPaymentId } from "@/api/debug";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRootNavigationState, Redirect, router } from "expo-router";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import dayjs from "dayjs";
+import ConfettiCannon from "react-native-confetti-cannon";
+import { fetchEmissionsData } from "@/api/emissions";
+import { testFetchCarbonCreditsByPaymentId } from "@/api/debug";
+import { Loading } from "@/components/common";
+import { useTheme } from "@/contexts/ThemeContext"; // Assuming you have this context
+import { THEME_STORAGE_KEY } from "@/constants";
 
 // Initialize debugMode with useState
 export default function Index() {
+  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [hasCalculatedEmissions, setHasCalculatedEmissions] = useState(false);
@@ -49,8 +53,23 @@ export default function Index() {
       }
     });
 
+    loadThemePreference();
+
     return () => unsubscribe();
   }, []);
+
+  const loadThemePreference = async () => {
+    try {
+      const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+      if (savedTheme) {
+        if (savedTheme !== theme) {
+          toggleTheme();
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load theme preference", error);
+    }
+  };
 
   if (!rootNavigationState?.key) return null;
 
@@ -111,11 +130,14 @@ export default function Index() {
               <Icon name="arrow-right" size={24} color="#FFF" />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={
-            // () => explosionRef.current?.start()
-            // () => testFetchCarbonCreditProducts()
-            () => testFetchCarbonCreditsByPaymentId("pi_3Pwwo2JNQHxtxrkG0b6OZarf")
-            }>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={
+              // () => explosionRef.current?.start()
+              // () => testFetchCarbonCreditProducts()
+              () => testFetchCarbonCreditsByPaymentId("pi_3Pwwo2JNQHxtxrkG0b6OZarf")
+            }
+          >
             <View style={styles.buttonContent}>
               <View style={styles.buttonLabel}>
                 <Icon name="smile-o" size={24} color="#FFF" />
