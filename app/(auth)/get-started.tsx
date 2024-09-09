@@ -84,10 +84,10 @@ export default function GetStartedScreen() {
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.contentContainer}>
-          <Text style={[styles.title, { color: textColor }]}>
+          <ThemedText style={styles.title}>
             Forever<Text style={{ color: primaryColor }}>green</Text>
-          </Text>
-          <Image style={styles.logo} source={TreeLogo} />
+          </ThemedText>
+          <Image style={styles.logo} source={TreeLogo} tintColor={primaryColor} />
         </View>
         <View style={styles.buttonContainer}>
           <GreenButton
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 20,
+    fontWeight: "bold",
     textAlign: "center",
-    fontWeight: "800",
   },
   loginLinkText: {
     fontWeight: "800",

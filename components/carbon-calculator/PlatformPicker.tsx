@@ -3,7 +3,6 @@ import { Platform, View, Text, Modal, FlatList, StyleSheet, Pressable } from "re
 import { Picker } from "@react-native-picker/picker";
 import { ThemedText } from "../common";
 import { useThemeColor } from "@/hooks";
-import { darkenColor } from "@/utils";
 
 interface PickerProps {
   selectedValue: string | undefined;

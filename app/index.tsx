@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { Loading } from "@/components/common";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { testFetchCarbonCreditProducts, testFetchCarbonCreditsByPaymentId } from "@/api/debug";
 
 // Initialize debugMode with useState
 export default function Index() {
@@ -110,7 +111,11 @@ export default function Index() {
               <Icon name="arrow-right" size={24} color="#FFF" />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => explosionRef.current?.start()}>
+          <TouchableOpacity style={styles.button} onPress={
+            // () => explosionRef.current?.start()
+            // () => testFetchCarbonCreditProducts()
+            () => testFetchCarbonCreditsByPaymentId("pi_3Pwwo2JNQHxtxrkG0b6OZarf")
+            }>
             <View style={styles.buttonContent}>
               <View style={styles.buttonLabel}>
                 <Icon name="smile-o" size={24} color="#FFF" />

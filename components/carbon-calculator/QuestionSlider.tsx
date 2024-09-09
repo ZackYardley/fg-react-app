@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Slider } from "@react-native-assets/slider";
 import { ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
 
 interface QuestionSliderProps {
   question: string;
@@ -21,6 +22,7 @@ const QuestionSlider = ({
   useColoredSlider = false, // Default to false for backwards compatibility
 }: QuestionSliderProps) => {
   const [localValue, setLocalValue] = useState(value);
+  const primaryColor = useThemeColor({}, "primary");
 
   useEffect(() => {
     setLocalValue(value);
@@ -31,7 +33,7 @@ const QuestionSlider = ({
       return { trackColor: "#8E8F8E", thumbColor: "#8E8F8E" };
     }
     if (val <= 2) {
-      return { trackColor: "#008450", thumbColor: "#008450" }; // Green shades
+      return { trackColor: primaryColor, thumbColor: primaryColor }; // Green shades
     } else if (val <= 5) {
       return { trackColor: "#EFB700", thumbColor: "#EFB700" }; // Yellow shades
     } else {

@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, StatusBar, TouchableOpacity } from "react-native";
 import { getRecentPayments } from "@/api/payments";
 import { fetchRecentInvoices } from "@/api/subscriptions";
-import { Payment, Invoice } from "@/types";
+import { Payment, Invoice, CarbonCredit } from "@/types";
 import { BackButton, Loading, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
 import { formatDate, formatPrice } from "@/utils";
 import { router } from "expo-router";
-import { printToFileAsync } from 'expo-print';
-import { shareAsync } from 'expo-sharing';
+import { printToFileAsync } from "expo-print";
+import { shareAsync } from "expo-sharing";
+import { fetchCarbonCreditsByPaymentId } from "@/api/products";
 
 interface CertificateData {
   type: "payment" | "invoice";
   data: Payment | Invoice;
+  carbonCredit?: CarbonCredit[];
 }
 
 interface Credit {
@@ -45,7 +47,18 @@ const PurchaseHistoryScreen = () => {
         // Sort by date, most recent first
         combinedHistory.sort((a, b) => b.data.created - a.data.created);
 
-        setPurchaseHistory(combinedHistory);
+        // Fetch carbon credit details for payments
+        const historyWithCarbonCredits = await Promise.all(
+          combinedHistory.map(async (item) => {
+            if (item.type === "payment") {
+              const carbonCredit = await fetchCarbonCreditsByPaymentId(item.data.id);
+              return { ...item, carbonCredit };
+            }
+            return item;
+          })
+        );
+        console.log(historyWithCarbonCredits);
+        setPurchaseHistory(historyWithCarbonCredits);
       } catch (error) {
         console.error("Error fetching purchase history:", error);
       } finally {
@@ -56,63 +69,74 @@ const PurchaseHistoryScreen = () => {
     fetchPurchaseHistory();
   }, []);
 
-  const generatePdf = async (item: CertificateData) => {
+  const generateMultiPagePdf = async (items: CertificateData) => {
     try {
-      const html = generateHtml(item);
-      const file = await printToFileAsync({ 
-        html: html,
-        base64: false
+      // Generate HTML for each item
+      items.carbonCredit = items.carbonCredit || [];
+      const htmlPages = items.carbonCredit.map((credit) => generateHtml(credit));
+      // Combine all HTML pages into a single string, separated by page breaks
+      const combinedHtml = htmlPages.join('<div style="page-break-after: always;"></div>');
+      // Generate PDF from combined HTML
+      const file = await printToFileAsync({
+        html: combinedHtml,
+        base64: false,
       });
+      // Share the generated PDF
       await shareAsync(file.uri);
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      console.error("Error generating multi-page PDF:", error);
     }
   };
 
-  const generateHtml = (item: CertificateData) => {
-    const data = item.data;
-    const isPaymentData = isPayment(data);
-    
+  const generateHtml = (item: CarbonCredit) => {
     return `
       <!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Carbon Offset Certificate</title>
+          <title>${item.stripe_metadata_certificate_title || "Certificate of Verified Carbon Unit (VCU) Retirement"}</title>
           <style>
               body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-              .certificate { border: 2px solid #000; padding: 20px; max-width: 600px; margin: 0 auto; }
-              .header { text-align: center; margin-bottom: 20px; }
+              .certificate { border: 2px solid #000; padding: 40px; max-width: 800px; margin: 0 auto; position: relative; }
+              .logo { position: absolute; top: 20px; height: 40px; }
+              .logo-left { left: 20px; }
+              .logo-right { right: 20px; }
+              .logo-center { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); height: 60px; }
+              .header { text-align: center; margin-top: 120px; margin-bottom: 30px; }
               .content { margin-bottom: 20px; }
-              .footer { text-align: center; margin-top: 20px; }
+              .content h2 { margin-bottom: 5px; }
+              .content p { margin-top: 0; }
+              .footer { text-align: center; margin-top: 40px; }
+              .icon { position: absolute; bottom: 20px; right: 20px; width: 60px; height: 60px; }
           </style>
       </head>
       <body>
           <div class="certificate">
+              <img src="${item.stripe_metadata_fg_logo}" alt="Forevergreen" class="logo logo-left">
+              <img src="${item.stripe_metadata_mini_standard}" alt="Verra" class="logo logo-right">
+              <img src="${item.stripe_metadata_standard_logo}" alt="Verified Carbon Standard" class="logo-center">
+              
               <div class="header">
-                  <h1>Carbon Offset Certificate</h1>
-                  <h2>${isPaymentData ? "Payment" : "Invoice"} Details</h2>
+                  <h1>${item.stripe_metadata_certificate_title || "Certificate of Verified Carbon Unit (VCU) Retirement"}</h1>
+                  <p>${item.stripe_metadata_quantity || "1"} Carbon Credit retired to offset ${item.stripe_metadata_quantity || "1"} Ton of CO2 on behalf of ${item.stripe_metadata_your_purchase || "Name"}</p>
               </div>
+              
               <div class="content">
-                  <p><strong>Date:</strong> ${formatDate(data.created)}</p>
-                  <p><strong>Amount:</strong> ${isPaymentData ? formatPrice(data.amount) : formatPrice(data.total)}</p>
-                  <p><strong>${isPaymentData ? "Transaction ID" : "Invoice Number"}:</strong> ${isPaymentData ? data.id : data.number}</p>
-                  ${isPaymentData && data.metadata.items ? `
-                    <h3>Credits</h3>
-                    <ul>
-                      ${data.metadata.items.map((credit: Credit) => `
-                        <li>${credit.name || "Unknown Credit"}: ${credit.quantity} x ${formatPrice(credit.price)}</li>
-                      `).join('')}
-                    </ul>
-                  ` : ''}
-                  ${!isPaymentData && data.lines.data.length > 0 ? `
-                    <p><strong>Description:</strong> ${data.lines.data[0].description}</p>
-                  ` : ''}
+                  <h2>Project Name:</h2>
+                  <p>${item.stripe_metadata_project_name}</p>
+                  
+                  <h2>VCU Serial Number:</h2>
+                  <p>${item.stripe_metadata_serial_number}</p>
+                  
+                  <h2>Retirement Reason</h2>
+                  <p>${item.stripe_metadata_retirement_reason}</p>
+                  
+                  <h2>${item.stripe_metadata_registry_title || "Registry Link"}:</h2>
+                  <p><a href="${item.stripe_metadata_registry_link}">${item.stripe_metadata_registry_link}</a></p>
               </div>
-              <div class="footer">
-                  <p>Thank you for your contribution to carbon offset!</p>
-              </div>
+              
+              <img src="${item.stripe_metadata_cta}" alt="Energy Icon" class="icon">
           </div>
       </body>
       </html>
@@ -121,7 +145,7 @@ const PurchaseHistoryScreen = () => {
 
   const renderPurchaseItem = ({ item }: { item: CertificateData }) => {
     const data = item.data;
-    
+
     return (
       <ThemedView style={styles.paymentCard}>
         <View style={styles.paymentHeader}>
@@ -130,33 +154,41 @@ const PurchaseHistoryScreen = () => {
             {isPayment(data) ? formatPrice(data.amount) : formatPrice(data.total)}
           </ThemedText>
         </View>
-        {isPayment(data) && data.metadata.items?.map((credit: Credit, index: number) => (
-          <View key={index} style={styles.creditItem}>
-            <ThemedText style={styles.creditName}>{credit.name || "Unknown Credit"}</ThemedText>
-            <ThemedText style={styles.creditQuantity}>
-              {credit.quantity} x {formatPrice(credit.price)}
-            </ThemedText>
-          </View>
-        ))}
+        {isPayment(data) &&
+          data.metadata.items?.map((credit: Credit, index: number) => (
+            <View key={index} style={styles.creditItem}>
+              <ThemedText style={styles.creditName}>{credit.name || "Unknown Credit"}</ThemedText>
+              <ThemedText style={styles.creditQuantity}>
+                {credit.quantity} x {formatPrice(credit.price)}
+              </ThemedText>
+            </View>
+          ))}
         {isInvoice(data) && data.lines.data.length > 0 && (
           <View style={styles.creditItem}>
             <ThemedText style={styles.creditName}>{data.lines.data[0].description}</ThemedText>
+          </View>
+        )}
+        {item.carbonCredit && item.carbonCredit.length > 0 && (
+          <View style={styles.carbonCreditsContainer}>
+            <ThemedText style={styles.carbonCreditsTitle}>Carbon Credits:</ThemedText>
+            {item.carbonCredit.map((credit, index) => (
+              <ThemedText key={index} style={styles.carbonCreditItem}>
+                {credit.stripe_metadata_project_name} - {credit.stripe_metadata_quantity || 1} ton(s)
+              </ThemedText>
+            ))}
           </View>
         )}
         <View style={styles.paymentMethodContainer}>
           <ThemedText style={styles.paymentMethod}>
             {isPayment(data) ? "Transaction ID:" : "Invoice Number:"}
           </ThemedText>
-          <ThemedText style={styles.paymentMethod}>
-            {isPayment(data) ? data.id : data.number}
-          </ThemedText>
+          <ThemedText style={styles.paymentMethod}>{isPayment(data) ? data.id : data.number}</ThemedText>
         </View>
-        <TouchableOpacity 
-          style={styles.generateButton} 
-          onPress={() => generatePdf(item)}
-        >
-          <ThemedText style={styles.generateButtonText}>Generate PDF</ThemedText>
-        </TouchableOpacity>
+        {item.carbonCredit && item.carbonCredit.length > 0 && (
+          <TouchableOpacity style={styles.generateButton} onPress={() => generateMultiPagePdf(item)}>
+            <ThemedText style={styles.generateButtonText}>Generate Certificates</ThemedText>
+          </TouchableOpacity>
+        )}
       </ThemedView>
     );
   };
@@ -212,6 +244,19 @@ const styles = StyleSheet.create({
   creditName: {
     fontSize: 16,
   },
+  carbonCreditsContainer: {
+    marginTop: 10,
+  },
+  carbonCreditsTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  carbonCreditItem: {
+    fontSize: 14,
+    marginLeft: 10,
+  },
+
   creditQuantity: {
     fontSize: 16,
   },

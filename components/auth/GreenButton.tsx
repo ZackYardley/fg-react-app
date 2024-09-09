@@ -16,7 +16,6 @@ const GreenButton = ({
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const primaryColor = useThemeColor({}, "primary");
-  const textColor = useThemeColor({}, "text");
   const onPrimary = useThemeColor({}, "onPrimary");
 
   const handlePressIn = useCallback(() => {

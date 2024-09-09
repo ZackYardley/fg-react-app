@@ -119,13 +119,13 @@ const HomeScreen = () => {
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
                   values={[transportationEmissions, dietEmissions, energyEmissions]}
-                  colors={["#44945F", "#AEDCA7", "#66A570"]}
+                  colors={["#22C55E", "#AEDCA7", "#66A570"]}
                   width={Math.round(width / 3)}
                   height={100}
                 />
                 <View style={styles.legendContainer}>
                   <View style={styles.legendItem}>
-                    <View style={[styles.legendColor, { backgroundColor: "#44945F" }]} />
+                    <View style={[styles.legendColor, { backgroundColor: "#22C55E" }]} />
                     <ThemedText>Transportation</ThemedText>
                   </View>
                   <View style={styles.legendItem}>

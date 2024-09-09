@@ -50,7 +50,15 @@ interface CarbonCredit extends Product {
   stripe_metadata_registry_title: string;
   stripe_metadata_your_purchase: string;
   stripe_metadata_quantity: string;
-  isPlaceholder: boolean;
+  isPlaceholder: boolean;  
+  // Certificate Stuff
+  stripe_metadata_project_name: string;
+  stripe_metadata_certificate_title: string;
+  stripe_metadata_retirement_reason: string;
+  stripe_metadata_serial_number: string;
+  stripe_metadata_fg_logo: string;
+  stripe_metadata_standard_logo: string;
+  stripe_metadata_mini_standard: string
 }
 
 interface CarbonCreditSubscription extends Product {

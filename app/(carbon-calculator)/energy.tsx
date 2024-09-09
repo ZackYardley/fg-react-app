@@ -16,6 +16,7 @@ import {
 import { Loading, ThemedSafeAreaView, ThemedText } from "@/components/common";
 import { StateData, SurveyData, SurveyEmissions } from "@/types";
 import { useThemeColor } from "@/hooks";
+import { GreenButton } from "@/components/auth";
 
 export default function EnergyCalculator() {
   const onPrimary = useThemeColor({}, "onPrimary");
@@ -261,16 +262,12 @@ export default function EnergyCalculator() {
             />
           )}
 
-          <Pressable
-            style={[styles.locationButton, isProcessing && styles.locationButtonLoading]}
+          <GreenButton
+            title="Use my current location"
             onPress={handleUseCurrentLocation}
-            disabled={isProcessing}
-          >
-            <ThemedText style={[styles.locationButtonText, { color: onPrimary }]}>
-              {isProcessing ? "Loading..." : "Use my current location"}
-            </ThemedText>
-          </Pressable>
-
+            style={styles.locationButton}
+            textStyle={styles.locationButtonText}
+          />
           <NumberInput
             question="How much was your electric bill last month? ⚡"
             value={surveyData.electricBill || ""}
@@ -388,7 +385,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   locationButton: {
-    backgroundColor: "#22C55E",
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 50,

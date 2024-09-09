@@ -5,8 +5,9 @@
 
 export const Colors = {
   light: {
-    primary: "#16A34A",
-    onPrimary: "#FFF1F2",
+    // primary: "#16A34A",
+    primary: "#FFFFFF",
+    onPrimary: "#FFFFFF",
     card: "#FFFFFF",
     border: "#E4E4E7",
     text: "#09090B",
@@ -20,7 +21,8 @@ export const Colors = {
     error: "#A31B15",
   },
   dark: {
-    primary: "#22C55E",
+    // primary: "#22C55E",
+    primary: "#000000",
     onPrimary: "#F2F2F2",
     card: "#1C1917",
     border: "#27272A",

@@ -24,7 +24,8 @@ const TransportQuestion = ({
   const inputRef = useRef<any>(null);
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
-
+  const primaryColor = useThemeColor({}, "primary");
+  
   return (
     <View style={styles.container}>
       <ThemedText style={styles.questionText}>{question}</ThemedText>
@@ -37,7 +38,7 @@ const TransportQuestion = ({
                   value={option}
                   status={useTransport === option ? "checked" : "unchecked"}
                   onPress={() => setUseTransport(option)}
-                  color="#44945F"
+                  color={primaryColor}
                   uncheckedColor="#808080"
                 />
                 <ThemedText style={styles.optionText}>{option}</ThemedText>

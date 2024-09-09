@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   profileImageBG: {
-    backgroundColor: "#337946",
+    backgroundColor: "#22C55E",
     width: 110,
     height: 110,
     borderRadius: 60,

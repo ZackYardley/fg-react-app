@@ -177,14 +177,14 @@ const Breakdown = () => {
                 <PieChartBreakdown
                   names={["Transportation", "Diet", "Energy"]}
                   values={[transportationEmissions, dietEmissions, energyEmissions]}
-                  colors={["#44945F", "#AEDCA7", "#66A570"]}
+                  colors={["#22C55E", "#AEDCA7", "#66A570"]}
                   height={220}
                   width={width}
                 />
               </View>
               <View style={styles.legendContainer}>
                 {[
-                  { name: "Transportation", color: "#44945F" },
+                  { name: "Transportation", color: "#22C55E" },
                   { name: "Diet", color: "#AEDCA7" },
                   { name: "Energy", color: "#66A570" },
                 ].map((item, index) => (
@@ -201,7 +201,7 @@ const Breakdown = () => {
               <ThemedText style={[styles.cardTitle, { textAlign: "center" }]}>You vs the Average American</ThemedText>
               <View style={styles.legendContainer}>
                 {[
-                  { name: "You", color: "#44945F" },
+                  { name: "You", color: "#22C55E" },
                   { name: "Average American", color: "#A9A9A9" },
                 ].map((item, index) => (
                   <View key={index} style={styles.legendItem}>
@@ -220,7 +220,7 @@ const Breakdown = () => {
                 <BarChartBreakdown
                   names={["You", "Average American"]}
                   values={[totalEmissions, AVERAGE_AMERICAN_EMISSIONS]}
-                  colors={["#44945F", "#A9A9A9"]}
+                  colors={["#22C55E", "#A9A9A9"]}
                   width={width - 104}
                   backgroundColor={card}
                 />

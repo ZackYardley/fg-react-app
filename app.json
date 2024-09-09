@@ -20,7 +20,7 @@
       "entitlements": {
         "aps-environment": "production"
       },
-      "buildNumber": "5",
+      "buildNumber": "6",
       "associatedDomains": [
         "applinks:fg-react-app.web.app"
       ],

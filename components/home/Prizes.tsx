@@ -12,7 +12,9 @@ const Prizes = () => {
   const [journeyData, setJourneyData] = useState<JourneyDocument | null>(null);
   const backgroundColor = useThemeColor({}, "background");
   const positive = useThemeColor({}, "primary");
+  const success = useThemeColor({}, "success");
   const negative = useThemeColor({}, "negative");
+  const error = useThemeColor({}, "error");
   const carouselRef = useRef(null);
   const { width: screenWidth } = useWindowDimensions();
 
@@ -61,7 +63,7 @@ const Prizes = () => {
         <ThemedText style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</ThemedText>
         <View style={styles.prizeSection}>
           <TouchableOpacity
-            style={[styles.prizeBox, isNetZero ? {backgroundColor: positive} : {backgroundColor: negative}]}
+            style={[styles.prizeBox, isNetZero ? { backgroundColor: success } : { backgroundColor: error }]}
             onPress={() => router.push("/journey")}
           >
             <ThemedText style={styles.monthNetZeroText}>{displayNetZeroMonths}</ThemedText>

@@ -12,16 +12,18 @@ const PageHeader = ({
   subtitle?: string;
   description?: string;
 }) => {
-  const testColor = useThemeColor({}, "text");
+  const textColor = useThemeColor({}, "text");
+  const primaryColor = useThemeColor({}, "primary");
+  
   return (
     <View style={styles.header}>
       <View style={styles.headerContent}>
-        <Text style={[styles.title, { color: testColor }]}>
+        <Text style={[styles.title, { color: textColor }]}>
           {title}
-          <Text style={styles.titleGreen}>{titleAlt}</Text>
+          <Text style={{ color: primaryColor }}>{titleAlt}</Text>
         </Text>
-        <Text style={[styles.subtitle, { color: testColor }]}>{subtitle}</Text>
-        <Text style={[styles.description, { color: testColor }]}>{description}</Text>
+        <Text style={[styles.subtitle, { color: textColor }]}>{subtitle}</Text>
+        <Text style={[styles.description, { color: textColor }]}>{description}</Text>
       </View>
     </View>
   );
@@ -42,9 +44,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     maxWidth: 256,
-  },
-  titleGreen: {
-    color: "#22C55E",
   },
   subtitle: {
     fontSize: 24,

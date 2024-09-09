@@ -10,13 +10,19 @@ const NextButton = ({ isFormValid, onPress }: { isFormValid: boolean; onPress: (
       onPress();
     }
   };
+  const primaryColor = useThemeColor({}, "primary");
   const textColor = useThemeColor({}, "text");
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePress}>
-        <View style={[styles.button, isFormValid ? styles.validButton : styles.invalidButton]}>
-          <Icon name="arrow-right" size={30} color={isFormValid ? "#000" : "#AAA"} />
+        <View
+          style={[
+            styles.button,
+            isFormValid ? [styles.validButton, { backgroundColor: primaryColor }] : styles.invalidButton,
+          ]}
+        >
+          <Icon name="arrow-right" size={30} color={isFormValid ? textColor : "#AAA"} />
         </View>
       </TouchableOpacity>
     </View>
@@ -43,7 +49,6 @@ const styles = StyleSheet.create({
   },
   validButton: {
     borderColor: "black",
-    backgroundColor: "#22C55E",
   },
   invalidButton: {
     borderColor: "#D1D5DB", // Equivalent to Tailwind's gray-300

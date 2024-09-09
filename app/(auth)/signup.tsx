@@ -181,9 +181,6 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginBottom: 20,
   },
-  titleHighlight: {
-    color: "#22C55E",
-  },
   logoContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -205,16 +202,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   createAccountButton: {
-    backgroundColor: "#22C55E",
     borderRadius: 9999,
     padding: 16,
     marginTop: 32,
     borderWidth: 1,
-    borderColor: "#000",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
     elevation: 2,
   },
   createAccountButtonText: {
