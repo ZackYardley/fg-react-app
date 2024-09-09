@@ -111,7 +111,6 @@ export default function CarbonCreditScreen() {
   const renderHeader = () => (
     <>
       <PageHeader subtitle="Carbon Credits" description="Click on a project to learn more or purchase" />
-      <ShoppingCartBtn numItems={numItems} />
     </>
   );
 
@@ -163,16 +162,19 @@ export default function CarbonCreditScreen() {
     }
 
     return (
-      <FlatList
-        ListHeaderComponent={renderHeader}
-        data={credits}
-        renderItem={renderCreditItem}
-        keyExtractor={(item, index) => item.name + index}
-        numColumns={3}
-        columnWrapperStyle={styles.columnWrapper}
-        style={styles.flatList}
-        ListFooterComponent={renderFooter}
-      />
+      <>
+        <ShoppingCartBtn numItems={numItems} />
+        <FlatList
+          ListHeaderComponent={renderHeader}
+          data={credits}
+          renderItem={renderCreditItem}
+          keyExtractor={(item, index) => item.name + index}
+          numColumns={3}
+          columnWrapperStyle={styles.columnWrapper}
+          style={styles.flatList}
+          ListFooterComponent={renderFooter}
+        />
+      </>
     );
   };
 

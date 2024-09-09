@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#22C55E",
     borderRadius: 9999,
+    zIndex: 999,
   },
   badge: {
     position: "absolute",
