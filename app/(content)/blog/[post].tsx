@@ -70,14 +70,12 @@ export default function BlogPostPage() {
       <ScrollView contentContainerStyle={styles.scrollViewContent} contentInsetAdjustmentBehavior="automatic">
         <PageHeader subtitle="Blogs" />
         <BackButton />
-        <GreenCircles />
         <View style={styles.header}>
           <ThemedText style={styles.title}>{info.title}</ThemedText>
-          <View style={{ display: "flex", flexDirection: "row", gap: 8, alignItems: "center" }}>
+          {/* <View style={{ display: "flex", flexDirection: "row", gap: 8, alignItems: "center" }}>
             <Image source={Credit} style={styles.authorImage} />
             <ThemedText style={styles.subtitle}>{info.author}</ThemedText>
-          </View>
-          {/* <Image source={info.featuredImage} style={styles.featuredImage} contentFit="cover" /> */}
+          </View> */}
           <ThemedText style={styles.date}>{dayjs(info.date).format("MMM DD, YYYY")}</ThemedText>
         </View>
         <MDXStyles
