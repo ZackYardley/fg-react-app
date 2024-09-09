@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -51,6 +50,7 @@ const PurchaseCompleteScreen = () => {
   const card = useThemeColor({}, "card");
   const textColor = useThemeColor({}, "text");
   const primary = useThemeColor({}, "primary");
+  const accent = useThemeColor({}, "accent");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -230,18 +230,13 @@ const PurchaseCompleteScreen = () => {
           titleAlt={productType === "subscription" ? "subscription!" : "purchase!"}
         />
         <View style={{ paddingHorizontal: 16 }}>
-          <LinearGradient
-            style={styles.card}
-            colors={[card, darkenColor(card, 10)]}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          >
+          <LinearGradient style={styles.card} colors={[card, accent]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}>
             {productType === "subscription" ? renderSubscriptionContent() : renderOneTimePurchaseContent()}
           </LinearGradient>
 
           <LinearGradient
             style={styles.infoContainer}
-            colors={[card, darkenColor(card, 10)]}
+            colors={[card, accent]}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           >

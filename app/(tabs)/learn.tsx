@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { ScrollView, Pressable, View, StyleSheet, StatusBar, Dimensions, Image, Text } from "react-native";
+import { useState, useCallback } from "react";
+import { ScrollView, Pressable, View, StyleSheet, StatusBar, Image } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/api/subscriptions";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { Loading, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
+import { GreenCircles, Loading, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { Link, useFocusEffect } from "expo-router";
 import { Book, Camera, Blog, FastFacts, Credit, Newsletter, Methodology } from "@/constants/Images";
 import { useRouter } from "expo-router";
@@ -13,8 +13,8 @@ import { useThemeColor } from "@/hooks";
 const LearnScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
-  const success = useThemeColor({}, "success");
   const onPrimary = useThemeColor({}, "onPrimary");
+  const primary = useThemeColor({}, "primary");
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -61,11 +61,9 @@ const LearnScreen = () => {
   return (
     <ThemedSafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar />
+      <GreenCircles />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
-          <View style={[styles.circle, styles.topLeftCircle]} />
-          <View style={[styles.circle, styles.bottomRightCircle]} />
-
           <PageHeader subtitle="Learn" />
 
           {/* Resource Guides */}
@@ -77,7 +75,10 @@ const LearnScreen = () => {
                 <ThemedText style={styles.cardText}>
                   Check out our guides with info about how to live a sustainable lifestyle!{" "}
                 </ThemedText>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                <Pressable
+                  style={[styles.button, { backgroundColor: primary }]}
+                  onPress={() => handleOpenLink("https://www.forevergreen.earth/")}
+                >
                   <ThemedText style={[styles.buttonText, { color: onPrimary }]}>Explore</ThemedText>
                 </Pressable>
               </ThemedView>
@@ -96,7 +97,10 @@ const LearnScreen = () => {
                 <ThemedText style={styles.cardText}>
                   Follow at your own pace: courses about sustainable living!{" "}
                 </ThemedText>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                <Pressable
+                  style={[styles.button, { backgroundColor: primary }]}
+                  onPress={() => handleOpenLink("https://www.forevergreen.earth/")}
+                >
                   <ThemedText style={[styles.buttonText, { color: onPrimary }]}>Explore</ThemedText>
                 </Pressable>
               </ThemedView>
@@ -116,7 +120,7 @@ const LearnScreen = () => {
                   Blogs about hot climate topics: easy to read and educational!
                 </ThemedText>
                 <Link href="/blog" style={{ marginTop: 10 }}>
-                  <View style={[styles.button]}>
+                  <View style={[styles.button, { backgroundColor: primary }]}>
                     <ThemedText style={[styles.buttonText, { color: onPrimary }]}>Read Now</ThemedText>
                   </View>
                 </Link>
@@ -136,7 +140,10 @@ const LearnScreen = () => {
                 <ThemedText style={styles.cardText}>
                   Want a quick fact about climate related topics to expand your view?{" "}
                 </ThemedText>
-                <Pressable style={styles.button} onPress={() => handleOpenLink("https://www.forevergreen.earth/")}>
+                <Pressable
+                  style={[styles.button, { backgroundColor: primary }]}
+                  onPress={() => handleOpenLink("https://www.forevergreen.earth/")}
+                >
                   <ThemedText style={[styles.buttonText, { color: onPrimary }]}>View</ThemedText>
                 </Pressable>
               </ThemedView>
@@ -156,7 +163,7 @@ const LearnScreen = () => {
                   Learn more about Carbon Credits and what goes into our projects!{" "}
                 </ThemedText>
                 <Link href="/carbon-credit" style={{ marginTop: 10 }}>
-                  <View style={[styles.button]}>
+                  <View style={[styles.button, { backgroundColor: primary }]}>
                     <ThemedText style={[styles.buttonText, { color: onPrimary }]}>View</ThemedText>
                   </View>
                 </Link>
@@ -174,7 +181,7 @@ const LearnScreen = () => {
               <ThemedView style={styles.card}>
                 <ThemedText style={styles.cardTitle}>Methodology</ThemedText>
                 <ThemedText style={styles.cardText}>Find out how we calculate your emissions first-hand! </ThemedText>
-                <Pressable style={styles.button} onPress={handleOpenPdf}>
+                <Pressable style={[styles.button, { backgroundColor: primary }]} onPress={handleOpenPdf}>
                   <ThemedText style={[styles.buttonText, { color: onPrimary }]}>Learn More</ThemedText>
                 </Pressable>
               </ThemedView>
@@ -193,11 +200,14 @@ const LearnScreen = () => {
                 </ThemedText>
                 {isNewsletterSubscribed ? (
                   <View style={{ display: "flex", flexDirection: "row", gap: 8 }}>
-                    <Ionicons name="checkmark-circle" color={success} size={24} />
+                    <Ionicons name="checkmark-circle" color={primary} size={24} />
                     <ThemedText style={styles.buttonText}>Subscribed</ThemedText>
                   </View>
                 ) : (
-                  <Pressable style={styles.button} onPress={handleNewsletterSubscription}>
+                  <Pressable
+                    style={[styles.button, { backgroundColor: primary }]}
+                    onPress={handleNewsletterSubscription}
+                  >
                     <ThemedText style={styles.buttonText}>Subscribe</ThemedText>
                   </Pressable>
                 )}

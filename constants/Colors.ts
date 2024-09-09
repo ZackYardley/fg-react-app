@@ -5,9 +5,9 @@
 
 export const Colors = {
   light: {
-    // primary: "#16A34A",
-    primary: "#FFFFFF",
+    primary: "#16A34A",
     onPrimary: "#FFFFFF",
+    accent: "#E5F5F6",
     card: "#FFFFFF",
     border: "#E4E4E7",
     text: "#09090B",
@@ -22,8 +22,8 @@ export const Colors = {
   },
   dark: {
     primary: "#22C55E",
-    // primary: "#000000",
     onPrimary: "#F2F2F2",
+    accent: "#3B82F6",
     card: "#1C1917",
     border: "#27272A",
     text: "#F2F2F2",

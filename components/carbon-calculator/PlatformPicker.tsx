@@ -18,11 +18,12 @@ const IOSPicker = ({ selectedValue, onValueChange, items, disabled }: PickerProp
 
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor({}, "border");
 
   return (
     <View>
       <Pressable
-        style={[styles.iosPickerTrigger, { backgroundColor, borderColor: textColor }]}
+        style={[styles.iosPickerTrigger, { backgroundColor, borderColor: borderColor }]}
         onPress={() => !disabled && setIsPickerVisible(true)}
       >
         <ThemedText style={[styles.iosPickerTriggerText, disabled && styles.disabledText]}>
@@ -110,9 +111,7 @@ const PlatformPicker = Platform.select({
 
 const styles = StyleSheet.create({
   iosPickerTrigger: {
-    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
     borderRadius: 8,
     padding: 12,
     marginTop: 8,

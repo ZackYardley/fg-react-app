@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 12,
     borderRadius: 9999, // Very large number to ensure circular shape
-    borderWidth: 2,
+    borderWidth: 1,
     height: 64,
     width: 64,
     alignItems: "center",

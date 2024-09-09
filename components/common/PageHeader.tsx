@@ -23,7 +23,7 @@ const PageHeader = ({
           <Text style={{ color: primaryColor }}>{titleAlt}</Text>
         </ThemedText>
         <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
-        <ThemedText style={styles.description}>{description}</ThemedText>
+        {description && <ThemedText style={styles.description}>{description}</ThemedText>}
       </View>
     </View>
   );

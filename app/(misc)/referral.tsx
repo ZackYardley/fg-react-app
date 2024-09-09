@@ -1,15 +1,17 @@
 import { incrementUserReferrals, sendReferralEmail } from "@/api/referral";
-import { BackButton, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText } from "@/components/common";
+import { GreenButton } from "@/components/auth";
+import { BackButton, PageHeader, ThemedSafeAreaView, ThemedView, ThemedText, GreenCircles } from "@/components/common";
 import { useThemeColor } from "@/hooks";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, TextInput, KeyboardAvoidingView, ScrollView, StyleSheet, Alert } from "react-native";
 
 const ReferralForm = () => {
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor({}, "border");
   const auth = getAuth();
   const [friendName, setFriendName] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
@@ -59,8 +61,7 @@ const ReferralForm = () => {
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
-            <View style={styles.greenCircle1} />
-            <View style={styles.greenCircle2} />
+            <GreenCircles />
 
             <PageHeader subtitle="Refer a Friend" description="Help the Cause Today by Referring a Friend" />
             <BackButton />
@@ -69,7 +70,10 @@ const ReferralForm = () => {
               <View style={styles.inputContainer}>
                 <ThemedText style={styles.inputLabel}>Enter Your Friend's Name Below:</ThemedText>
                 <TextInput
-                  style={[styles.input, { backgroundColor, color: textColor }]}
+                  style={[
+                    styles.input,
+                    { backgroundColor, color: textColor, borderColor: borderColor, borderWidth: 1 },
+                  ]}
                   placeholder="Your Answer"
                   value={friendName}
                   onChangeText={setFriendName}
@@ -79,7 +83,10 @@ const ReferralForm = () => {
               <View style={styles.inputContainer}>
                 <ThemedText style={styles.inputLabel}>Enter Your Friend's Email Address Below:</ThemedText>
                 <TextInput
-                  style={[styles.input, { backgroundColor, color: textColor }]}
+                  style={[
+                    styles.input,
+                    { backgroundColor, color: textColor, borderColor: borderColor, borderWidth: 1 },
+                  ]}
                   placeholder="Your Answer"
                   value={friendEmail}
                   onChangeText={(text) => {
@@ -93,16 +100,17 @@ const ReferralForm = () => {
               <View style={styles.inputContainer}>
                 <ThemedText style={styles.inputLabel}>Enter a Note or Leave Blank:</ThemedText>
                 <TextInput
-                  style={[styles.input, { backgroundColor, color: textColor }]}
+                  style={[
+                    styles.input,
+                    { backgroundColor, color: textColor, marginBottom: 16, borderColor: borderColor, borderWidth: 1 },
+                  ]}
                   placeholder="Your Answer"
                   value={note}
                   onChangeText={setNote}
                   placeholderTextColor={"#B6ABAB"}
                 />
               </View>
-              <Pressable style={styles.submitButton} onPress={handleReferral}>
-                <Text style={styles.submitButtonText}>Submit</Text>
-              </Pressable>
+              <GreenButton title="Submit" onPress={handleReferral} />
             </ThemedView>
           </View>
         </ScrollView>
@@ -122,24 +130,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-  },
-  greenCircle1: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    backgroundColor: "#22C55E",
-    borderRadius: 150,
-    top: 200,
-    left: 200,
-  },
-  greenCircle2: {
-    position: "absolute",
-    width: 200,
-    height: 200,
-    backgroundColor: "#22C55E",
-    borderRadius: 100,
-    bottom: 100,
-    right: 300,
   },
   formContainer: {
     marginTop: 32,
@@ -171,19 +161,5 @@ const styles = StyleSheet.create({
     padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: "black",
-  },
-  submitButton: {
-    marginTop: 16,
-    marginHorizontal: 90,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    backgroundColor: "#22C55E",
-    borderRadius: 9999,
-  },
-  submitButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
   },
 });

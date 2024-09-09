@@ -3,7 +3,7 @@ import { Dimensions, View, StyleSheet, TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { fetchEmissionsData } from "@/api/emissions";
 import dayjs from "dayjs";
-import { Loading, ThemedText } from "@/components/common";
+import { Loading, ThemedText, ThemedView } from "@/components/common";
 import { router } from "expo-router";
 import { useThemeColor } from "@/hooks";
 
@@ -77,7 +77,7 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
   ];
 
   return (
-    <View style={[styles.emissionsGraph, { backgroundColor }]}>
+    <ThemedView style={styles.emissionsGraph}>
       <ThemedText style={styles.sectionTitle}>Your net-zero journey</ThemedText>
       <View style={styles.graphContainer}>
         <View>
@@ -106,15 +106,7 @@ const LineChartBreakdown = ({ userId }: { userId?: string }) => {
         </View>
         <Legend datasets={datasets} />
       </View>
-      <TouchableOpacity
-        style={styles.offsetButton}
-        onPress={() => {
-          router.push("/offset-now");
-        }}
-      >
-        <ThemedText style={styles.offsetButtonText}>Offset Now!</ThemedText>
-      </TouchableOpacity>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -139,7 +131,6 @@ const styles = StyleSheet.create({
   },
   offsetButton: {
     marginTop: 10,
-    backgroundColor: "#22C55E",
     borderRadius: 50,
     alignItems: "center",
     alignSelf: "center",

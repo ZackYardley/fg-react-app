@@ -23,6 +23,7 @@ export default function CarbonCreditScreen() {
   const [subscriptionPrice, setSubscriptionPrice] = useState<number | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const card = useThemeColor({}, "card");
+  const primary = useThemeColor({}, "primary");
 
   useEffect(() => {
     const initializeData = async () => {
@@ -130,7 +131,10 @@ export default function CarbonCreditScreen() {
           credits to make sure you are net zero every month. This is the easiest way to reduce your impact on the planet
           and support awesome climate projects!
         </ThemedText>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/carbon-credit-sub")}>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: primary }]}
+          onPress={() => router.push("/carbon-credit-sub")}
+        >
           <ThemedText style={styles.buttonText}>
             {loading
               ? "Loading..."
@@ -212,7 +216,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   button: {
-    backgroundColor: "#22C55E",
     padding: 16,
     marginHorizontal: "auto",
     borderRadius: 9999,

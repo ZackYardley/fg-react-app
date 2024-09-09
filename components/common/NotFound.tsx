@@ -1,20 +1,23 @@
 import { router } from "expo-router";
-import { StyleSheet, Image, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import { fourofour } from "@/constants/Images";
 import ThemedSafeAreaView from "./ThemedSafeAreaView";
 import ThemedText from "./ThemedText";
 import { useThemeColor } from "@/hooks";
 import { StatusBar } from "expo-status-bar";
+import { Image } from "expo-image";
 
 const NotFoundComponent = () => {
   const onPrimary = useThemeColor({}, "onPrimary");
+  const primary = useThemeColor({}, "primary");
+
   return (
     <ThemedSafeAreaView style={styles.container}>
       <StatusBar />
       <ThemedText style={styles.errorCode}>404</ThemedText>
       <ThemedText style={styles.errorMessage}>Page Not Found</ThemedText>
-      <Image source={fourofour} style={styles.image} />
-      <TouchableOpacity onPress={() => router.replace("/blog/clean-oceans-safe-seas")} style={styles.button}>
+      <Image source={fourofour} style={styles.image} tintColor={primary} />
+      <TouchableOpacity onPress={() => router.replace("/")} style={styles.button}>
         <Text style={[styles.buttonText, { color: onPrimary }]}>Back Home</Text>
       </TouchableOpacity>
     </ThemedSafeAreaView>

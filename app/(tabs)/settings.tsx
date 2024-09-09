@@ -25,6 +25,7 @@ interface SettingsItemProps {
 
 export default function ProfileScreen() {
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
   const { resetPaymentSheetCustomer, initPaymentSheet, presentPaymentSheet } = useStripe();
   const auth = getAuth();
 
@@ -213,7 +214,7 @@ export default function ProfileScreen() {
         <PageHeader subtitle="Settings" />
         <View style={styles.profileContainer}>
           <View style={styles.profileInfo}>
-            <View style={styles.profileImageBG}>
+            <View style={[styles.profileImageBG, {backgroundColor: primary}]}>
               {profilePicture ? (
                 <Image
                   style={styles.profileImage}
@@ -343,7 +344,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   profileImageBG: {
-    backgroundColor: "#22C55E",
     width: 110,
     height: 110,
     borderRadius: 60,

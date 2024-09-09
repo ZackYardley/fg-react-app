@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useThemeColor } from "@/hooks";
-import { ThemedText } from "../common";
+import { ThemedText, ThemedView } from "../common";
 import { useTheme } from "react-native-paper";
 
 const CarbonFootprintSection = ({
@@ -23,7 +23,7 @@ const CarbonFootprintSection = ({
 
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
-  const backgroundColor = useThemeColor({}, "card");
+  const primary = useThemeColor({}, "primary");
 
   return (
     <View style={styles.footprintContainer}>
@@ -48,43 +48,45 @@ const CarbonFootprintSection = ({
         </ThemedText>
         <ThemedText style={styles.netZeroCheck}>{isPositiveImpact ? "Net-Zero ✅" : "Net-Zero ❌"}</ThemedText>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.calculatorBox, { backgroundColor }]} onPress={() => router.push("/pre-survey")}>
-        <ThemedText style={styles.boxTitle}>Calculate your impact</ThemedText>
-        <View style={styles.calculator}>
-          {/* Calculator buttons */}
-          <>
-            <View style={styles.calculatorRow}>
-              <TextButton label="AC" style={styles.grayButton} />
-              <TextButton label="+/-" style={[styles.grayButton, styles.marginLeft]} />
-              <TextButton label="%" style={[styles.grayButton, styles.marginLeft]} />
-              <TextButton label="/" style={[styles.greenButton, styles.marginLeft]} />
-            </View>
-            <View style={styles.calculatorRow}>
-              <TextButton label="7" style={styles.darkButton} />
-              <TextButton label="8" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="9" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="X" style={[styles.greenButton, styles.marginLeft]} />
-            </View>
-            <View style={styles.calculatorRow}>
-              <TextButton label="4" style={styles.darkButton} />
-              <TextButton label="5" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="6" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="-" style={[styles.greenButton, styles.marginLeft]} />
-            </View>
-            <View style={styles.calculatorRow}>
-              <TextButton label="1" style={styles.darkButton} />
-              <TextButton label="2" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="3" style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="+" style={[styles.greenButton, styles.marginLeft]} />
-            </View>
-            <View style={styles.calculatorRow}>
-              <TextButton label="0" style={[styles.darkButton, styles.wideButton]} />
-              <TextButton label="." style={[styles.darkButton, styles.marginLeft]} />
-              <TextButton label="=" style={[styles.greenButton, styles.marginLeft]} />
-            </View>
-          </>
-        </View>
-      </TouchableOpacity>
+      <ThemedView style={{ width: "47%", borderRadius: 16, alignContent: "center", justifyContent: "center" }}>
+        <TouchableOpacity onPress={() => router.push("/pre-survey")} style={styles.calculatorBox}>
+          <ThemedText style={styles.boxTitle}>Calculate your impact</ThemedText>
+          <View style={styles.calculator}>
+            {/* Calculator buttons */}
+            <>
+              <View style={styles.calculatorRow}>
+                <TextButton label="AC" style={styles.grayButton} />
+                <TextButton label="+/-" style={[styles.grayButton, styles.marginLeft]} />
+                <TextButton label="%" style={[styles.grayButton, styles.marginLeft]} />
+                <TextButton label="/" style={[styles.greenButton, { backgroundColor: primary }, styles.marginLeft]} />
+              </View>
+              <View style={styles.calculatorRow}>
+                <TextButton label="7" style={styles.darkButton} />
+                <TextButton label="8" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="9" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="X" style={[styles.greenButton, { backgroundColor: primary }, styles.marginLeft]} />
+              </View>
+              <View style={styles.calculatorRow}>
+                <TextButton label="4" style={styles.darkButton} />
+                <TextButton label="5" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="6" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="-" style={[styles.greenButton, { backgroundColor: primary }, styles.marginLeft]} />
+              </View>
+              <View style={styles.calculatorRow}>
+                <TextButton label="1" style={styles.darkButton} />
+                <TextButton label="2" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="3" style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="+" style={[styles.greenButton, { backgroundColor: primary }, styles.marginLeft]} />
+              </View>
+              <View style={styles.calculatorRow}>
+                <TextButton label="0" style={[styles.darkButton, styles.wideButton]} />
+                <TextButton label="." style={[styles.darkButton, styles.marginLeft]} />
+                <TextButton label="=" style={[styles.greenButton, { backgroundColor: primary }, styles.marginLeft]} />
+              </View>
+            </>
+          </View>
+        </TouchableOpacity>
+      </ThemedView>
     </View>
   );
 };
@@ -101,8 +103,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   calculatorBox: {
-    borderRadius: 16,
-    width: "47%",
+    width: "100%",
     padding: 16,
   },
   boxTitle: {
@@ -147,7 +148,6 @@ const styles = StyleSheet.create({
     width: "22%",
   },
   greenButton: {
-    backgroundColor: "#22C55E",
     width: "22%",
   },
   wideButton: {

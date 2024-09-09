@@ -1,9 +1,15 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { router } from "expo-router";
+import { useThemeColor } from "@/hooks";
 export const ShoppingCartBtn = ({ numItems }: { numItems: number }) => {
+  const primary = useThemeColor({}, "primary");
+
   return (
-    <TouchableOpacity style={styles.cartContainer} onPress={() => router.navigate("/shopping-cart")}>
+    <TouchableOpacity
+      style={[styles.cartContainer, { backgroundColor: primary }]}
+      onPress={() => router.navigate("/shopping-cart")}
+    >
       <Icon name="shopping-cart" size={24} color="white" />
       {numItems > 0 && (
         <View style={styles.badge}>
@@ -20,7 +26,6 @@ const styles = StyleSheet.create({
     top: 16,
     right: 16,
     padding: 10,
-    backgroundColor: "#22C55E",
     borderRadius: 9999,
     zIndex: 999,
   },

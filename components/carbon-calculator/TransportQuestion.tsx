@@ -25,7 +25,8 @@ const TransportQuestion = ({
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
   const primaryColor = useThemeColor({}, "primary");
-  
+  const borderColor = useThemeColor({}, "border");
+
   return (
     <View style={styles.container}>
       <ThemedText style={styles.questionText}>{question}</ThemedText>
@@ -60,7 +61,8 @@ const TransportQuestion = ({
                 borderWidth: 1,
                 borderRadius: 10,
               }}
-              outlineColor="#D9D9D9"
+              outlineColor={borderColor}
+              activeOutlineColor={primaryColor}
               style={[styles.textInput, { backgroundColor }]}
               dense={true}
               textColor={textColor}

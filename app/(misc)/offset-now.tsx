@@ -6,11 +6,12 @@ import { isUserSubscribedMailChimp, updateUserSubscriptionMailChimp } from "@/ap
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { GreenButton } from "@/components/auth";
+import { GoogleButton, GreenButton } from "@/components/auth";
 import { useThemeColor } from "@/hooks";
 import { LinearGradient } from "expo-linear-gradient";
 import { Credit } from "@/constants/Images";
 import { Credits } from "@/components/home";
+import { darkenColor } from "@/utils";
 
 export default function OffsetNowScreen() {
   const [isNewsletterSubscribed, setIsNewsletterSubscribed] = useState(false);
@@ -21,8 +22,6 @@ export default function OffsetNowScreen() {
 
   const onPrimary = useThemeColor({}, "onPrimary");
   const primary = useThemeColor({}, "primary");
-  const background = useThemeColor({}, "background");
-  const text = useThemeColor({}, "text");
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -59,27 +58,29 @@ export default function OffsetNowScreen() {
         <View style={styles.content}>
           <ThemedView style={styles.carbonCreditSection}>
             <LinearGradient
-              colors={["#4CAF50", "#2E7D32"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              colors={[darkenColor(primary, 10), primary]}
+              start={{ x: 0.5, y: 0.6 }}
+              end={{ x: 0.5, y: 1 }}
               style={styles.gradientBackground}
             >
-              <ThemedText style={styles.sectionTitle}>Carbon Credit Subscription</ThemedText>
+              <ThemedText style={[styles.sectionTitle, { color: onPrimary }]}>Carbon Credit Subscription</ThemedText>
               <Credits justCredits />
-              <ThemedText style={styles.sectionText}>
+              <ThemedText style={[styles.sectionText, { color: onPrimary }]}>
                 Make a lasting impact with our carbon credit subscription. Offset your carbon footprint and support
                 innovative climate projects every month!
               </ThemedText>
               <View style={styles.buttonContainer}>
-                <GreenButton
+                <GoogleButton
                   title="Buy a credit"
                   onPress={() => router.navigate("/carbon-credit")}
                   style={styles.carbonButton}
+                  noLogo
                 />
-                <GreenButton
+                <GoogleButton
                   title="Start Subscription"
                   onPress={() => router.navigate("/carbon-credit-sub")}
                   style={styles.carbonButton}
+                  noLogo
                 />
               </View>
             </LinearGradient>
@@ -135,17 +136,12 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 24,
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   gradientBackground: {
     padding: 24,
     alignItems: "center",
   },
   section: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
@@ -155,7 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
-    color: "#FFFFFF",
   },
   sectionIcon: {
     width: 80,
@@ -166,7 +161,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 24,
     textAlign: "center",
-    color: "#FFFFFF",
     lineHeight: 24,
   },
   buttonContainer: {

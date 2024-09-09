@@ -1,7 +1,8 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { ThemedText } from "@/components/common";
+import { ThemedText, ThemedView } from "@/components/common";
 import { useThemeColor } from "@/hooks";
+import { GreenButton } from "../auth";
 
 const EmissionsOffset = ({
   monthlyEmissions,
@@ -18,10 +19,10 @@ const EmissionsOffset = ({
 }) => {
   const positive = useThemeColor({}, "primary");
   const negative = useThemeColor({}, "error");
-  const backgroundColor = useThemeColor({}, "card");
+  const primary = useThemeColor({}, "primary");
 
   return (
-    <View style={[styles.carbonFootprint, { backgroundColor }]}>
+    <ThemedView style={styles.carbonFootprint}>
       <ThemedText style={styles.carbonFootprintTitle}>Your Carbon Footprint</ThemedText>
       <View style={styles.carbonFootprintContent}>
         <View style={styles.section}>
@@ -46,10 +47,13 @@ const EmissionsOffset = ({
           : "You are not net-zero this month! 😔"}
       </ThemedText>
 
-      <TouchableOpacity onPress={() => router.navigate("/offset-now")} style={styles.offsetButton}>
-        <ThemedText style={styles.offsetButtonText}>Offset Now!</ThemedText>
-      </TouchableOpacity>
-    </View>
+      <GreenButton
+        onPress={() => router.navigate("/offset-now")}
+        title="Offset Now!"
+        style={styles.offsetButton}
+        textStyle={styles.offsetButtonText}
+      />
+    </ThemedView>
   );
 };
 
@@ -102,15 +106,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   offsetButton: {
-    marginTop: 10,
-    backgroundColor: "#22C55E",
+    marginTop: 16,
     borderRadius: 50,
     alignItems: "center",
     alignSelf: "center",
     justifyContent: "center",
-    height: 40,
-    width: 150,
-    paddingVertical: 4,
+    paddingVertical: 8,
     paddingHorizontal: 16,
   },
   offsetButtonText: {

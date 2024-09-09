@@ -277,8 +277,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 24,
-    paddingTop: 8,
   },
   card: {
     elevation: 5,

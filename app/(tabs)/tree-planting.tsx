@@ -96,7 +96,7 @@ export default function TreePlantingScreen() {
           onBackdropPress={handleWaitlistNo}
           overlayStyle={{ backgroundColor: backgroundColor }}
         >
-          <ThemedView style={styles.overlayContent}>
+          <View style={styles.overlayContent}>
             <ThemedText style={styles.overlayText}>{loading ? "Loading..." : message}</ThemedText>
             <View style={styles.overlayButtonsContainer}>
               {isWaitlisted || loading ? (
@@ -114,7 +114,7 @@ export default function TreePlantingScreen() {
                 </>
               )}
             </View>
-          </ThemedView>
+          </View>
         </Overlay>
 
         <PageHeader subtitle="Tree Planting" description="Subscribe today to plant a tree monthly!" />

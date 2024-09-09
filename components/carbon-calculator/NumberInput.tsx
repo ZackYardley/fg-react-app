@@ -24,6 +24,8 @@ const NumberInput = ({
   const inputRef = useRef<any>(null);
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
+  const borderColor = useThemeColor({}, "border");
+  const primaryColor = useThemeColor({}, "primary");
 
   return (
     <>
@@ -36,7 +38,8 @@ const NumberInput = ({
         keyboardType="numeric"
         mode="outlined"
         outlineStyle={styles.outlineStyle}
-        outlineColor="#D9D9D9"
+        outlineColor={borderColor}
+        activeOutlineColor={primaryColor}
         style={[styles.input, { backgroundColor }]}
         textColor={textColor}
         right={label ? <TextInput.Affix text={label} textStyle={[styles.affixText, { color: textColor }]} /> : null}

@@ -11,9 +11,7 @@ import { JourneyDocument } from "@/types";
 const Prizes = () => {
   const [journeyData, setJourneyData] = useState<JourneyDocument | null>(null);
   const backgroundColor = useThemeColor({}, "background");
-  const positive = useThemeColor({}, "primary");
-  const success = useThemeColor({}, "success");
-  const negative = useThemeColor({}, "negative");
+  const primary = useThemeColor({}, "primary");
   const error = useThemeColor({}, "error");
   const carouselRef = useRef(null);
   const { width: screenWidth } = useWindowDimensions();
@@ -24,7 +22,7 @@ const Prizes = () => {
         const data = await fetchJourneyData();
         setJourneyData(data);
       } catch (error) {
-        console.error('Error loading journey data:', error);
+        console.error("Error loading journey data:", error);
         // Handle error (e.g., show an error message to the user)
       }
     };
@@ -41,14 +39,14 @@ const Prizes = () => {
     { title: "24 Months Net-Zero", image: Crewneck, months: 24 },
   ];
 
-  const renderCarouselItem = ({ item }: { item: typeof carouselData[0] }) => (
+  const renderCarouselItem = ({ item }: { item: (typeof carouselData)[0] }) => (
     <View style={styles.carouselItem}>
-      <Image 
-        source={item.image} 
+      <Image
+        source={item.image}
         style={[
           styles.carouselImage,
-          (journeyData?.netZeroMonths || 0) >= item.months ? styles.unlockedImage : styles.lockedImage
-        ]} 
+          (journeyData?.netZeroMonths || 0) >= item.months ? styles.unlockedImage : styles.lockedImage,
+        ]}
       />
       <ThemedText style={styles.carouselText}>{item.title}</ThemedText>
     </View>
@@ -63,7 +61,7 @@ const Prizes = () => {
         <ThemedText style={styles.chartTitle}>Be Net-Zero, Earn Prizes!</ThemedText>
         <View style={styles.prizeSection}>
           <TouchableOpacity
-            style={[styles.prizeBox, isNetZero ? { backgroundColor: success } : { backgroundColor: error }]}
+            style={[styles.prizeBox, isNetZero ? { backgroundColor: primary } : { backgroundColor: error }]}
             onPress={() => router.push("/journey")}
           >
             <ThemedText style={styles.monthNetZeroText}>{displayNetZeroMonths}</ThemedText>
@@ -86,7 +84,6 @@ const Prizes = () => {
     </ThemedView>
   );
 };
-
 
 export default Prizes;
 

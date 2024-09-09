@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
-    color: "#22C55E",
+    color: "#16A34A",
     textDecorationLine: "underline",
   },
   feature: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   webButton: {
-    backgroundColor: "#22C55E",
+    backgroundColor: "#16A34A",
     borderRadius: 50,
     paddingHorizontal: 40,
     borderWidth: 0,

@@ -9,9 +9,13 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useThemeColor } from "@/hooks";
 import { StatusBar } from "expo-status-bar";
+import { GreenButton } from "@/components/auth";
 
 export default function ProfileSettings() {
   const textColor = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
+  const borderColor = useThemeColor({}, "border");
+
   const auth = getAuth();
   const storage = getStorage();
 
@@ -19,7 +23,6 @@ export default function ProfileSettings() {
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [profileImage, setProfileImage] = useState(user?.photoURL || null);
   const [isEmailVerified, setIsEmailVerified] = useState(user?.emailVerified || false);
-
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -97,8 +100,8 @@ export default function ProfileSettings() {
         <BackButton />
 
         <View style={{ paddingHorizontal: 20 }}>
-          <View style={styles.profileImageContainer}>
-            <TouchableOpacity style={styles.profileImageButton} onPress={pickImage}>
+          <View style={[styles.profileImageContainer, { borderColor: primary }]}>
+            <TouchableOpacity style={[styles.profileImageButton, { backgroundColor: primary }]} onPress={pickImage}>
               {profileImage ? (
                 <>
                   <Image style={styles.profileImage} source={{ uri: profileImage }} contentFit="cover" />
@@ -108,8 +111,8 @@ export default function ProfileSettings() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.profileImageText}>+</Text>
-                  <Text style={styles.uploadText}>Upload a profile picture!</Text>
+                  <ThemedText style={styles.profileImageText}>+</ThemedText>
+                  <ThemedText style={styles.uploadText}>Upload a profile picture!</ThemedText>
                 </>
               )}
             </TouchableOpacity>
@@ -118,7 +121,7 @@ export default function ProfileSettings() {
           <View style={styles.form}>
             <ThemedText style={styles.label}>Display Name</ThemedText>
             <TextInput
-              style={[styles.input, { color: textColor }]}
+              style={[styles.input, { color: textColor, borderColor }]}
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Enter your name"
@@ -139,9 +142,7 @@ export default function ProfileSettings() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.saveButton} onPress={saveProfile}>
-            <ThemedText style={styles.saveButtonText}>Save</ThemedText>
-          </TouchableOpacity>
+          <GreenButton title="Save Profile" onPress={saveProfile} />
         </View>
       </ScrollView>
     </ThemedSafeAreaView>
@@ -155,12 +156,17 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: "center",
     marginBottom: 30,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderStyle: "dashed",
+    padding: 10,
+    borderRadius: 9999,
+    marginHorizontal: "auto",
   },
   profileImageButton: {
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: "#22C55E",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -185,7 +191,6 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     marginTop: 10,
-    color: "#22C55E",
     fontSize: 18,
     fontWeight: "500",
   },
@@ -211,7 +216,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: "#22C55E",
     borderRadius: 30,
     padding: 10,
     alignItems: "center",

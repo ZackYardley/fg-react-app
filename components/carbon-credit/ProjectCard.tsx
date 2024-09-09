@@ -11,6 +11,7 @@ import { useThemeColor } from "@/hooks";
 const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
   const textColor = useThemeColor({}, "text");
   const backgroundColor = useThemeColor({}, "background");
+  const primary = useThemeColor({}, "primary");
 
   const [quantity, setQuantity] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
@@ -107,7 +108,7 @@ const ProjectCard: React.FC<{ project: CarbonCredit }> = ({ project }) => {
         <View style={styles.totalPriceContainer}>
           <ThemedText style={styles.totalPriceText}>{formatPrice(project.prices[0].unit_amount * quantity)}</ThemedText>
         </View>
-        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+        <TouchableOpacity style={[styles.addToCartButton, { backgroundColor: primary }]} onPress={handleAddToCart}>
           <Icon name="shopping-cart" size={18} color="#fff" style={styles.cartIcon} />
           <ThemedText style={styles.addToCartText}>Add to Cart</ThemedText>
         </TouchableOpacity>
@@ -221,7 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   addToCartButton: {
-    backgroundColor: "#22C55E",
     padding: 8,
     borderRadius: 24,
     flexDirection: "row",

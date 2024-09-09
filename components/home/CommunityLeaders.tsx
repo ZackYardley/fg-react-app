@@ -3,10 +3,13 @@ import { View, Pressable, StyleSheet } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { getTopReferrers } from "@/api/referral";
 import { ThemedView, ThemedText } from "../common";
+import { useThemeColor } from "@/hooks";
+import { GreenButton } from "../auth";
 
 const CommunityLeaders = () => {
   const [topReferrers, setTopReferrers] = useState<{ userId: string; name: string; totalReferrals: number }[]>([]);
   const [focused, setFocused] = useState(false);
+  const primary = useThemeColor({}, "primary");
 
   useEffect(() => {
     const loadData = async () => {
@@ -49,9 +52,12 @@ const CommunityLeaders = () => {
             </ThemedText>
           )}
         </View>
-        <Pressable style={styles.referButton} onPress={() => router.push("/referral")}>
-          <ThemedText style={styles.referButtonText}>Refer a friend!</ThemedText>
-        </Pressable>
+        <GreenButton
+          onPress={() => router.push("/referral")}
+          title="Refer a friend!"
+          style={styles.referButton}
+          textStyle={styles.referButtonText}
+        />
       </ThemedView>
     </View>
   );
@@ -84,13 +90,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   referButton: {
-    backgroundColor: "#22C55E",
-    marginLeft: 5,
     borderRadius: 50,
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
-    width: 150,
   },
   referButtonText: {
     color: "white",

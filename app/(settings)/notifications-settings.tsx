@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Switch } from "react-native";
+import { View, ScrollView, StyleSheet, Switch } from "react-native";
 import messaging from "@react-native-firebase/messaging";
 import { Notifications } from "@/api/notifications";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { BackButton, PageHeader, ThemedSafeAreaView, ThemedText, ThemedView } from "@/components/common";
 import { StatusBar } from "expo-status-bar";
 
